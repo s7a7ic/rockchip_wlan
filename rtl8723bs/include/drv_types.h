@@ -122,10 +122,6 @@ typedef struct _ADAPTER _adapter, ADAPTER, *PADAPTER;
 	#include <rtw_tdls.h>
 #endif /* CONFIG_TDLS */
 
-#ifdef CONFIG_WAPI_SUPPORT
-	#include <rtw_wapi.h>
-#endif /* CONFIG_WAPI_SUPPORT */
-
 #ifdef CONFIG_DRVEXT_MODULE
 	#include <drvext_api.h>
 #endif /* CONFIG_DRVEXT_MODULE */
@@ -537,8 +533,6 @@ struct rx_logs {
 	u32 core_rx_pre_ctrl;
 	u32 core_rx_pre_ctrl_err;
 	u32 core_rx_pre_data;
-	u32 core_rx_pre_data_wapi_seq_err;
-	u32 core_rx_pre_data_wapi_key_err;
 	u32 core_rx_pre_data_handled;
 	u32 core_rx_pre_data_err;
 	u32 core_rx_pre_data_unknown;
@@ -550,7 +544,6 @@ struct rx_logs {
 	u32 core_rx_post_decrypt_wep;
 	u32 core_rx_post_decrypt_tkip;
 	u32 core_rx_post_decrypt_aes;
-	u32 core_rx_post_decrypt_wapi;
 	u32 core_rx_post_decrypt_hw;
 	u32 core_rx_post_decrypt_unknown;
 	u32 core_rx_post_decrypt_err;
@@ -1334,11 +1327,6 @@ struct _ADAPTER {
 #ifdef CONFIG_TDLS
 	struct tdls_info	tdlsinfo;
 #endif /* CONFIG_TDLS */
-
-#ifdef CONFIG_WAPI_SUPPORT
-	u8	WapiSupport;
-	RT_WAPI_T	wapiInfo;
-#endif
 
 #ifdef CONFIG_RTW_REPEATER_SON
 	u8	rtw_rson_scanstage;

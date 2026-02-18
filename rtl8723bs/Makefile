@@ -53,7 +53,6 @@ CONFIG_HW_PWRP_DETECTION = n
 CONFIG_WIFI_TEST = n
 CONFIG_BT_COEXIST = y
 CONFIG_INTEL_WIDI = n
-CONFIG_WAPI_SUPPORT = n
 CONFIG_EFUSE_CONFIG_FILE = y
 CONFIG_EXT_CLK = n
 CONFIG_TRAFFIC_PROTECT = n
@@ -780,11 +779,6 @@ endif
 ifeq ($(CONFIG_INTEL_WIDI), y)
 ccflags-y += -DCONFIG_INTEL_WIDI
 endif
-
-ifeq ($(CONFIG_WAPI_SUPPORT), y)
-ccflags-y += -DCONFIG_WAPI_SUPPORT
-endif
-
 
 ifeq ($(CONFIG_EFUSE_CONFIG_FILE), y)
 ccflags-y += -DCONFIG_EFUSE_CONFIG_FILE
@@ -1755,9 +1749,6 @@ endif
 $(MODULE_NAME)-y += $(rtk_core)
 
 $(MODULE_NAME)-$(CONFIG_INTEL_WIDI) += core/rtw_intel_widi.o
-
-$(MODULE_NAME)-$(CONFIG_WAPI_SUPPORT) += core/rtw_wapi.o	\
-					core/rtw_wapi_sms4.o
 
 $(MODULE_NAME)-y += $(_OS_INTFS_FILES)
 $(MODULE_NAME)-y += $(_HAL_INTFS_FILES)

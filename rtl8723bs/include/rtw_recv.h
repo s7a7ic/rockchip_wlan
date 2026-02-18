@@ -73,7 +73,6 @@
 #define PHY_RSSI_SLID_WIN_MAX				100
 #define PHY_LINKQUALITY_SLID_WIN_MAX		20
 
-
 #define SNAP_SIZE sizeof(struct ieee80211_snap_hdr)
 
 #define RX_MPDU_QUEUE				0
@@ -132,7 +131,6 @@ struct	stainfo_rxcache	{
 #endif
 };
 
-
 struct smooth_rssi_data {
 	u32	elements[100];	/* array to store values */
 	u32	index;			/* index to current array to store */
@@ -158,7 +156,6 @@ struct rx_raw_rssi {
 	s8 ofdm_pwr[4];
 	u8 ofdm_snr[4];
 };
-
 
 #include "cmn_info/rtw_sta_info.h"
 
@@ -215,7 +212,6 @@ struct rx_pkt_attrib	{
 	u8	ppdu_cnt;
 	struct phydm_phyinfo_struct phy_info;
 };
-
 
 /* These definition is used for Rx packet reordering. */
 #define SN_LESS(a, b)		(((a-b) & 0x800) != 0)
@@ -295,8 +291,6 @@ struct rtw_rx_ring {
 };
 #endif
 
-
-
 /*
 accesser of recv_priv: rtw_recv_entry(dispatch / passive level); recv_thread(passive) ; returnpkt(dispatch)
 ; halt(passive) ;
@@ -350,7 +344,6 @@ struct recv_priv {
 	uint	counter; /* record the number that up-layer will return to drv; only when counter==0 can we  release recv_priv */
 	NDIS_EVENT	recv_resource_evt ;
 #endif
-
 
 	u32 is_any_non_be_pkts;
 
@@ -435,7 +428,6 @@ struct recv_priv {
 	/* s8 RxRssi[2]; */
 	/* int FalseAlmCnt_all; */
 
-
 #ifdef CONFIG_NEW_SIGNAL_STAT_PROCESS
 	_timer signal_stat_timer;
 	u32 signal_stat_sampling_interval;
@@ -480,7 +472,6 @@ void dump_rx_bh_tk(void *sel, struct recv_priv *recv);
 #endif /* CONFIG_NEW_SIGNAL_STAT_PROCESS */
 
 struct sta_recv_priv {
-
 	_lock	lock;
 	sint	option;
 
@@ -492,9 +483,7 @@ struct sta_recv_priv {
 	/* uint	sta_rx_bytes; */
 	/* uint	sta_rx_pkts; */
 	/* uint	sta_rx_fail; */
-
 };
-
 
 struct recv_buf {
 	_list list;
@@ -543,21 +532,13 @@ struct recv_buf {
 #endif /* PLATFORM_FREEBSD */ /* skb solution */
 };
 
-
 /*
 	head  ----->
-
 		data  ----->
-
 			payload
-
 		tail  ----->
-
-
 	end   ----->
-
 	len = (unsigned int )(tail - data);
-
 */
 struct recv_frame_hdr {
 	_list	list;
@@ -585,34 +566,19 @@ struct recv_frame_hdr {
 
 	void *precvbuf;
 
-
-	/*  */
 	struct sta_info *psta;
 
 	/* for A-MPDU Rx reordering buffer control */
 	struct recv_reorder_ctrl *preorder_ctrl;
-
-#ifdef CONFIG_WAPI_SUPPORT
-	u8 UserPriority;
-	u8 WapiTempPN[16];
-	u8 WapiSrcAddr[6];
-	u8 bWapiCheckPNInDecrypt;
-	u8 bIsWaiPacket;
-#endif
-
 };
 
-
 union recv_frame {
-
 	union {
 		_list list;
 		struct recv_frame_hdr hdr;
 		uint mem[RECVFRAME_HDR_ALIGN >> 2];
 	} u;
-
 	/* uint mem[MAX_RXSZ>>2]; */
-
 };
 
 bool rtw_rframe_del_wfd_ie(union recv_frame *rframe, u8 ies_offset);
@@ -662,20 +628,16 @@ __inline static u8 *get_rxmem(union recv_frame *precvframe)
 
 __inline static u8 *get_rx_status(union recv_frame *precvframe)
 {
-
 	return get_rxmem(precvframe);
-
 }
 
 __inline static u8 *get_recvframe_data(union recv_frame *precvframe)
 {
-
 	/* alwasy return rx_data */
 	if (precvframe == NULL)
 		return NULL;
 
 	return precvframe->u.hdr.rx_data;
-
 }
 
 __inline static u8 *recvframe_push(union recv_frame *precvframe, sint sz)
@@ -691,7 +653,6 @@ __inline static u8 *recvframe_push(union recv_frame *precvframe, sint sz)
 	if (precvframe == NULL)
 		return NULL;
 
-
 	precvframe->u.hdr.rx_data -= sz ;
 	if (precvframe->u.hdr.rx_data < precvframe->u.hdr.rx_head) {
 		precvframe->u.hdr.rx_data += sz ;
@@ -701,9 +662,7 @@ __inline static u8 *recvframe_push(union recv_frame *precvframe, sint sz)
 	precvframe->u.hdr.len += sz;
 
 	return precvframe->u.hdr.rx_data;
-
 }
-
 
 __inline static u8 *recvframe_pull(union recv_frame *precvframe, sint sz)
 {
@@ -711,10 +670,8 @@ __inline static u8 *recvframe_pull(union recv_frame *precvframe, sint sz)
 
 	/* used for extract sz bytes from rx_data, update rx_data and return the updated rx_data to the caller */
 
-
 	if (precvframe == NULL)
 		return NULL;
-
 
 	precvframe->u.hdr.rx_data += sz;
 
@@ -726,7 +683,6 @@ __inline static u8 *recvframe_pull(union recv_frame *precvframe, sint sz)
 	precvframe->u.hdr.len -= sz;
 
 	return precvframe->u.hdr.rx_data;
-
 }
 
 __inline static u8 *recvframe_put(union recv_frame *precvframe, sint sz)
@@ -754,10 +710,7 @@ __inline static u8 *recvframe_put(union recv_frame *precvframe, sint sz)
 	precvframe->u.hdr.len += sz;
 
 	return precvframe->u.hdr.rx_tail;
-
 }
-
-
 
 __inline static u8 *recvframe_pull_tail(union recv_frame *precvframe, sint sz)
 {
@@ -782,8 +735,6 @@ __inline static u8 *recvframe_pull_tail(union recv_frame *precvframe, sint sz)
 
 }
 
-
-
 __inline static _buffer *get_rxbuf_desc(union recv_frame *precvframe)
 {
 	_buffer *buf_desc;
@@ -797,7 +748,6 @@ __inline static _buffer *get_rxbuf_desc(union recv_frame *precvframe)
 	return buf_desc;
 }
 
-
 __inline static union recv_frame *rxmem_to_recvframe(u8 *rxmem)
 {
 	/* due to the design of 2048 bytes alignment of recv_frame, we can reference the union recv_frame */
@@ -805,7 +755,6 @@ __inline static union recv_frame *rxmem_to_recvframe(u8 *rxmem)
 	/* rxmem indicates the any member/address in recv_frame */
 
 	return (union recv_frame *)(((SIZE_PTR)rxmem >> RXFRAME_ALIGN) << RXFRAME_ALIGN);
-
 }
 
 __inline static union recv_frame *pkt_to_recvframe(_pkt *pkt)
@@ -832,7 +781,6 @@ __inline static u8 *pkt_to_recvmem(_pkt *pkt)
 	union recv_frame *precv_frame = pkt_to_recvframe(pkt);
 
 	return	precv_frame->u.hdr.rx_head;
-
 }
 
 __inline static u8 *pkt_to_recvdata(_pkt *pkt)
@@ -842,15 +790,12 @@ __inline static u8 *pkt_to_recvdata(_pkt *pkt)
 	union recv_frame *precv_frame = pkt_to_recvframe(pkt);
 
 	return	precv_frame->u.hdr.rx_data;
-
 }
-
 
 __inline static sint get_recvframe_len(union recv_frame *precvframe)
 {
 	return precvframe->u.hdr.len;
 }
-
 
 __inline static s32 translate_percentage_to_dbm(u32 SignalStrengthIndex)
 {

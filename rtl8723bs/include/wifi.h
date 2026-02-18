@@ -609,8 +609,6 @@ static inline int IsFrameTypeData(unsigned char *pframe)
 #define _SRC_IE_				59
 #define _HT_EXTRA_INFO_IE_			61
 #define _HT_ADD_INFO_IE_			61 /* _HT_EXTRA_INFO_IE_ */
-#define _WAPI_IE_					68
-
 
 /* #define EID_BSSCoexistence			72 */ /* 20/40 BSS Coexistence
  * #define EID_BSSIntolerantChlReport	73 */
@@ -696,7 +694,6 @@ typedef	enum _ELEMENT_ID {
 
 	EID_Vendor					= 221, /* 0xDD: Vendor Specific */
 
-	EID_WAPI					= 68,
 	EID_VHTCapability 			= 191, /* Based on 802.11ac D2.0 */
 	EID_VHTOperation 			= 192, /* Based on 802.11ac D2.0 */
 	EID_AID						= 197, /* Based on 802.11ac D4.0 */
@@ -1397,21 +1394,6 @@ struct rtw_regulatory {
 	int16_t power_limit;
 	struct regd_pair_mapping *regpair;
 };
-#endif
-
-#ifdef CONFIG_WAPI_SUPPORT
-#ifndef IW_AUTH_WAPI_VERSION_1
-#define IW_AUTH_WAPI_VERSION_1		0x00000008
-#endif
-#ifndef IW_AUTH_KEY_MGMT_WAPI_PSK
-#define IW_AUTH_KEY_MGMT_WAPI_PSK	0x04
-#endif
-#ifndef IW_AUTH_WAPI_ENABLED
-#define IW_AUTH_WAPI_ENABLED		0x20
-#endif
-#ifndef IW_ENCODE_ALG_SM4
-#define IW_ENCODE_ALG_SM4			0x20
-#endif
 #endif
 
 #endif /* _WIFI_H_ */

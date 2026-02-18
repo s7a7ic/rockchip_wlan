@@ -6778,11 +6778,7 @@ static void rtw_hal_construct_ARPRsp(
 
 	/* SET_80211_HDR_DURATION(pARPRspPkt, 0); */
 	/* SET_80211_HDR_FRAGMENT_SEQUENCE(pARPRspPkt, 0); */
-#ifdef CONFIG_WAPI_SUPPORT
-	*pLength = sMacHdrLng;
-#else
 	*pLength = 24;
-#endif
 	switch (psecuritypriv->dot11PrivacyAlgrthm) {
 	case _WEP40_:
 	case _WEP104_:
@@ -6794,11 +6790,6 @@ static void rtw_hal_construct_ARPRsp(
 	case _AES_:
 		EncryptionHeadOverhead = 8;
 		break;
-#ifdef CONFIG_WAPI_SUPPORT
-	case _SMS4_:
-		EncryptionHeadOverhead = 18;
-		break;
-#endif
 	default:
 		EncryptionHeadOverhead = 0;
 	}
@@ -6906,11 +6897,7 @@ static void rtw_hal_construct_na_message(_adapter *padapter,
 	SetSeqNum(pwlanhdr, 0);
 	set_duration(pwlanhdr, 0);
 
-#ifdef CONFIG_WAPI_SUPPORT
-	*pLength = sMacHdrLng;
-#else
 	*pLength = 24;
-#endif
 	switch (psecuritypriv->dot11PrivacyAlgrthm) {
 	case _WEP40_:
 	case _WEP104_:
@@ -6922,11 +6909,6 @@ static void rtw_hal_construct_na_message(_adapter *padapter,
 	case _AES_:
 		EncryptionHeadOverhead = 8;
 		break;
-#ifdef CONFIG_WAPI_SUPPORT
-	case _SMS4_:
-		EncryptionHeadOverhead = 18;
-		break;
-#endif
 	default:
 		EncryptionHeadOverhead = 0;
 	}
@@ -7259,11 +7241,7 @@ static void rtw_hal_construct_GTKRsp(
 	SetSeqNum(pwlanhdr, 0);
 	set_duration(pwlanhdr, 0);
 
-#ifdef CONFIG_WAPI_SUPPORT
-	*pLength = sMacHdrLng;
-#else
 	*pLength = 24;
-#endif /* CONFIG_WAPI_SUPPORT */
 
 	/* ------------------------------------------------------------------------- */
 	/* Security Header: leave space for it if necessary. */
@@ -7279,11 +7257,6 @@ static void rtw_hal_construct_GTKRsp(
 	case _AES_:
 		EncryptionHeadOverhead = 8;
 		break;
-#ifdef CONFIG_WAPI_SUPPORT
-	case _SMS4_:
-		EncryptionHeadOverhead = 18;
-		break;
-#endif /* CONFIG_WAPI_SUPPORT */
 	default:
 		EncryptionHeadOverhead = 0;
 	}
