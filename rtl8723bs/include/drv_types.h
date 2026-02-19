@@ -90,7 +90,6 @@ typedef struct _ADAPTER _adapter, ADAPTER, *PADAPTER;
 #include <hal_intf.h>
 #include <hal_com.h>
 #include<hal_com_h2c.h>
-#include <hal_com_led.h>
 #include "../hal/hal_dm.h"
 #include <rtw_qos.h>
 #include <rtw_pwrctrl.h>
@@ -1290,10 +1289,6 @@ struct _ADAPTER {
 	struct	security_priv	securitypriv;
 	_lock   security_key_mutex; /* add for CONFIG_IEEE80211W, none 11w also can use */
 	struct	registry_priv	registrypriv;
-#ifdef CONFIG_RTW_LED
-	struct	led_priv	ledpriv;
-#endif
-
 
 #ifdef CONFIG_RTW_NAPI
 	struct	napi_struct napi;

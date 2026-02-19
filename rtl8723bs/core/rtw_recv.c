@@ -4026,7 +4026,7 @@ int recv_func_posthandle(_adapter *padapter, union recv_frame *prframe)
 	DBG_COUNTER(padapter->rx_logs.core_rx_post);
 
 	/* DATA FRAME */
-	rtw_led_control(padapter, LED_CTL_RX);
+//	rtw_led_control(padapter, LED_CTL_RX);
 
 	prframe = decryptor(padapter, prframe);
 	if (prframe == NULL) {

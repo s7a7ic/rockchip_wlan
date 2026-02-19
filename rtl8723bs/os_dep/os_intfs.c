@@ -2300,9 +2300,6 @@ u8 rtw_init_drv_sw(_adapter *padapter)
 #endif
 
 	rtw_hal_dm_init(padapter);
-#ifdef CONFIG_RTW_SW_LED
-	rtw_hal_sw_led_init(padapter);
-#endif
 #ifdef DBG_CONFIG_ERROR_DETECT
 	rtw_hal_sreset_init(padapter);
 #endif
@@ -2356,10 +2353,6 @@ void rtw_cancel_all_timer(_adapter *padapter)
 #endif
 
 	_cancel_timer_ex(&adapter_to_dvobj(padapter)->dynamic_chk_timer);
-#ifdef CONFIG_RTW_SW_LED
-	/* cancel sw led timer */
-	rtw_hal_sw_led_deinit(padapter);
-#endif
 	_cancel_timer_ex(&(adapter_to_pwrctl(padapter)->pwr_state_check_timer));
 
 #ifdef CONFIG_TX_AMSDU
@@ -3197,7 +3190,7 @@ int _netdev_open(struct net_device *pnetdev)
 		rtw_cfg80211_init_wdev_data(padapter);
 #endif
 
-		rtw_led_control(padapter, LED_CTL_NO_LINK);
+//		rtw_led_control(padapter, LED_CTL_NO_LINK);
 
 		padapter->bup = _TRUE;
 		pwrctrlpriv->bips_processing = _FALSE;
@@ -3366,7 +3359,7 @@ int rtw_ips_pwr_up(_adapter *padapter)
 
 	result = ips_netdrv_open(padapter);
 
-	rtw_led_control(padapter, LED_CTL_NO_LINK);
+//	rtw_led_control(padapter, LED_CTL_NO_LINK);
 
 	RTW_INFO("<===  rtw_ips_pwr_up.............. in %dms\n", rtw_get_passing_time_ms(start_time));
 	return result;
@@ -3479,7 +3472,7 @@ static int netdev_close(struct net_device *pnetdev)
 		rtw_free_network_queue(padapter, _TRUE);
 #endif
 		/* Close LED */
-		rtw_led_control(padapter, LED_CTL_POWER_OFF);
+//		rtw_led_control(padapter, LED_CTL_POWER_OFF);
 	}
 
 #ifdef CONFIG_BR_EXT
@@ -4016,7 +4009,7 @@ int rtw_suspend_wow(_adapter *padapter)
 		rtw_mi_buddy_netif_stop_queue(padapter, _TRUE);
 
 		/* 0. Power off LED */
-		rtw_led_control(padapter, LED_CTL_POWER_OFF);
+//		rtw_led_control(padapter, LED_CTL_POWER_OFF);
 
 #if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
 		/* 2.only for SDIO disable interrupt */
@@ -4149,7 +4142,7 @@ int rtw_suspend_ap_wow(_adapter *padapter)
 	rtw_mi_netif_stop_queue(padapter, _FALSE);
 
 	/* 0. Power off LED */
-	rtw_led_control(padapter, LED_CTL_POWER_OFF);
+//	rtw_led_control(padapter, LED_CTL_POWER_OFF);
 #ifdef CONFIG_SDIO_HCI
 	/* 2.only for SDIO disable interrupt*/
 	rtw_intf_stop(padapter);
@@ -4247,7 +4240,7 @@ int rtw_suspend_normal(_adapter *padapter)
 
 	rtw_mi_suspend_free_assoc_resource(padapter);
 
-	rtw_led_control(padapter, LED_CTL_POWER_OFF);
+//	rtw_led_control(padapter, LED_CTL_POWER_OFF);
 
 	if ((rtw_hal_check_ips_status(padapter) == _TRUE)
 	    || (adapter_to_pwrctl(padapter)->rf_pwrstate == rf_off))
@@ -4497,16 +4490,6 @@ int rtw_resume_process_wow(_adapter *padapter)
 
 	pwrpriv->wowlan_mode = _FALSE;
 
-	/* Power On LED */
-#ifdef CONFIG_RTW_SW_LED
-
-	if (pwrpriv->wowlan_wake_reason == RX_DISASSOC||
-	    pwrpriv->wowlan_wake_reason == RX_DEAUTH||
-	    pwrpriv->wowlan_wake_reason == FW_DECISION_DISCONNECT)
-		rtw_led_control(padapter, LED_CTL_NO_LINK);
-	else
-		rtw_led_control(padapter, LED_CTL_LINK);
-#endif
 	/* clean driver side wake up reason. */
 	pwrpriv->wowlan_last_wake_reason = pwrpriv->wowlan_wake_reason;
 	pwrpriv->wowlan_wake_reason = 0;
@@ -4633,11 +4616,6 @@ int rtw_resume_process_ap_wow(_adapter *padapter)
 	rtw_btcoex_SuspendNotify(padapter, BTCOEX_SUSPEND_STATE_RESUME);
 #endif /* CONFIG_BT_COEXIST */
 
-	/* Power On LED */
-#ifdef CONFIG_RTW_SW_LED
-
-	rtw_led_control(padapter, LED_CTL_LINK);
-#endif
 exit:
 	RTW_INFO("<== "FUNC_ADPT_FMT" exit....\n", FUNC_ADPT_ARG(padapter));
 	return ret;

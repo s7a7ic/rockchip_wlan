@@ -200,7 +200,7 @@ void rtw_request_wps_pbc_event(_adapter *padapter)
 
 #endif
 
-	rtw_led_control(padapter, LED_CTL_START_WPS_BOTTON);
+//	rtw_led_control(padapter, LED_CTL_START_WPS_BOTTON);
 }
 #endif/* #ifdef CONFIG_SUPPORT_HW_WPS_PBC */
 
@@ -216,7 +216,6 @@ void indicate_wx_scan_complete_event(_adapter *padapter)
 	wireless_send_event(padapter->pnetdev, SIOCGIWSCAN, &wrqu, NULL);
 #endif
 }
-
 
 void rtw_indicate_wx_assoc_event(_adapter *padapter)
 {
@@ -3845,21 +3844,19 @@ static int rtw_wps_start(struct net_device *dev,
 
 	RTW_INFO("[%s] wps_start = %d\n", __FUNCTION__, u32wps_start);
 
-	if (u32wps_start == 1)   /* WPS Start */
-		rtw_led_control(padapter, LED_CTL_START_WPS);
-	else if (u32wps_start == 2)   /* WPS Stop because of wps success */
-		rtw_led_control(padapter, LED_CTL_STOP_WPS);
-	else if (u32wps_start == 3)   /* WPS Stop because of wps fail */
-		rtw_led_control(padapter, LED_CTL_STOP_WPS_FAIL);
+//	if (u32wps_start == 1)   /* WPS Start */
+//		rtw_led_control(padapter, LED_CTL_START_WPS);
+//	else if (u32wps_start == 2)   /* WPS Stop because of wps success */
+//		rtw_led_control(padapter, LED_CTL_STOP_WPS);
+//	else if (u32wps_start == 3)   /* WPS Stop because of wps fail */
+//		rtw_led_control(padapter, LED_CTL_STOP_WPS_FAIL);
 
 #ifdef CONFIG_INTEL_WIDI
 	process_intel_widi_wps_status(padapter, u32wps_start);
 #endif /* CONFIG_INTEL_WIDI */
 
 exit:
-
 	return ret;
-
 }
 
 #ifdef CONFIG_P2P
@@ -5921,10 +5918,6 @@ static int rtw_rereg_nd_name(struct net_device *dev,
 		goto exit;
 
 	if (_rtw_memcmp(rereg_priv->old_ifname, "disable%d", 9) == _TRUE) {
-		#ifdef CONFIG_RTW_SW_LED
-		padapter->ledpriv.bRegUseLed = rereg_priv->old_bRegUseLed;
-		rtw_hal_sw_led_init(padapter);
-		#endif
 		/* rtw_ips_mode_req(&padapter->pwrctrlpriv, rereg_priv->old_ips_mode); */
 	}
 
@@ -5938,12 +5931,7 @@ static int rtw_rereg_nd_name(struct net_device *dev,
 		rtw_free_network_queue(padapter, _TRUE);
 
 		/* close led */
-		rtw_led_control(padapter, LED_CTL_POWER_OFF);
-		#ifdef CONFIG_RTW_SW_LED
-		rereg_priv->old_bRegUseLed = padapter->ledpriv.bRegUseLed;
-		padapter->ledpriv.bRegUseLed = _FALSE;
-		rtw_hal_sw_led_deinit(padapter);
-		#endif
+//		rtw_led_control(padapter, LED_CTL_POWER_OFF);
 		/* the interface is being "disabled", we can do deeper IPS */
 		/* rereg_priv->old_ips_mode = rtw_get_ips_mode_req(&padapter->pwrctrlpriv); */
 		/* rtw_ips_mode_req(&padapter->pwrctrlpriv, IPS_NORMAL); */

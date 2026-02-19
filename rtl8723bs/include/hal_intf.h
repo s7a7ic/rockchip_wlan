@@ -314,10 +314,6 @@ struct hal_ops {
 #endif
 
 	/*** DM section ***/
-#ifdef CONFIG_RTW_SW_LED
-	void	(*InitSwLeds)(_adapter *padapter);
-	void	(*DeInitSwLeds)(_adapter *padapter);
-#endif
 	void	(*set_chnl_bw_handler)(_adapter *padapter, u8 channel, enum channel_width Bandwidth, u8 Offset40, u8 Offset80);
 
 	void	(*set_tx_power_level_handler)(_adapter *padapter, u8 channel);
@@ -601,10 +597,7 @@ void	rtw_hal_free_data(_adapter *padapter);
 
 void rtw_hal_dm_init(_adapter *padapter);
 void rtw_hal_dm_deinit(_adapter *padapter);
-#ifdef CONFIG_RTW_SW_LED
-void rtw_hal_sw_led_init(_adapter *padapter);
-void rtw_hal_sw_led_deinit(_adapter *padapter);
-#endif
+
 u32 rtw_hal_power_on(_adapter *padapter);
 void rtw_hal_power_off(_adapter *padapter);
 

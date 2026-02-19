@@ -31,7 +31,6 @@
 
 #define PLATFORM_LINUX
 
-
 /*
  * Wi-Fi Functions Config
  */
@@ -106,18 +105,12 @@
 
 /* #define CONFIG_80211D */
 
-
 /*
  * Hareware/Firmware Related Config
  */
 /* #define CONFIG_BT_COEXIST */	/* Set from Makefile */
 /* #define CONFIG_ANTENNA_DIVERSITY */	/* Set from Makefile */
 /* #define SUPPORT_HW_RFOFF_DETECTED */
-
-/*#define CONFIG_RTW_LED*/
-#ifdef CONFIG_RTW_LED
-	/*#define CONFIG_RTW_SW_LED*/
-#endif /* CONFIG_RTW_LED */
 
 #define CONFIG_XMIT_ACK
 #ifdef CONFIG_XMIT_ACK
@@ -130,7 +123,6 @@
 
 #define RTW_NOTCH_FILTER 0 /* 0:Disable, 1:Enable, */
 
-
 /*
  * Interface Related Config
  */
@@ -138,7 +130,6 @@
 #define CONFIG_SDIO_RX_COPY
 #define CONFIG_XMIT_THREAD_MODE
 /* #define CONFIG_SDIO_TX_ENABLE_AVAL_INT */
-
 
 /*
  * Others
@@ -159,7 +150,6 @@
 #define CONFIG_LONG_DELAY_ISSUE
 /* #define CONFIG_PATCH_JOIN_WRONG_CHANNEL */
 #define CONFIG_ATTEMPT_TO_FIX_AP_BEACON_ERROR
-
 
 /*
  * Auto Config Section

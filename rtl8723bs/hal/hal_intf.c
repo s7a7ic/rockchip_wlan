@@ -127,6 +127,7 @@ void	rtw_hal_free_data(_adapter *padapter)
 	/* free HAL Data	 */
 	rtw_hal_data_deinit(padapter);
 }
+
 void rtw_hal_dm_init(_adapter *padapter)
 {
 	if (is_primary_adapter(padapter)) {
@@ -139,6 +140,7 @@ void rtw_hal_dm_init(_adapter *padapter)
 		phy_load_tx_power_ext_info(padapter, 1);
 	}
 }
+
 void rtw_hal_dm_deinit(_adapter *padapter)
 {
 	if (is_primary_adapter(padapter)) {
@@ -149,19 +151,6 @@ void rtw_hal_dm_deinit(_adapter *padapter)
 		_rtw_spinlock_free(&pHalData->IQKSpinLock);
 	}
 }
-#ifdef CONFIG_RTW_SW_LED
-void	rtw_hal_sw_led_init(_adapter *padapter)
-{
-	if (padapter->hal_func.InitSwLeds)
-		padapter->hal_func.InitSwLeds(padapter);
-}
-
-void rtw_hal_sw_led_deinit(_adapter *padapter)
-{
-	if (padapter->hal_func.DeInitSwLeds)
-		padapter->hal_func.DeInitSwLeds(padapter);
-}
-#endif
 
 u32 rtw_hal_power_on(_adapter *padapter)
 {
@@ -176,6 +165,7 @@ u32 rtw_hal_power_on(_adapter *padapter)
 
 	return ret;
 }
+
 void rtw_hal_power_off(_adapter *padapter)
 {
 	struct macid_ctl_t *macid_ctl = &padapter->dvobj->macid_ctl;
@@ -188,7 +178,6 @@ void rtw_hal_power_off(_adapter *padapter)
 
 	padapter->hal_func.hal_power_off(padapter);
 }
-
 
 void rtw_hal_init_opmode(_adapter *padapter)
 {
@@ -233,7 +222,7 @@ uint	 rtw_hal_init(_adapter *padapter)
 		for (i = 0; i < dvobj->iface_nums; i++)
 			rtw_sec_restore_wep_key(dvobj->padapters[i]);
 
-		rtw_led_control(padapter, LED_CTL_POWER_ON);
+//		rtw_led_control(padapter, LED_CTL_POWER_ON);
 
 		init_hw_mlme_ext(padapter);
 
@@ -263,11 +252,10 @@ uint rtw_hal_deinit(_adapter *padapter)
 	status = padapter->hal_func.hal_deinit(padapter);
 
 	if (status == _SUCCESS) {
-		rtw_led_control(padapter, LED_CTL_POWER_OFF);
+//		rtw_led_control(padapter, LED_CTL_POWER_OFF);
 		pHalData->hw_init_completed = _FALSE;
 	} else
 		RTW_INFO("\n rtw_hal_deinit: hal_init fail\n");
-
 
 	return status;
 }

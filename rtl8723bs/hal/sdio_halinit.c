@@ -1675,10 +1675,7 @@ void rtl8723bs_set_hal_ops(PADAPTER padapter)
 
 	pHalFunc->init_recv_priv = &rtl8723bs_init_recv_priv;
 	pHalFunc->free_recv_priv = &rtl8723bs_free_recv_priv;
-#ifdef CONFIG_RTW_SW_LED
-	pHalFunc->InitSwLeds = &rtl8723bs_InitSwLeds;
-	pHalFunc->DeInitSwLeds = &rtl8723bs_DeInitSwLeds;
-#endif
+
 	pHalFunc->init_default_value = &rtl8723bs_init_default_value;
 	pHalFunc->intf_chip_configure = &rtl8723bs_interface_configure;
 	pHalFunc->read_adapter_info = &ReadAdapterInfo8723BS;

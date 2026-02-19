@@ -935,7 +935,7 @@ u8 rtw_sitesurvey_cmd(_adapter  *padapter, NDIS_802_11_SSID *ssid, int ssid_num,
 #endif /* CONFIG_SCAN_BACKOP */
 			mlme_set_scan_to_timer(pmlmepriv, SCANNING_TIMEOUT);
 
-		rtw_led_control(padapter, LED_CTL_SITE_SURVEY);
+//		rtw_led_control(padapter, LED_CTL_SITE_SURVEY);
 	} else
 		_clr_fwstate_(pmlmepriv, _FW_UNDER_SURVEY);
 
@@ -1366,7 +1366,7 @@ u8 rtw_joinbss_cmd(_adapter  *padapter, struct wlan_network *pnetwork)
 	struct _ft_priv			*pftpriv = &pmlmepriv->ftpriv;
 #endif
 
-	rtw_led_control(padapter, LED_CTL_START_TO_LINK);
+//	rtw_led_control(padapter, LED_CTL_START_TO_LINK);
 
 	pcmd = (struct cmd_obj *)rtw_zmalloc(sizeof(struct cmd_obj));
 	if (pcmd == NULL) {
@@ -1496,7 +1496,7 @@ u8 rtw_joinbss_cmd(_adapter  *padapter, struct wlan_network *pnetwork)
 #endif /* CONFIG_80211N_HT */
 
 #ifdef CONFIG_RTW_80211R
-	/*IEEE802.11-2012 Std. Table 8-101¡XAKM suite selectors*/
+	/*IEEE802.11-2012 Std. Table 8-101ï¿½XAKM suite selectors*/
 	if ((rtw_chk_ft_flags(padapter, RTW_FT_STA_SUPPORTED)) &&
 		((psecuritypriv->rsn_akm_suite_type == 3) || (psecuritypriv->rsn_akm_suite_type == 4))
 		) {
@@ -2260,15 +2260,13 @@ inline u8 rtw_set_country_cmd(_adapter *adapter, int flags, const char *country_
 	return _rtw_set_chplan_cmd(adapter, flags, RTW_CHPLAN_UNSPECIFIED, ent, swconfig);
 }
 
-u8 rtw_led_blink_cmd(_adapter *padapter, PVOID pLed)
+/*u8 rtw_led_blink_cmd(_adapter *padapter, PVOID pLed)
 {
 	struct	cmd_obj	*pcmdobj;
 	struct	LedBlink_param *ledBlink_param;
 	struct	cmd_priv   *pcmdpriv = &padapter->cmdpriv;
 
 	u8	res = _SUCCESS;
-
-
 
 	pcmdobj = (struct	cmd_obj *)rtw_zmalloc(sizeof(struct	cmd_obj));
 	if (pcmdobj == NULL) {
@@ -2289,10 +2287,9 @@ u8 rtw_led_blink_cmd(_adapter *padapter, PVOID pLed)
 	res = rtw_enqueue_cmd(pcmdpriv, pcmdobj);
 
 exit:
-
-
 	return res;
 }
+*/
 
 u8 rtw_set_csa_cmd(_adapter *padapter, u8 new_ch_no)
 {
@@ -4874,8 +4871,6 @@ exit:
 	return;
 }
 
-
-
 void rtw_setstaKey_cmdrsp_callback(_adapter	*padapter ,  struct cmd_obj *pcmd)
 {
 
@@ -4891,11 +4886,9 @@ void rtw_setstaKey_cmdrsp_callback(_adapter	*padapter ,  struct cmd_obj *pcmd)
 	/* psta->cmn.aid = psta->cmn.mac_id = psetstakey_rsp->keyid; */ /* CAM_ID(CAM_ENTRY) */
 
 exit:
-
 	rtw_free_cmd_obj(pcmd);
-
-
 }
+
 void rtw_setassocsta_cmdrsp_callback(_adapter	*padapter,  struct cmd_obj *pcmd)
 {
 	_irqL	irqL;
@@ -4904,7 +4897,6 @@ void rtw_setassocsta_cmdrsp_callback(_adapter	*padapter,  struct cmd_obj *pcmd)
 	struct set_assocsta_parm *passocsta_parm = (struct set_assocsta_parm *)(pcmd->parmbuf);
 	struct set_assocsta_rsp *passocsta_rsp = (struct set_assocsta_rsp *)(pcmd->rsp);
 	struct sta_info	*psta = rtw_get_stainfo(pstapriv, passocsta_parm->addr);
-
 
 	if (psta == NULL) {
 		goto exit;
@@ -4922,7 +4914,6 @@ void rtw_setassocsta_cmdrsp_callback(_adapter	*padapter,  struct cmd_obj *pcmd)
 
 exit:
 	rtw_free_cmd_obj(pcmd);
-
 }
 
 void rtw_getrttbl_cmd_cmdrsp_callback(_adapter	*padapter,  struct cmd_obj *pcmd);
@@ -4934,6 +4925,4 @@ void rtw_getrttbl_cmd_cmdrsp_callback(_adapter	*padapter,  struct cmd_obj *pcmd)
 	if (padapter->registrypriv.mp_mode == 1)
 		padapter->mppriv.workparam.bcompleted = _TRUE;
 #endif
-
-
 }

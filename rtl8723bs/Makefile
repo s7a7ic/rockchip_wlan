@@ -124,8 +124,7 @@ _HAL_INTFS_FILES :=	hal/hal_intf.o \
 			hal/hal_btcoex.o \
 			hal/hal_mp.o \
 			hal/hal_mcc.o \
-			hal/hal_$(HCI_NAME).o \
-			hal/led/hal_$(HCI_NAME)_led.o
+			hal/hal_$(HCI_NAME).o
 
 _BTC_FILES += hal/HalBtc8723bWifiOnly.o
 
@@ -158,10 +157,8 @@ _HAL_INTFS_FILES +=	hal/$(RTL871X)_hal_init.o \
 
 _HAL_INTFS_FILES +=	\
 			hal/$(HCI_NAME)_halinit.o \
-			hal/rtl$(MODULE_NAME)_led.o \
 			hal/rtl$(MODULE_NAME)_xmit.o \
 			hal/rtl$(MODULE_NAME)_recv.o
-
 
 _HAL_INTFS_FILES += hal/$(HCI_NAME)_ops.o
 

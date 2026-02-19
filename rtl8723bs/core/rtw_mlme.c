@@ -1551,16 +1551,13 @@ void rtw_indicate_connect(_adapter *padapter)
 	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
 	struct xmit_priv	*pxmitpriv = &padapter->xmitpriv;
 
-
-
 	pmlmepriv->to_join = _FALSE;
 
 	if (!check_fwstate(&padapter->mlmepriv, _FW_LINKED)) {
 
 		set_fwstate(pmlmepriv, _FW_LINKED);
 
-		rtw_led_control(padapter, LED_CTL_LINK);
-
+//		rtw_led_control(padapter, LED_CTL_LINK);
 
 #ifdef CONFIG_DRVEXT_MODULE
 		if (padapter->drvextpriv.enable_wpa)
@@ -1583,8 +1580,6 @@ void rtw_indicate_connect(_adapter *padapter)
 #endif /* CONFIG_INTEL_WIDI */
 	if (!MLME_IS_AP(padapter) && !MLME_IS_MESH(padapter))
 		rtw_mi_set_scan_deny(padapter, 3000);
-
-
 }
 
 
@@ -1601,8 +1596,6 @@ void rtw_indicate_disconnect(_adapter *padapter, u16 reason, u8 locally_generate
 	struct sta_priv *pstapriv = &padapter->stapriv;
 	u8 *wps_ie = NULL;
 	uint wpsie_len = 0;
-
-
 
 	_clr_fwstate_(pmlmepriv, _FW_UNDER_LINKING | WIFI_UNDER_WPS);
 
@@ -1638,7 +1631,7 @@ void rtw_indicate_disconnect(_adapter *padapter, u16 reason, u8 locally_generate
 
 		_clr_fwstate_(pmlmepriv, _FW_LINKED);
 
-		rtw_led_control(padapter, LED_CTL_NO_LINK);
+//		rtw_led_control(padapter, LED_CTL_NO_LINK);
 
 		rtw_clear_scan_deny(padapter);
 	}
