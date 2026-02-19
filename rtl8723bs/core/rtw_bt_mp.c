@@ -1,19 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017 Realtek Corporation. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- *****************************************************************************/
-
-
+ ******************************************************************************/
 #include <drv_types.h>
 #include <rtw_bt_mp.h>
 
@@ -26,7 +16,6 @@ void MPh2c_timeout_handle(void *FunctionContext)
 {
 	PADAPTER pAdapter;
 	PMPT_CONTEXT pMptCtx;
-
 
 	RTW_INFO("[MPT], MPh2c_timeout_handle\n");
 
@@ -67,8 +56,7 @@ u32 WaitC2Hevent(PADAPTER pAdapter, u8 *C2H_event, u32 delay_time)
 	return _TRUE;
 }
 
-BT_CTRL_STATUS
-mptbt_CheckC2hFrame(
+BT_CTRL_STATUS mptbt_CheckC2hFrame(
 	PADAPTER		Adapter,
 	PBT_H2C			pH2c,
 	PBT_EXT_C2H		pExtC2h
@@ -93,8 +81,7 @@ mptbt_CheckC2hFrame(
 	return c2hStatus;
 }
 
-BT_CTRL_STATUS
-mptbt_SendH2c(
+BT_CTRL_STATUS mptbt_SendH2c(
 	PADAPTER	Adapter,
 	PBT_H2C	pH2c,
 	u2Byte		h2cCmdLen
@@ -151,10 +138,7 @@ mptbt_SendH2c(
 	return h2cStatus;
 }
 
-
-
-BT_CTRL_STATUS
-mptbt_CheckBtRspStatus(
+BT_CTRL_STATUS mptbt_CheckBtRspStatus(
 	PADAPTER			Adapter,
 	PBT_EXT_C2H			pExtC2h
 )
@@ -187,10 +171,7 @@ mptbt_CheckBtRspStatus(
 	return retStatus;
 }
 
-
-
-BT_CTRL_STATUS
-mptbt_BtFwOpCodeProcess(
+BT_CTRL_STATUS mptbt_BtFwOpCodeProcess(
 	PADAPTER		Adapter,
 	u1Byte			btFwOpCode,
 	u1Byte			opCodeVer,
@@ -245,11 +226,7 @@ mptbt_BtFwOpCodeProcess(
 	return retStatus;
 }
 
-
-
-
-u2Byte
-mptbt_BtReady(
+u2Byte mptbt_BtReady(
 	PADAPTER		Adapter,
 	PBT_REQ_CMD	pBtReq,
 	PBT_RSP_CMD	pBtRsp
@@ -390,8 +367,7 @@ u4Byte mptbt_switch_RF(PADAPTER	Adapter, u1Byte	Enter)
 	return 0;
 }
 
-u2Byte
-mptbt_BtSetMode(
+u2Byte mptbt_BtSetMode(
 	PADAPTER		Adapter,
 	PBT_REQ_CMD	pBtReq,
 	PBT_RSP_CMD	pBtRsp
@@ -454,9 +430,7 @@ mptbt_BtSetMode(
 	return paraLen;
 }
 
-
-VOID
-MPTBT_FwC2hBtMpCtrl(
+void MPTBT_FwC2hBtMpCtrl(
 	PADAPTER	Adapter,
 	pu1Byte	tmpBuf,
 	u1Byte		length
@@ -519,14 +493,9 @@ MPTBT_FwC2hBtMpCtrl(
 		RTW_INFO("[MPT], EXT_C2H Target not found,pExtC2h->extendId =%d ,pExtC2h->reqNum=%d\n", pExtC2h->extendId, pExtC2h->reqNum);
 		break;
 	}
-
-
-
 }
 
-
-u2Byte
-mptbt_BtGetGeneral(
+u2Byte mptbt_BtGetGeneral(
 	IN	PADAPTER		Adapter,
 	IN	PBT_REQ_CMD	pBtReq,
 	IN	PBT_RSP_CMD	pBtRsp
@@ -827,8 +796,6 @@ mptbt_BtGetGeneral(
 	return paraLen;
 }
 
-
-
 u2Byte
 mptbt_BtSetGeneral(
 	IN	PADAPTER		Adapter,
@@ -1114,8 +1081,6 @@ mptbt_BtSetGeneral(
 	return paraLen;
 }
 
-
-
 u2Byte
 mptbt_BtSetTxRxPars(
 	IN	PADAPTER		Adapter,
@@ -1314,7 +1279,6 @@ mptbt_BtSetTxRxPars(
 		return paraLen;
 	}
 
-
 	/* fill h2c parameters */
 	btOpcode = BT_LO_OP_SET_CHNL_TX_GAIN;
 	if ((pTxRxPars->txrxChannel > 78) ||
@@ -1393,10 +1357,7 @@ mptbt_BtSetTxRxPars(
 	return paraLen;
 }
 
-
-
-u2Byte
-mptbt_BtTestCtrl(
+u2Byte mptbt_BtTestCtrl(
 	IN	PADAPTER		Adapter,
 	IN	PBT_REQ_CMD	pBtReq,
 	IN	PBT_RSP_CMD	pBtRsp
@@ -1459,9 +1420,7 @@ mptbt_BtTestCtrl(
 	return paraLen;
 }
 
-
-u2Byte
-mptbt_TestBT(
+u2Byte mptbt_TestBT(
 	IN	PADAPTER		Adapter,
 	IN	PBT_REQ_CMD	pBtReq,
 	IN	PBT_RSP_CMD	pBtRsp
@@ -1487,7 +1446,6 @@ mptbt_TestBT(
 	/*	retStatus = mptbt_BtFwOpCodeProcess(Adapter, btOpcode, btOpcodeVer, &h2cParaBuf[0], h2cParaLen); */
 	retStatus = mptbt_BtFwOpCodeProcess(Adapter, btOpcode, btOpcodeVer, h2cParaBuf, h2cParaLen);
 
-
 	/* 3. construct respond status code and data. */
 	if (BT_STATUS_BT_OP_SUCCESS != retStatus) {
 		pBtRsp->status = ((btOpcode << 8) | retStatus);
@@ -1499,11 +1457,7 @@ mptbt_TestBT(
 	return paraLen;
 }
 
-VOID
-mptbt_BtControlProcess(
-	PADAPTER	Adapter,
-	PVOID		pInBuf
-)
+void mptbt_BtControlProcess(PADAPTER Adapter, PVOID pInBuf)
 {
 	u1Byte			H2C_Parameter[6] = {0};
 	PBT_H2C		pH2c = (PBT_H2C)&H2C_Parameter[0];
@@ -1511,7 +1465,6 @@ mptbt_BtControlProcess(
 	PBT_REQ_CMD	pBtReq = (PBT_REQ_CMD)pInBuf;
 	PBT_RSP_CMD	pBtRsp;
 	u1Byte			i;
-
 
 	RTW_INFO("[MPT], mptbt_BtControlProcess()=========>\n");
 

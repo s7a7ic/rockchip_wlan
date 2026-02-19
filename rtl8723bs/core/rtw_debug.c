@@ -1,17 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017 Realtek Corporation. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- *****************************************************************************/
+ ******************************************************************************/
 #define _RTW_DEBUG_C_
 
 #include <drv_types.h>
@@ -169,9 +161,6 @@ void dump_drv_cfg(void *sel)
 #endif
 #endif /*CONFIG_SDIO_HCI*/
 
-#ifdef CONFIG_PCI_HCI
-#endif
-
 	RTW_PRINT_SEL(sel, "\n=== XMIT-INFO ===\n");
 	RTW_PRINT_SEL(sel, "NR_XMITFRAME = %d\n", NR_XMITFRAME);
 	RTW_PRINT_SEL(sel, "NR_XMITBUFF = %d\n", NR_XMITBUFF);
@@ -184,7 +173,6 @@ void dump_drv_cfg(void *sel)
 	RTW_PRINT_SEL(sel, "NR_RECVFRAME = %d\n", NR_RECVFRAME);
 	RTW_PRINT_SEL(sel, "NR_RECVBUFF = %d\n", NR_RECVBUFF);
 	RTW_PRINT_SEL(sel, "MAX_RECVBUF_SZ = %d\n", MAX_RECVBUF_SZ);
-
 }
 
 void dump_log_level(void *sel)
@@ -248,29 +236,6 @@ void mac_reg_dump(void *sel, _adapter *adapter)
 		if ((j++) % 4 == 0)
 			_RTW_PRINT_SEL(sel, "\n");
 	}
-
-#ifdef CONFIG_RTL8814A
-	{
-		for (i = 0x1000; i < 0x1650; i += 4) {
-			if (j % 4 == 1)
-				RTW_PRINT_SEL(sel, "0x%04x", i);
-			_RTW_PRINT_SEL(sel, " 0x%08x ", rtw_read32(adapter, i));
-			if ((j++) % 4 == 0)
-				_RTW_PRINT_SEL(sel, "\n");
-		}
-	}
-#endif /* CONFIG_RTL8814A */
-
-
-#if defined(CONFIG_RTL8822B) || defined(CONFIG_RTL8821C)
-	for (i = 0x1000; i < 0x1800; i += 4) {
-		if (j % 4 == 1)
-			RTW_PRINT_SEL(sel, "0x%04x", i);
-		_RTW_PRINT_SEL(sel, " 0x%08x ", rtw_read32(adapter, i));
-		if ((j++) % 4 == 0)
-			_RTW_PRINT_SEL(sel, "\n");
-	}
-#endif /* CONFIG_RTL8822B */
 }
 
 void bb_reg_dump(void *sel, _adapter *adapter)
@@ -285,16 +250,6 @@ void bb_reg_dump(void *sel, _adapter *adapter)
 		if ((j++) % 4 == 0)
 			_RTW_PRINT_SEL(sel, "\n");
 	}
-
-#if defined(CONFIG_RTL8822B) || defined(CONFIG_RTL8821C)
-	for (i = 0x1800; i < 0x2000; i += 4) {
-		if (j % 4 == 1)
-			RTW_PRINT_SEL(sel, "0x%04x", i);
-		_RTW_PRINT_SEL(sel, " 0x%08x ", rtw_read32(adapter, i));
-		if ((j++) % 4 == 0)
-			_RTW_PRINT_SEL(sel, "\n");
-	}
-#endif /* CONFIG_RTL8822B */
 }
 
 void bb_reg_dump_ex(void *sel, _adapter *adapter)
@@ -307,14 +262,6 @@ void bb_reg_dump_ex(void *sel, _adapter *adapter)
 		_RTW_PRINT_SEL(sel, " 0x%08x ", rtw_read32(adapter, i));
 		_RTW_PRINT_SEL(sel, "\n");
 	}
-
-#if defined(CONFIG_RTL8822B) || defined(CONFIG_RTL8821C)
-	for (i = 0x1800; i < 0x2000; i += 4) {
-		RTW_PRINT_SEL(sel, "0x%04x", i);
-		_RTW_PRINT_SEL(sel, " 0x%08x ", rtw_read32(adapter, i));
-		_RTW_PRINT_SEL(sel, "\n");
-	}
-#endif /* CONFIG_RTL8822B */
 }
 
 void rf_reg_dump(void *sel, _adapter *adapter)

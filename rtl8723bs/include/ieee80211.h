@@ -7,15 +7,6 @@
 #ifndef __IEEE80211_H
 #define __IEEE80211_H
 
-#ifndef CONFIG_RTL8711FW
-
-	#if defined PLATFORM_OS_XP
-		#include <ntstrsafe.h>
-	#endif
-#else
-
-#endif
-
 #define MGMT_QUEUE_NUM 5
 
 #define ETH_ALEN	6
@@ -1453,8 +1444,7 @@ enum rtw_ieee80211_ft_actioncode {
 };
 #endif
 
-#define OUI_MICROSOFT 0x0050f2 /* Microsoft (also used in Wi-Fi specs)
-				* 00:50:F2 */
+#define OUI_MICROSOFT 0x0050f2 /* Microsoft (also used in Wi-Fi specs) 00:50:F2 */
 #ifndef PLATFORM_FREEBSD /* Baron BSD has defined */
 	#define WME_OUI_TYPE 2
 #endif /* PLATFORM_FREEBSD */

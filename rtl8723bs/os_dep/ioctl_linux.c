@@ -1,17 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017 Realtek Corporation. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- *****************************************************************************/
+ ******************************************************************************/
 #define _IOCTL_LINUX_C_
 
 #include <drv_types.h>
@@ -30,7 +22,6 @@
 #ifdef CONFIG_80211N_HT
 extern int rtw_ht_enable;
 #endif
-
 
 #define RTL_IOCTL_WPA_SUPPLICANT	(SIOCIWFIRSTPRIV+30)
 
@@ -54,7 +45,6 @@ extern int ui_pid[3];
 #define WEXT_CSCAN_PASV_DWELL_SECTION	'P'
 #define WEXT_CSCAN_HOME_DWELL_SECTION	'H'
 #define WEXT_CSCAN_TYPE_SECTION		'T'
-
 
 extern u8 key_2char2num(u8 hch, u8 lch);
 extern u8 str_2char2num(u8 hch, u8 lch);
@@ -146,12 +136,10 @@ static void indicate_wx_custom_event(_adapter *padapter, char *msg)
 
 }
 
-
 static void request_wps_pbc_event(_adapter *padapter)
 {
 	u8 *buff, *p;
 	union iwreq_data wrqu;
-
 
 	buff = rtw_malloc(IW_CUSTOM_MAX);
 	if (!buff)
@@ -6304,9 +6292,6 @@ static int rtw_dbg_port(struct net_device *dev,
 				pxmitpriv->free_xmitbuf_cnt, pxmitpriv->free_xmitframe_cnt,
 				pxmitpriv->free_xmit_extbuf_cnt, pxmitpriv->free_xframe_ext_cnt,
 				 precvpriv->free_recvframe_cnt);
-#ifdef CONFIG_USB_HCI
-			RTW_INFO("rx_urb_pending_cn=%d\n", ATOMIC_READ(&(precvpriv->rx_pending_cnt)));
-#endif
 		}
 			break;
 		case 0x09: {
@@ -8162,10 +8147,6 @@ static int rtw_wowlan_ctrl(struct net_device *dev,
 		rtw_suspend_common(padapter);
 
 	else if (_rtw_memcmp(extra, "disable", 7)) {
-#ifdef CONFIG_USB_HCI
-		RTW_ENABLE_FUNC(padapter, DF_RX_BIT);
-		RTW_ENABLE_FUNC(padapter, DF_TX_BIT);
-#endif
 		rtw_resume_common(padapter);
 
 #ifdef CONFIG_PNO_SUPPORT
@@ -8296,10 +8277,6 @@ static int rtw_ap_wowlan_ctrl(struct net_device *dev,
 
 		rtw_suspend_common(padapter);
 	} else if (_rtw_memcmp(extra, "disable", 7)) {
-#ifdef CONFIG_USB_HCI
-		RTW_ENABLE_FUNC(padapter, DF_RX_BIT);
-		RTW_ENABLE_FUNC(padapter, DF_TX_BIT);
-#endif
 		rtw_resume_common(padapter);
 	} else {
 		RTW_INFO("[%s] Invalid Parameter.\n", __func__);
@@ -8859,42 +8836,11 @@ static int rtw_mp_efuse_get(struct net_device *dev,
 		}
 		/*		RTW_INFO("}\n"); */
 	} else if (strcmp(tmp[0], "vidpid") == 0) {
-#ifdef CONFIG_RTL8188E
-#ifdef CONFIG_USB_HCI
-		addr = EEPROM_VID_88EU;
-#endif
-#ifdef CONFIG_PCI_HCI
-		addr = EEPROM_VID_88EE;
-#endif
-#endif /* CONFIG_RTL8188E */
 
-#ifdef CONFIG_RTL8192E
-#ifdef CONFIG_USB_HCI
-		addr = EEPROM_VID_8192EU;
-#endif
-#ifdef CONFIG_PCI_HCI
-		addr = EEPROM_VID_8192EE;
-#endif
-#endif /* CONFIG_RTL8192E */
+
 #ifdef CONFIG_RTL8723B
 		addr = EEPROM_VID_8723BU;
 #endif /* CONFIG_RTL8192E */
-
-#ifdef CONFIG_RTL8188F
-		addr = EEPROM_VID_8188FU;
-#endif /* CONFIG_RTL8188F */
-
-#ifdef CONFIG_RTL8703B
-#ifdef CONFIG_USB_HCI
-		addr = EEPROM_VID_8703BU;
-#endif
-#endif /* CONFIG_RTL8703B */
-
-#ifdef CONFIG_RTL8723D
-#ifdef CONFIG_USB_HCI
-		addr = EEPROM_VID_8723DU;
-#endif /* CONFIG_USB_HCI */
-#endif /* CONFIG_RTL8723D */
 
 		cnts = 4;
 
@@ -9497,43 +9443,10 @@ static int rtw_mp_efuse_set(struct net_device *dev,
 		}
 
 		/* pidvid,da0b7881		 */
-#ifdef CONFIG_RTL8188E
-#ifdef CONFIG_USB_HCI
-		addr = EEPROM_VID_88EU;
-#endif
-#ifdef CONFIG_PCI_HCI
-		addr = EEPROM_VID_88EE;
-#endif
-#endif /* CONFIG_RTL8188E */
-
-#ifdef CONFIG_RTL8192E
-#ifdef CONFIG_USB_HCI
-		addr = EEPROM_VID_8192EU;
-#endif
-#ifdef CONFIG_PCI_HCI
-		addr = EEPROM_VID_8192EE;
-#endif
-#endif /* CONFIG_RTL8188E */
 
 #ifdef CONFIG_RTL8723B
 		addr = EEPROM_VID_8723BU;
 #endif
-
-#ifdef CONFIG_RTL8188F
-		addr = EEPROM_VID_8188FU;
-#endif
-
-#ifdef CONFIG_RTL8703B
-#ifdef CONFIG_USB_HCI
-		addr = EEPROM_VID_8703BU;
-#endif /* CONFIG_USB_HCI */
-#endif /* CONFIG_RTL8703B */
-
-#ifdef CONFIG_RTL8723D
-#ifdef CONFIG_USB_HCI
-		addr = EEPROM_VID_8723DU;
-#endif /* CONFIG_USB_HCI */
-#endif /* CONFIG_RTL8723D */
 
 		cnts = strlen(tmp[1]);
 		if (cnts % 2) {

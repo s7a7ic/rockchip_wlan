@@ -1367,8 +1367,6 @@ void fill_tx_desc_8188e(PADAPTER padapter)
 
 	desc->txdw5 |= cpu_to_le32(RTY_LMT_EN); /* retry limit enable */
 	desc->txdw5 |= cpu_to_le32(0x00180000); /* DATA/RTS Rate Fallback Limit	 */
-
-
 }
 #endif
 
@@ -1392,11 +1390,7 @@ void fill_tx_desc_8814a(PADAPTER padapter)
 	offset = TXDESC_SIZE + OFFSET_SZ;
 
 	SET_TX_DESC_OFFSET_8814A(pDesc, offset);
-#if defined(CONFIG_PCI_HCI)
-	SET_TX_DESC_PKT_OFFSET_8814A(pDesc, 0); /* 8814AE pkt_offset is 0 */
-#else
 	SET_TX_DESC_PKT_OFFSET_8814A(pDesc, 1);
-#endif
 
 	if (bmcast)
 		SET_TX_DESC_BMC_8814A(pDesc, 1);
@@ -1450,12 +1444,8 @@ void fill_tx_desc_8812a(PADAPTER padapter)
 	offset = TXDESC_SIZE + OFFSET_SZ;
 
 	SET_TX_DESC_OFFSET_8812(pDesc, offset);
-
-#if defined(CONFIG_PCI_HCI)
-	SET_TX_DESC_PKT_OFFSET_8812(pDesc, 0);
-#else
 	SET_TX_DESC_PKT_OFFSET_8812(pDesc, 1);
-#endif
+
 	if (bmcast)
 		SET_TX_DESC_BMC_8812(pDesc, 1);
 
@@ -1501,12 +1491,7 @@ void fill_tx_desc_8192e(PADAPTER padapter)
 	offset = TXDESC_SIZE + OFFSET_SZ;
 
 	SET_TX_DESC_OFFSET_92E(pDesc, offset);
-#if defined(CONFIG_PCI_HCI) /* 8192EE */
-
-	SET_TX_DESC_PKT_OFFSET_92E(pDesc, 0); /* 8192EE pkt_offset is 0 */
-#else /* 8192EU 8192ES */
 	SET_TX_DESC_PKT_OFFSET_92E(pDesc, 1);
-#endif
 
 	if (bmcast)
 		SET_TX_DESC_BMC_92E(pDesc, 1);
@@ -1834,17 +1819,6 @@ void SetPacketTx(PADAPTER padapter)
 	if (IS_ERR(pmp_priv->tx.PktTxThread)) {
 		RTW_ERR("Create PktTx Thread Fail !!!!!\n");
 		pmp_priv->tx.PktTxThread = NULL;
-	}
-#endif
-#ifdef PLATFORM_FREEBSD
-	{
-		struct proc *p;
-		struct thread *td;
-		pmp_priv->tx.PktTxThread = kproc_kthread_add(mp_xmit_packet_thread, pmp_priv,
-			&p, &td, RFHIGHPID, 0, "MPXmitThread", "MPXmitThread");
-
-		if (pmp_priv->tx.PktTxThread < 0)
-			RTW_INFO("Create PktTx Thread Fail !!!!!\n");
 	}
 #endif
 

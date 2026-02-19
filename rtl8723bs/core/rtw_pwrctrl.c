@@ -1,17 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017 Realtek Corporation. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- *****************************************************************************/
+ ******************************************************************************/
 #define _RTW_PWRCTRL_C_
 
 #include <drv_types.h>
@@ -58,7 +50,6 @@ int rtw_fw_ps_state(PADAPTER padapter)
 			RTW_INFO("%s: fw_ps_state=%04x\n", __FUNCTION__, fw_ps_state);
 		}
 	}
-
 
 exit_fw_ps_state:
 	_exit_pwrlock(&pwrpriv->check_32k_lock);
@@ -1394,9 +1385,6 @@ void LPS_Leave_check(
 
 		if (rtw_is_surprise_removed(padapter)
 		    || (!rtw_is_hw_init_completed(padapter))
-#ifdef CONFIG_USB_HCI
-		    || rtw_is_drv_stopped(padapter)
-#endif
 		    || (pwrpriv->pwr_mode == PS_MODE_ACTIVE)
 		   )
 			bReady = _TRUE;
@@ -2417,23 +2405,6 @@ int _rtw_pwr_wakeup(_adapter *padapter, u32 ips_deffer_ms, const char *caller)
 	}
 
 	if (rf_off == pwrpriv->rf_pwrstate) {
-#ifdef CONFIG_USB_HCI
-#ifdef CONFIG_AUTOSUSPEND
-		if (pwrpriv->brfoffbyhw == _TRUE) {
-			RTW_INFO("hw still in rf_off state ...........\n");
-			ret = _FAIL;
-			goto exit;
-		} else if (padapter->registrypriv.usbss_enable) {
-			RTW_INFO("%s call autoresume_enter....\n", __FUNCTION__);
-			if (_FAIL ==  autoresume_enter(padapter)) {
-				RTW_INFO("======> autoresume fail.............\n");
-				ret = _FAIL;
-				goto exit;
-			}
-		} else
-#endif
-#endif
-		{
 #ifdef CONFIG_IPS
 			RTW_INFO("%s call ips_leave....\n", __FUNCTION__);
 			if (_FAIL ==  ips_leave(padapter)) {
@@ -2442,7 +2413,6 @@ int _rtw_pwr_wakeup(_adapter *padapter, u32 ips_deffer_ms, const char *caller)
 				goto exit;
 			}
 #endif
-		}
 	}
 
 	/* TODO: the following checking need to be merged... */

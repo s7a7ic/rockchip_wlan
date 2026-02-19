@@ -1,17 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017 Realtek Corporation. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- *****************************************************************************/
+ ******************************************************************************/
 #define _RTW_CMD_C_
 
 #include <drv_types.h>
@@ -21,15 +13,11 @@
 	#define DBG_CMD_EXECUTE 0
 #endif
 
-/*
-Caller and the rtw_cmd_thread can protect cmd_q by spin_lock.
-No irqsave is necessary.
-*/
+/* Caller and the rtw_cmd_thread can protect cmd_q by spin_lock. No irqsave is necessary. */
 
 sint	_rtw_init_cmd_priv(struct	cmd_priv *pcmdpriv)
 {
 	sint res = _SUCCESS;
-
 
 	_rtw_init_sema(&(pcmdpriv->cmd_queue_sema), 0);
 	/* _rtw_init_sema(&(pcmdpriv->cmd_done_sema), 0); */
@@ -63,10 +51,7 @@ sint	_rtw_init_cmd_priv(struct	cmd_priv *pcmdpriv)
 
 	_rtw_mutex_init(&pcmdpriv->sctx_mutex);
 exit:
-
-
 	return res;
-
 }
 
 #ifdef CONFIG_C2H_WK
@@ -130,7 +115,6 @@ sint _rtw_init_evt_priv(struct evt_priv *pevtpriv)
 {
 	sint res = _SUCCESS;
 
-
 #ifdef CONFIG_H2CLBK
 	_rtw_init_sema(&(pevtpriv->lbkevt_done), 0);
 	pevtpriv->lbkevt_limit = 0;
@@ -164,21 +148,11 @@ sint _rtw_init_evt_priv(struct evt_priv *pevtpriv)
 
 	pevtpriv->c2h_mem = pevtpriv->allocated_c2h_mem +  4\
 			    - ((u32)(pevtpriv->allocated_c2h_mem) & 3);
-#ifdef PLATFORM_OS_XP
-	pevtpriv->pc2h_mdl = IoAllocateMdl((u8 *)pevtpriv->c2h_mem, C2H_MEM_SZ , FALSE, FALSE, NULL);
-
-	if (pevtpriv->pc2h_mdl == NULL) {
-		res = _FAIL;
-		goto exit;
-	}
-	MmBuildMdlForNonPagedPool(pevtpriv->pc2h_mdl);
-#endif
 #endif /* end of CONFIG_SDIO_HCI */
 
 	_rtw_init_queue(&(pevtpriv->evt_queue));
 
 exit:
-
 #endif /* end of CONFIG_EVENT_THREAD_MODE */
 
 #ifdef CONFIG_C2H_WK
@@ -186,15 +160,11 @@ exit:
 	pevtpriv->c2h_wk_alive = _FALSE;
 	pevtpriv->c2h_queue = rtw_cbuf_alloc(C2H_QUEUE_MAX_LEN + 1);
 #endif
-
-
 	return res;
 }
 
 void _rtw_free_evt_priv(struct	evt_priv *pevtpriv)
 {
-
-
 #ifdef CONFIG_EVENT_THREAD_MODE
 	_rtw_free_sema(&(pevtpriv->evt_notify));
 
@@ -215,14 +185,10 @@ void _rtw_free_evt_priv(struct	evt_priv *pevtpriv)
 	}
 	rtw_cbuf_free(pevtpriv->c2h_queue);
 #endif
-
-
-
 }
 
 void _rtw_free_cmd_priv(struct	cmd_priv *pcmdpriv)
 {
-
 	if (pcmdpriv) {
 		_rtw_spinlock_free(&(pcmdpriv->cmd_queue.lock));
 		_rtw_free_sema(&(pcmdpriv->cmd_queue_sema));
@@ -246,7 +212,6 @@ rtw_enqueue_cmd can only be called between kernel thread,
 since only spin_lock is used.
 
 ISR/Call-Back functions can't call this sub-function.
-
 */
 #ifdef DBG_CMD_QUEUE
 extern u8 dump_cmd_id;
@@ -255,7 +220,6 @@ extern u8 dump_cmd_id;
 sint _rtw_enqueue_cmd(_queue *queue, struct cmd_obj *obj, bool to_head)
 {
 	_irqL irqL;
-
 
 	if (obj == NULL)
 		goto exit;
@@ -308,8 +272,6 @@ sint _rtw_enqueue_cmd(_queue *queue, struct cmd_obj *obj, bool to_head)
 	_exit_critical(&queue->lock, &irqL);
 
 exit:
-
-
 	return _SUCCESS;
 }
 
@@ -317,7 +279,6 @@ struct	cmd_obj	*_rtw_dequeue_cmd(_queue *queue)
 {
 	_irqL irqL;
 	struct cmd_obj *obj;
-
 
 	/* _enter_critical_bh(&(queue->lock), &irqL); */
 	_enter_critical(&queue->lock, &irqL);
@@ -328,7 +289,6 @@ struct	cmd_obj	*_rtw_dequeue_cmd(_queue *queue)
 			&queue->queue, queue->queue.prev, queue->queue.prev->prev->next, queue->queue.prev->next);
 	}
 #endif /* DBG_CMD_QUEUE */
-
 
 	if (rtw_is_list_empty(&(queue->queue)))
 		obj = NULL;
@@ -437,13 +397,10 @@ int rtw_cmd_filter(struct cmd_priv *pcmdpriv, struct cmd_obj *cmd_obj)
 	return _SUCCESS;
 }
 
-
-
 u32 rtw_enqueue_cmd(struct cmd_priv *pcmdpriv, struct cmd_obj *cmd_obj)
 {
 	int res = _FAIL;
 	PADAPTER padapter = pcmdpriv->padapter;
-
 
 	if (cmd_obj == NULL)
 		goto exit;
@@ -479,18 +436,13 @@ u32 rtw_enqueue_cmd(struct cmd_priv *pcmdpriv, struct cmd_obj *cmd_obj)
 		_rtw_up_sema(&pcmdpriv->cmd_queue_sema);
 
 exit:
-
-
 	return res;
 }
 
 struct	cmd_obj	*rtw_dequeue_cmd(struct cmd_priv *pcmdpriv)
 {
 	struct cmd_obj *cmd_obj;
-
-
 	cmd_obj = _rtw_dequeue_cmd(&pcmdpriv->cmd_queue);
-
 	return cmd_obj;
 }
 
@@ -517,9 +469,7 @@ void rtw_free_cmd_obj(struct cmd_obj *pcmd)
 
 	/* free cmd_obj */
 	rtw_mfree((unsigned char *)pcmd, sizeof(struct cmd_obj));
-
 }
-
 
 void rtw_stop_cmd_thread(_adapter *adapter)
 {
@@ -550,7 +500,6 @@ thread_return rtw_cmd_thread(thread_context context)
 	prspbuf = pcmdpriv->rsp_buf;
 	ATOMIC_SET(&(pcmdpriv->cmdthd_running), _TRUE);
 	_rtw_up_sema(&pcmdpriv->start_cmdthread_sema);
-
 
 	while (1) {
 		if (_rtw_down_sema(&pcmdpriv->cmd_queue_sema) == _FAIL) {

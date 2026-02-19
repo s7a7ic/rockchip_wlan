@@ -1,17 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017 Realtek Corporation. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- *****************************************************************************/
+ ******************************************************************************/
 #define _RECV_OSDEP_C_
 
 #include <drv_types.h>
@@ -67,7 +59,6 @@ int rtw_os_alloc_recvframe(_adapter *padapter, union recv_frame *precvframe, u8 
 		res = _FAIL;
 		return res;
 	}
-
 
 	/*	Modified by Albert 20101213 */
 	/*	For 8 bytes IP header alignment. */
@@ -153,9 +144,7 @@ int rtw_os_alloc_recvframe(_adapter *padapter, union recv_frame *precvframe, u8 
 	}
 
 exit_rtw_os_recv_resource_alloc:
-
 	return res;
-
 }
 
 void rtw_os_free_recvframe(union recv_frame *precvframe)
@@ -171,7 +160,6 @@ void rtw_os_free_recvframe(union recv_frame *precvframe)
 int rtw_os_recv_resource_init(struct recv_priv *precvpriv, _adapter *padapter)
 {
 	int	res = _SUCCESS;
-
 
 #ifdef CONFIG_RTW_NAPI
 	skb_queue_head_init(&precvpriv->rx_napi_skb_queue);
@@ -197,7 +185,6 @@ void rtw_os_recv_resource_free(struct recv_priv *precvpriv)
 	union recv_frame *precvframe;
 	precvframe = (union recv_frame *) precvpriv->precv_frame_buf;
 
-
 #ifdef CONFIG_RTW_NAPI
 	if (skb_queue_len(&precvpriv->rx_napi_skb_queue))
 		RTW_WARN("rx_napi_skb_queue not empty\n");
@@ -218,34 +205,6 @@ int rtw_os_recvbuf_resource_alloc(_adapter *padapter, struct recv_buf *precvbuf)
 {
 	int res = _SUCCESS;
 
-#ifdef CONFIG_USB_HCI
-	struct dvobj_priv	*pdvobjpriv = adapter_to_dvobj(padapter);
-	struct usb_device	*pusbd = pdvobjpriv->pusbdev;
-
-	precvbuf->irp_pending = _FALSE;
-	precvbuf->purb = usb_alloc_urb(0, GFP_KERNEL);
-	if (precvbuf->purb == NULL)
-		res = _FAIL;
-
-	precvbuf->pskb = NULL;
-
-	precvbuf->pallocated_buf  = precvbuf->pbuf = NULL;
-
-	precvbuf->pdata = precvbuf->phead = precvbuf->ptail = precvbuf->pend = NULL;
-
-	precvbuf->transfer_len = 0;
-
-	precvbuf->len = 0;
-
-#ifdef CONFIG_USE_USB_BUFFER_ALLOC_RX
-	precvbuf->pallocated_buf = rtw_usb_buffer_alloc(pusbd, (size_t)precvbuf->alloc_sz, &precvbuf->dma_transfer_addr);
-	precvbuf->pbuf = precvbuf->pallocated_buf;
-	if (precvbuf->pallocated_buf == NULL)
-		return _FAIL;
-#endif /* CONFIG_USE_USB_BUFFER_ALLOC_RX */
-
-#endif /* CONFIG_USB_HCI */
-
 	return res;
 }
 
@@ -254,27 +213,6 @@ int rtw_os_recvbuf_resource_free(_adapter *padapter, struct recv_buf *precvbuf)
 {
 	int ret = _SUCCESS;
 
-#ifdef CONFIG_USB_HCI
-
-#ifdef CONFIG_USE_USB_BUFFER_ALLOC_RX
-
-	struct dvobj_priv	*pdvobjpriv = adapter_to_dvobj(padapter);
-	struct usb_device	*pusbd = pdvobjpriv->pusbdev;
-
-	rtw_usb_buffer_free(pusbd, (size_t)precvbuf->alloc_sz, precvbuf->pallocated_buf, precvbuf->dma_transfer_addr);
-	precvbuf->pallocated_buf =  NULL;
-	precvbuf->dma_transfer_addr = 0;
-
-#endif /* CONFIG_USE_USB_BUFFER_ALLOC_RX */
-
-	if (precvbuf->purb) {
-		/* usb_kill_urb(precvbuf->purb); */
-		usb_free_urb(precvbuf->purb);
-	}
-
-#endif /* CONFIG_USB_HCI */
-
-
 	if (precvbuf->pskb) {
 #ifdef CONFIG_PREALLOC_RX_SKB_BUFFER
 		if (rtw_free_skb_premem(precvbuf->pskb) != 0)
@@ -282,7 +220,6 @@ int rtw_os_recvbuf_resource_free(_adapter *padapter, struct recv_buf *precvbuf)
 			rtw_skb_free(precvbuf->pskb);
 	}
 	return ret;
-
 }
 
 _pkt *rtw_os_alloc_msdu_pkt(union recv_frame *prframe, u16 nSubframe_Length, u8 *pdata)
@@ -831,12 +768,9 @@ _recv_indicatepkt_end:
 
 	rtw_free_recvframe(precv_frame, pfree_recv_queue);
 
-
-
 	return _SUCCESS;
 
 _recv_indicatepkt_drop:
-
 	/* enqueue back to free_recv_queue */
 	if (precv_frame)
 		rtw_free_recvframe(precv_frame, pfree_recv_queue);
@@ -844,30 +778,13 @@ _recv_indicatepkt_drop:
 	DBG_COUNTER(padapter->rx_logs.os_indicate_err);
 
 	return _FAIL;
-
 }
 
 void rtw_os_read_port(_adapter *padapter, struct recv_buf *precvbuf)
 {
 	struct recv_priv *precvpriv = &padapter->recvpriv;
 
-#ifdef CONFIG_USB_HCI
-
-	precvbuf->ref_cnt--;
-
-	/* free skb in recv_buf */
-	rtw_skb_free(precvbuf->pskb);
-
-	precvbuf->pskb = NULL;
-
-	if (precvbuf->irp_pending == _FALSE)
-		rtw_read_port(padapter, precvpriv->ff_hwaddr, 0, (unsigned char *)precvbuf);
-
-
-#endif
 #if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
 	precvbuf->pskb = NULL;
 #endif
-
 }
-

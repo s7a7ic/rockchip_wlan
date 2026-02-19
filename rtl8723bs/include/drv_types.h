@@ -1467,7 +1467,6 @@ int rtw_suspend_free_assoc_resource(_adapter *padapter);
 #endif
 
 #ifdef CONFIG_SDIO_HCI
-	#include <sdio_osintf.h>
 	#include <sdio_ops.h>
 	#include <sdio_hal.h>
 #endif

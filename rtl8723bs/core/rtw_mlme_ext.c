@@ -1,17 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017 Realtek Corporation. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- *****************************************************************************/
+ ******************************************************************************/
 #define _RTW_MLME_EXT_C_
 
 #include <drv_types.h>
@@ -19,7 +11,6 @@
 	#include <rtw_wifi_regd.h>
 #endif /* CONFIG_IOCTL_CFG80211 */
 #include <hal_data.h>
-
 
 struct mlme_handler mlme_sta_tbl[] = {
 	{WIFI_ASSOCREQ,		"OnAssocReq",	&OnAssocReq},
@@ -90,7 +81,6 @@ struct action_handler OnAction_tbl[] = {
 	{RTW_WLAN_CATEGORY_VHT, "ACTION_VHT", &OnAction_vht},
 	{RTW_WLAN_CATEGORY_P2P, "ACTION_P2P", &OnAction_p2p},
 };
-
 
 u8	null_addr[ETH_ALEN] = {0, 0, 0, 0, 0, 0};
 
@@ -10434,36 +10424,6 @@ unsigned int send_beacon(_adapter *padapter)
 	u8	bxmitok = _FALSE;
 	int	issue = 0;
 	int poll = 0;
-#if defined(CONFIG_PCI_HCI) && defined(RTL8814AE_SW_BCN)
-	HAL_DATA_TYPE	*pHalData = GET_HAL_DATA(padapter);
-#endif
-
-#ifdef CONFIG_PCI_HCI
-	/* bypass TX BCN queue because op ch is switching/waiting */
-	if (check_fwstate(&padapter->mlmepriv, WIFI_OP_CH_SWITCHING)
-		#ifdef CONFIG_DFS_MASTER
-		|| IS_CH_WAITING(adapter_to_rfctl(padapter))
-		#endif
-	)
-		return _SUCCESS;
-
-	/* RTW_INFO("%s\n", __FUNCTION__); */
-
-	rtw_hal_set_hwreg(padapter, HW_VAR_BCN_VALID, NULL);
-
-	/* 8192EE Port select for Beacon DL */
-	rtw_hal_set_hwreg(padapter, HW_VAR_DL_BCN_SEL, NULL);
-
-	issue_beacon(padapter, 0);
-
-#ifdef RTL8814AE_SW_BCN
-	if (pHalData->bCorrectBCN != 0)
-		RTW_INFO("%s, line%d, Warnning, pHalData->bCorrectBCN != 0\n", __func__, __LINE__);
-	pHalData->bCorrectBCN = 1;
-#endif
-
-	return _SUCCESS;
-#endif
 
 #if defined(CONFIG_USB_HCI) || defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
 	systime start = rtw_get_current_time();
@@ -14934,9 +14894,8 @@ u8 chk_bmc_sleepq_hdl(_adapter *padapter, unsigned char *pbuf)
 		return H2C_SUCCESS;
 
 	if ((pstapriv->tim_bitmap & BIT(0)) && (psta_bmc->sleepq_len > 0)) {
-#ifndef CONFIG_PCI_HCI
-		rtw_msleep_os(10);/* 10ms, ATIM(HIQ) Windows */
-#endif
+		rtw_msleep_os(10); /* 10ms, ATIM(HIQ) Windows */
+
 		/* _enter_critical_bh(&psta_bmc->sleep_q.lock, &irqL); */
 		_enter_critical_bh(&pxmitpriv->lock, &irqL);
 
@@ -15679,7 +15638,6 @@ u8 run_in_thread_hdl(_adapter *padapter, u8 *pbuf)
 {
 	struct RunInThread_param *p;
 
-
 	if (NULL == pbuf)
 		return H2C_PARAMETERS_ERROR;
 	p = (struct RunInThread_param *)pbuf;
@@ -15692,7 +15650,6 @@ u8 run_in_thread_hdl(_adapter *padapter, u8 *pbuf)
 
 u8 rtw_getmacreg_hdl(_adapter *padapter, u8 *pbuf)
 {
-
 	struct readMAC_parm *preadmacparm = NULL;
 	u8 sz = 0;
 	u32	addr = 0;

@@ -1,18 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017 Realtek Corporation. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- *****************************************************************************/
-
+ ******************************************************************************/
 #define _OSDEP_SERVICE_C_
 
 #include <drv_types.h>
@@ -72,12 +63,7 @@ u32 rtw_atoi(u8 *s)
 inline u8 *_rtw_vmalloc(u32 sz)
 {
 	u8	*pbuf;
-#ifdef PLATFORM_LINUX
 	pbuf = vmalloc(sz);
-#endif
-#ifdef PLATFORM_FREEBSD
-	pbuf = malloc(sz, M_DEVBUF, M_NOWAIT);
-#endif
 
 #ifdef DBG_MEMORY_LEAK
 #ifdef PLATFORM_LINUX
@@ -138,19 +124,13 @@ u8 *_rtw_malloc(u32 sz)
 
 u8 *_rtw_zmalloc(u32 sz)
 {
-#ifdef PLATFORM_FREEBSD
-	return malloc(sz, M_DEVBUF, M_ZERO | M_NOWAIT);
-#else /* PLATFORM_FREEBSD */
 	u8	*pbuf = _rtw_malloc(sz);
 
 	if (pbuf != NULL) {
-#ifdef PLATFORM_LINUX
 		memset(pbuf, 0, sz);
-#endif
 	}
 
 	return pbuf;
-#endif /* PLATFORM_FREEBSD */
 }
 
 void	_rtw_mfree(u8 *pbuf, u32 sz)
@@ -199,15 +179,8 @@ inline struct sk_buff *_rtw_pskb_copy(struct sk_buff *skb)
 
 inline int _rtw_netif_rx(_nic_hdl ndev, struct sk_buff *skb)
 {
-#if defined(PLATFORM_LINUX)
 	skb->dev = ndev;
 	return netif_rx(skb);
-#elif defined(PLATFORM_FREEBSD)
-	return (*ndev->if_input)(ndev, skb);
-#else
-	rtw_warn_on(1);
-	return -1;
-#endif
 }
 
 #ifdef CONFIG_RTW_NAPI

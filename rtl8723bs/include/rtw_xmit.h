@@ -1,20 +1,11 @@
+// SPDX-License-Identifier: GPL-2.0
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017 Realtek Corporation. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- *****************************************************************************/
+ ******************************************************************************/
 #ifndef _RTW_XMIT_H_
 #define _RTW_XMIT_H_
-
 
 #if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
 	#ifdef CONFIG_TX_AGGREGATION
@@ -570,33 +561,6 @@ struct xmit_buf {
 
 	struct submit_ctx *sctx;
 
-#ifdef CONFIG_USB_HCI
-
-	/* u32 sz[8]; */
-	u32	ff_hwaddr;
-#ifdef RTW_HALMAC
-	u8 bulkout_id; /* for halmac */
-#endif /* RTW_HALMAC */
-
-#if defined(PLATFORM_OS_XP) || defined(PLATFORM_LINUX) || defined(PLATFORM_FREEBSD)
-	PURB	pxmit_urb[8];
-	dma_addr_t dma_transfer_addr;	/* (in) dma addr for transfer_buffer */
-#endif
-
-#ifdef PLATFORM_OS_XP
-	PIRP		pxmit_irp[8];
-#endif
-
-#ifdef PLATFORM_OS_CE
-	USB_TRANSFER	usb_transfer_write_port;
-#endif
-
-	u8 bpending[8];
-
-	sint last[8];
-
-#endif
-
 #if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
 	u8 *phead;
 	u8 *pdata;
@@ -605,53 +569,25 @@ struct xmit_buf {
 	u32 ff_hwaddr;
 	u8	pg_num;
 	u8	agg_num;
-#ifdef PLATFORM_OS_XP
-	PMDL pxmitbuf_mdl;
-	PIRP  pxmitbuf_irp;
-	PSDBUS_REQUEST_PACKET pxmitbuf_sdrp;
-#endif
-#endif
-
-#ifdef CONFIG_PCI_HCI
-#ifdef CONFIG_TRX_BD_ARCH
-	/*struct tx_buf_desc *buf_desc;*/
-#else
-	struct tx_desc *desc;
-#endif
 #endif
 
 #if defined(DBG_XMIT_BUF) || defined(DBG_XMIT_BUF_EXT)
 	u8 no;
 #endif
-
 };
-
 
 struct xmit_frame {
 	_list	list;
-
 	struct pkt_attrib attrib;
-
 	_pkt *pkt;
-
 	int	frame_tag;
-
 	_adapter *padapter;
-
 	u8	*buf_addr;
-
 	struct xmit_buf *pxmitbuf;
 
 #if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
 	u8	pg_num;
 	u8	agg_num;
-#endif
-
-#ifdef CONFIG_USB_HCI
-#ifdef CONFIG_USB_TX_AGGREGATION
-	u8	agg_num;
-#endif
-	s8	pkt_offset;
 #endif
 
 #ifdef CONFIG_XMIT_ACK
@@ -660,7 +596,6 @@ struct xmit_frame {
 
 	u8 *alloc_addr; /* the actual address this xmitframe allocated */
 	u8 ext_tag; /* 0:data, 1:mgmt */
-
 };
 
 struct tx_servq {
@@ -669,12 +604,10 @@ struct tx_servq {
 	int qcnt;
 };
 
-
 struct sta_xmit_priv {
 	_lock	lock;
 	sint	option;
 	sint	apsd_setting;	/* When bit mask is on, the associated edca queue supports APSD. */
-
 
 	/* struct tx_servq blk_q[MAX_NUMBLKS]; */
 	struct tx_servq	be_q;			/* priority == 0,3 */
@@ -689,10 +622,7 @@ struct sta_xmit_priv {
 	/* uint	sta_tx_bytes; */
 	/* u64	sta_tx_pkts; */
 	/* uint	sta_tx_fail; */
-
-
 };
-
 
 struct	hw_txqueue	{
 	volatile sint	head;
@@ -771,38 +701,6 @@ struct	xmit_priv	{
 	u8	hwxmit_entry;
 
 	u8	wmm_para_seq[4];/* sequence for wmm ac parameter strength from large to small. it's value is 0->vo, 1->vi, 2->be, 3->bk. */
-
-#ifdef CONFIG_USB_HCI
-	_sema	tx_retevt;/* all tx return event; */
-	u8		txirp_cnt;
-
-#ifdef PLATFORM_OS_CE
-	USB_TRANSFER	usb_transfer_write_port;
-	/*	USB_TRANSFER	usb_transfer_write_mem; */
-#endif
-#ifdef PLATFORM_LINUX
-	struct tasklet_struct xmit_tasklet;
-#endif
-#ifdef PLATFORM_FREEBSD
-	struct task xmit_tasklet;
-#endif
-	/* per AC pending irp */
-	int beq_cnt;
-	int bkq_cnt;
-	int viq_cnt;
-	int voq_cnt;
-
-#endif
-
-#ifdef CONFIG_PCI_HCI
-	/* Tx */
-	struct rtw_tx_ring	tx_ring[PCI_MAX_TX_QUEUE_COUNT];
-	int	txringcount[PCI_MAX_TX_QUEUE_COUNT];
-	u8 	beaconDMAing;		/* flag of indicating beacon is transmiting to HW by DMA */
-#ifdef PLATFORM_LINUX
-	struct tasklet_struct xmit_tasklet;
-#endif
-#endif
 
 #if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
 #ifdef CONFIG_SDIO_TX_TASKLET

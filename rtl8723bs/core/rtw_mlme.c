@@ -1,24 +1,15 @@
+// SPDX-License-Identifier: GPL-2.0
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017 Realtek Corporation. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- *****************************************************************************/
+ ******************************************************************************/
 #define _RTW_MLME_C_
 
 #include <hal_data.h>
 
 extern void indicate_wx_scan_complete_event(_adapter *padapter);
 extern u8 rtw_do_join(_adapter *padapter);
-
 
 void rtw_init_mlme_timer(_adapter *padapter)
 {
@@ -49,10 +40,8 @@ sint	_rtw_init_mlme_priv(_adapter *padapter)
 	struct mlme_priv		*pmlmepriv = &padapter->mlmepriv;
 	sint	res = _SUCCESS;
 
-
 	/* We don't need to memset padapter->XXX to zero, because adapter is allocated by rtw_zvmalloc(). */
 	/* _rtw_memset((u8 *)pmlmepriv, 0, sizeof(struct mlme_priv)); */
-
 
 	/*qos_priv*/
 	/*pmlmepriv->qospriv.qos_option = pregistrypriv->wmm_enable;*/
@@ -139,8 +128,6 @@ sint	_rtw_init_mlme_priv(_adapter *padapter)
 	rtw_init_mlme_timer(padapter);
 
 exit:
-
-
 	return res;
 }
 
@@ -4138,9 +4125,7 @@ void rtw_joinbss_reset(_adapter *padapter)
 #endif/* #if defined( CONFIG_USB_HCI) || defined (CONFIG_SDIO_HCI) */
 
 #endif/* #ifdef CONFIG_80211N_HT */
-
 }
-
 
 #ifdef CONFIG_80211N_HT
 void	rtw_ht_use_default_setting(_adapter *padapter)

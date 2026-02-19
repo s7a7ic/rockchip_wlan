@@ -1,17 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017 Realtek Corporation. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- *****************************************************************************/
+ ******************************************************************************/
 #define  _RTW_SECURITY_C_
 
 #include <drv_types.h>
@@ -982,15 +974,14 @@ static void next_key(u8 *key, sint round);
 static void byte_sub(u8 *in, u8 *out);
 static void shift_row(u8 *in, u8 *out);
 static void mix_column(u8 *in, u8 *out);
-#ifndef PLATFORM_FREEBSD
+
 static void add_round_key(u8 *shiftrow_in,
 			  u8 *mcol_in,
 			  u8 *block_in,
 			  sint round,
 			  u8 *out);
-#endif /* PLATFORM_FREEBSD */
-static void aes128k128d(u8 *key, u8 *data, u8 *ciphertext);
 
+static void aes128k128d(u8 *key, u8 *data, u8 *ciphertext);
 
 /****************************************/
 /* aes128k128d()                       */
@@ -1004,7 +995,6 @@ static void xor_128(u8 *a, u8 *b, u8 *out)
 		out[i] = a[i] ^ b[i];
 }
 
-
 static void xor_32(u8 *a, u8 *b, u8 *out)
 {
 	sint i;
@@ -1012,12 +1002,10 @@ static void xor_32(u8 *a, u8 *b, u8 *out)
 		out[i] = a[i] ^ b[i];
 }
 
-
 static u8 sbox(u8 a)
 {
 	return sbox_table[(sint)a];
 }
-
 
 static void next_key(u8 *key, sint round)
 {
@@ -1042,14 +1030,12 @@ static void next_key(u8 *key, sint round)
 	xor_32(&key[12], &key[8], &key[12]);
 }
 
-
 static void byte_sub(u8 *in, u8 *out)
 {
 	sint i;
 	for (i = 0; i < 16; i++)
 		out[i] = sbox(in[i]);
 }
-
 
 static void shift_row(u8 *in, u8 *out)
 {
@@ -1070,7 +1056,6 @@ static void shift_row(u8 *in, u8 *out)
 	out[14] = in[6];
 	out[15] = in[11];
 }
-
 
 static void mix_column(u8 *in, u8 *out)
 {
@@ -1128,7 +1113,6 @@ static void mix_column(u8 *in, u8 *out)
 	xor_32(temp, tempb, out);
 }
 
-
 static void aes128k128d(u8 *key, u8 *data, u8 *ciphertext)
 {
 	sint round;
@@ -1159,7 +1143,6 @@ static void aes128k128d(u8 *key, u8 *data, u8 *ciphertext)
 		}
 	}
 }
-
 
 /************************************************/
 /* construct_mic_iv()                          */
@@ -1203,7 +1186,6 @@ static void construct_mic_iv(
 	mic_iv[15] = (unsigned char)(payload_length % 256);
 }
 
-
 /************************************************/
 /* construct_mic_header1()                     */
 /* Builds the first MIC header block from      */
@@ -1242,7 +1224,6 @@ static void construct_mic_header1(
 	mic_header1[15] = mpdu[15];
 }
 
-
 /************************************************/
 /* construct_mic_header2()                     */
 /* Builds the last MIC header block from       */
@@ -1270,11 +1251,9 @@ static void construct_mic_header2(
 	mic_header2[6] = 0x00;
 	mic_header2[7] = 0x00; /* mpdu[23]; */
 
-
 	if (!qc_exists && a4_exists) {
 		for (i = 0; i < 6; i++)
 			mic_header2[8 + i] = mpdu[24 + i]; /* A4 */
-
 	}
 
 	if (qc_exists && !a4_exists) {
@@ -1289,9 +1268,7 @@ static void construct_mic_header2(
 		mic_header2[14] = mpdu[30] & 0x0f;
 		mic_header2[15] = mpdu[31] & 0x00;
 	}
-
 }
-
 
 /************************************************/
 /* construct_mic_header2()                     */
@@ -1338,7 +1315,6 @@ static void construct_ctr_preload(
 	ctr_preload[15] = (unsigned char)(c % 256);
 }
 
-
 /************************************/
 /* bitwise_xor()                   */
 /* A 128 bit, bitwise exclusive or */
@@ -1349,7 +1325,6 @@ static void bitwise_xor(u8 *ina, u8 *inb, u8 *out)
 	for (i = 0; i < 16; i++)
 		out[i] = ina[i] ^ inb[i];
 }
-
 
 static sint aes_cipher(u8 *key, uint	hdrlen,
 		       u8 *pframe, uint plen)
@@ -1374,7 +1349,6 @@ static sint aes_cipher(u8 *key, uint	hdrlen,
 	uint	frsubtype  = get_frame_sub_type(pframe);
 
 	frsubtype = frsubtype >> 4;
-
 
 	_rtw_memset((void *)mic_iv, 0, 16);
 	_rtw_memset((void *)mic_header1, 0, 16);
@@ -1441,7 +1415,6 @@ static sint aes_cipher(u8 *key, uint	hdrlen,
 		qc_exists
 	);
 
-
 	payload_remainder = plen % 16;
 	num_blocks = plen / 16;
 
@@ -1471,7 +1444,6 @@ static sint aes_cipher(u8 *key, uint	hdrlen,
 		}
 		bitwise_xor(aes_out, padded_buffer, chain_buffer);
 		aes128k128d(key, chain_buffer, aes_out);
-
 	}
 
 	for (j = 0 ; j < 8; j++)
@@ -1542,14 +1514,9 @@ static sint aes_cipher(u8 *key, uint	hdrlen,
 	return _SUCCESS;
 }
 
-
-
-
-
 u32	rtw_aes_encrypt(_adapter *padapter, u8 *pxmitframe)
 {
 	/* exclude ICV */
-
 
 	/*static*/
 	/*	unsigned char	message[MAX_MSG_SIZE]; */
@@ -1653,8 +1620,6 @@ u32	rtw_aes_encrypt(_adapter *padapter, u8 *pxmitframe)
 		*/
 	}
 
-
-
 	return res;
 }
 
@@ -1682,7 +1647,6 @@ static sint aes_decipher(u8 *key, uint	hdrlen,
 	uint	frtype  = GetFrameType(pframe);
 	uint	frsubtype  = get_frame_sub_type(pframe);
 	frsubtype = frsubtype >> 4;
-
 
 	_rtw_memset((void *)mic_iv, 0, 16);
 	_rtw_memset((void *)mic_header1, 0, 16);
@@ -1730,7 +1694,6 @@ static sint aes_decipher(u8 *key, uint	hdrlen,
 		qc_exists = 1;
 	} else
 		qc_exists = 0;
-
 
 	/* now, decrypt pframe with hdrlen offset and plen long */
 
@@ -1780,15 +1743,12 @@ static sint aes_decipher(u8 *key, uint	hdrlen,
 	if ((hdrlen + plen + 8) <= MAX_MSG_SIZE)
 		_rtw_memcpy((void *)message, pframe, (hdrlen + plen + 8)); /* 8 is for ext iv len */
 
-
 	pn_vector[0] = pframe[hdrlen];
 	pn_vector[1] = pframe[hdrlen + 1];
 	pn_vector[2] = pframe[hdrlen + 4];
 	pn_vector[3] = pframe[hdrlen + 5];
 	pn_vector[4] = pframe[hdrlen + 6];
 	pn_vector[5] = pframe[hdrlen + 7];
-
-
 
 	construct_mic_iv(
 		mic_iv,
@@ -1812,7 +1772,6 @@ static sint aes_decipher(u8 *key, uint	hdrlen,
 		a4_exists,
 		qc_exists
 	);
-
 
 	payload_remainder = (plen - 8) % 16;
 	num_blocks = (plen - 8) / 16;
@@ -1924,13 +1883,10 @@ u32	rtw_aes_decrypt(_adapter *padapter, u8 *precvframe)
 {
 	/* exclude ICV */
 
-
 	/*static*/
 	/*	unsigned char	message[MAX_MSG_SIZE]; */
 
-
 	/* Intermediate Buffers */
-
 
 	sint		length;
 	u32	prwskeylen;
@@ -2128,7 +2084,6 @@ BIP_exit:
 }
 #endif /* CONFIG_IEEE80211W */
 
-#ifndef PLATFORM_FREEBSD
 /* compress 512-bits */
 static int sha256_compress(struct sha256_state_rtk *md, unsigned char *buf)
 {
@@ -2398,7 +2353,7 @@ static void hmac_sha256_vector(u8 *key, size_t key_len, size_t num_elem,
 	_len[1] = 32;
 	sha256_vector(2, _addr, _len, mac);
 }
-#endif /* PLATFORM_FREEBSD */
+
 /**
  * sha256_prf - SHA256-based Pseudo-Random Function (IEEE 802.11r, 8.5.1.5.2)
  * @key: Key for PRF
@@ -2412,7 +2367,6 @@ static void hmac_sha256_vector(u8 *key, size_t key_len, size_t num_elem,
  * This function is used to derive new, cryptographically separate keys from a
  * given key.
  */
-#ifndef PLATFORM_FREEBSD /* Baron */
 static void sha256_prf(u8 *key, size_t key_len, char *label,
 		       u8 *data, size_t data_len, u8 *buf, size_t buf_len)
 {
@@ -2449,7 +2403,6 @@ static void sha256_prf(u8 *key, size_t key_len, char *label,
 		counter++;
 	}
 }
-#endif /* PLATFORM_FREEBSD Baron */
 
 /* AES tables*/
 const u32 Te0[256] = {
@@ -2628,7 +2581,6 @@ const u8 rcons[] = {
  *
  * @return	the number of rounds for the given cipher key size.
  */
-#ifndef PLATFORM_FREEBSD /* Baron */
 static void rijndaelKeySetupEnc(u32 rk[/*44*/], const u8 cipherKey[])
 {
 	int i;
@@ -2845,7 +2797,6 @@ int omac1_aes_128(u8 *key, u8 *data, size_t data_len, u8 *mac)
 {
 	return omac1_aes_128_vector(key, 1, &data, &data_len, mac);
 }
-#endif /* PLATFORM_FREEBSD Baron */
 
 #ifdef CONFIG_TDLS
 void wpa_tdls_generate_tpk(_adapter *padapter, PVOID sta)

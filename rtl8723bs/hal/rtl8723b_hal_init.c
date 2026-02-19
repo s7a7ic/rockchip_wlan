@@ -1,17 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017 Realtek Corporation. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- *****************************************************************************/
+ ******************************************************************************/
 #define _HAL_INIT_C_
 
 #include <rtl8723b_hal.h>
@@ -19,11 +11,8 @@
 #include "hal_com_h2c.h"
 #include <hal_com.h>
 #include "hal8723b_fw.h"
-static VOID
-_FWDownloadEnable(
-	IN	PADAPTER		padapter,
-	IN	BOOLEAN			enable
-)
+
+static VOID _FWDownloadEnable(IN	PADAPTER padapter, IN BOOLEAN enable)
 {
 	u8	tmp, count = 0;
 
@@ -71,14 +60,6 @@ _BlockWrite(
 	u32			remainSize_p1 = 0, remainSize_p2 = 0;
 	u8			*bufferPtr	= (u8 *)buffer;
 	u32			i = 0, offset = 0;
-#ifdef CONFIG_PCI_HCI
-	u8			remainFW[4] = {0, 0, 0, 0};
-	u8			*p = NULL;
-#endif
-
-#ifdef CONFIG_USB_HCI
-	blockSize_p1 = 254;
-#endif
 
 	/*	printk("====>%s %d\n", __func__, __LINE__); */
 
@@ -86,38 +67,14 @@ _BlockWrite(
 	blockCount_p1 = buffSize / blockSize_p1;
 	remainSize_p1 = buffSize % blockSize_p1;
 
-
-
 	for (i = 0; i < blockCount_p1; i++) {
-#ifdef CONFIG_USB_HCI
-		ret = rtw_writeN(padapter, (FW_8723B_START_ADDRESS + i * blockSize_p1), blockSize_p1, (bufferPtr + i * blockSize_p1));
-#else
 		ret = rtw_write32(padapter, (FW_8723B_START_ADDRESS + i * blockSize_p1), le32_to_cpu(*((u32 *)(bufferPtr + i * blockSize_p1))));
-#endif
+
 		if (ret == _FAIL) {
 			printk("====>%s %d i:%d\n", __func__, __LINE__, i);
 			goto exit;
 		}
 	}
-
-#ifdef CONFIG_PCI_HCI
-	p = (u8 *)((u32 *)(bufferPtr + blockCount_p1 * blockSize_p1));
-	if (remainSize_p1) {
-		switch (remainSize_p1) {
-		case 0:
-			break;
-		case 3:
-			remainFW[2] = *(p + 2);
-		case 2:
-			remainFW[1] = *(p + 1);
-		case 1:
-			remainFW[0] = *(p);
-			ret = rtw_write32(padapter, (FW_8723B_START_ADDRESS + blockCount_p1 * blockSize_p1),
-					  le32_to_cpu(*(u32 *)remainFW));
-		}
-		return ret;
-	}
-#endif
 
 	/* 3 Phase #2 */
 	if (remainSize_p1) {
@@ -125,17 +82,6 @@ _BlockWrite(
 
 		blockCount_p2 = remainSize_p1 / blockSize_p2;
 		remainSize_p2 = remainSize_p1 % blockSize_p2;
-
-
-
-#ifdef CONFIG_USB_HCI
-		for (i = 0; i < blockCount_p2; i++) {
-			ret = rtw_writeN(padapter, (FW_8723B_START_ADDRESS + offset + i * blockSize_p2), blockSize_p2, (bufferPtr + offset + i * blockSize_p2));
-
-			if (ret == _FAIL)
-				goto exit;
-		}
-#endif
 	}
 
 	/* 3 Phase #3 */
@@ -143,7 +89,6 @@ _BlockWrite(
 		offset = (blockCount_p1 * blockSize_p1) + (blockCount_p2 * blockSize_p2);
 
 		blockCount_p3 = remainSize_p2 / blockSize_p3;
-
 
 		for (i = 0 ; i < blockCount_p3 ; i++) {
 			ret = rtw_write8(padapter, (FW_8723B_START_ADDRESS + offset + i), *(bufferPtr + offset + i));
@@ -158,8 +103,7 @@ exit:
 	return ret;
 }
 
-static int
-_PageWrite(
+static int _PageWrite(
 	IN		PADAPTER	padapter,
 	IN		u32			page,
 	IN		PVOID		buffer,
@@ -175,11 +119,7 @@ _PageWrite(
 	return _BlockWrite(padapter, buffer, size);
 }
 
-static VOID
-_FillDummy(
-	u8		*pFwBuf,
-	u32	*pFwLen
-)
+static VOID _FillDummy(u8 *pFwBuf, u32 *pFwLen)
 {
 	u32	FwLen = *pFwLen;
 	u8	remain = (u8)(FwLen % 4);
@@ -194,8 +134,7 @@ _FillDummy(
 	*pFwLen = FwLen;
 }
 
-static int
-_WriteFW(
+static int _WriteFW(
 	IN		PADAPTER		padapter,
 	IN		PVOID			buffer,
 	IN		u32			size
@@ -206,12 +145,6 @@ _WriteFW(
 	u32	pageNums, remainSize ;
 	u32	page, offset;
 	u8		*bufferPtr = (u8 *)buffer;
-
-#ifdef CONFIG_PCI_HCI
-	/* 20100120 Joseph: Add for 88CE normal chip. */
-	/* Fill in zero to make firmware image to dword alignment. */
-	_FillDummy(bufferPtr, &size);
-#endif
 
 	pageNums = size / MAX_DLFW_PAGE_SIZE ;
 	/* RT_ASSERT((pageNums <= 4), ("Page numbers should not greater then 4\n")); */
@@ -538,11 +471,7 @@ int _WriteBTFWtoTxPktBuf8723B(
 		_rtw_memcpy((u8 *)(pmgntframe->buf_addr + txdesc_offset), ReservedPagePacket, FwBufLen);
 		RTW_INFO("[%d]===>TotalPktLen + TXDESC_OFFSET TotalPacketLen:%d\n", DLBcnCount, (FwBufLen + txdesc_offset));
 
-#ifdef CONFIG_PCI_HCI
-		dump_mgntframe(Adapter, pmgntframe);
-#else
 		dump_mgntframe_and_wait(Adapter, pmgntframe, 100);
-#endif
 
 #endif
 #if 1
@@ -5901,4 +5830,3 @@ void rtl8723b_set_hal_ops(struct hal_ops *pHalFunc)
 #endif
 
 }
-

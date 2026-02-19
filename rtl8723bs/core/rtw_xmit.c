@@ -3212,20 +3212,6 @@ void rtw_init_xmitframe(struct xmit_frame *pxframe)
 
 		pxframe->frame_tag = DATA_FRAMETAG;
 
-#ifdef CONFIG_USB_HCI
-		pxframe->pkt = NULL;
-#ifdef USB_PACKET_OFFSET_SZ
-		pxframe->pkt_offset = (PACKET_OFFSET_SZ / 8);
-#else
-		pxframe->pkt_offset = 1;/* default use pkt_offset to fill tx desc */
-#endif
-
-#ifdef CONFIG_USB_TX_AGGREGATION
-		pxframe->agg_num = 1;
-#endif
-
-#endif /* #ifdef CONFIG_USB_HCI */
-
 #if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
 		pxframe->pg_num = 1;
 		pxframe->agg_num = 1;
@@ -3507,10 +3493,6 @@ struct xmit_frame *rtw_get_xframe(struct xmit_priv *pxmitpriv, int *num_frame)
 	struct registry_priv	*pregpriv = &padapter->registrypriv;
 	int i, inx[4];
 
-#ifdef CONFIG_USB_HCI
-	/*	int j, tmp, acirp_cnt[4]; */
-#endif
-
 	inx[0] = 0;
 	inx[1] = 1;
 	inx[2] = 2;
@@ -3565,10 +3547,6 @@ struct xmit_frame *rtw_dequeue_xframe(struct xmit_priv *pxmitpriv, struct hw_xmi
 	_adapter *padapter = pxmitpriv->adapter;
 	struct registry_priv	*pregpriv = &padapter->registrypriv;
 	int i, inx[4];
-#ifdef CONFIG_USB_HCI
-	/*	int j, tmp, acirp_cnt[4]; */
-#endif
-
 
 	inx[0] = 0;
 	inx[1] = 1;
@@ -5085,11 +5063,8 @@ static struct xmit_buf *dequeue_pending_xmitbuf_under_survey(
 {
 	_irqL irql;
 	struct xmit_buf *pxmitbuf;
-#ifdef CONFIG_USB_HCI
-	struct xmit_frame *pxmitframe;
-#endif
-	_queue *pqueue;
 
+	_queue *pqueue;
 
 	pxmitbuf = NULL;
 	pqueue = &pxmitpriv->pending_xmitbuf_queue;
@@ -5109,15 +5084,7 @@ static struct xmit_buf *dequeue_pending_xmitbuf_under_survey(
 
 			pxmitbuf = LIST_CONTAINOR(plist, struct xmit_buf, list);
 
-#ifdef CONFIG_USB_HCI
-			pxmitframe = (struct xmit_frame *)pxmitbuf->priv_data;
-			if (pxmitframe)
-				type = get_frame_sub_type(pxmitbuf->pbuf + TXDESC_SIZE + pxmitframe->pkt_offset * PACKET_OFFSET_SZ);
-			else
-				RTW_INFO("%s, !!!ERROR!!! For USB, TODO ITEM\n", __FUNCTION__);
-#else
 			type = get_frame_sub_type(pxmitbuf->pbuf + TXDESC_OFFSET);
-#endif
 
 			if ((type == WIFI_PROBEREQ) ||
 			    (type == WIFI_DATA_NULL) ||
@@ -5302,17 +5269,6 @@ bool rtw_xmit_ac_blocked(_adapter *adapter)
 	struct mlme_ext_info *mlmeextinfo;
 	bool blocked = _FALSE;
 	int i;
-#ifdef DBG_CONFIG_ERROR_DETECT
-#ifdef DBG_CONFIG_ERROR_RESET
-#ifdef CONFIG_USB_HCI
-	if (rtw_hal_sreset_inprogress(adapter) == _TRUE) {
-		blocked = _TRUE;
-		goto exit;
-	}
-#endif/* #ifdef CONFIG_USB_HCI */
-#endif/* #ifdef DBG_CONFIG_ERROR_RESET */
-#endif/* #ifdef DBG_CONFIG_ERROR_DETECT */
-
 
 	for (i = 0; i < dvobj->iface_nums; i++) {
 		iface = dvobj->padapters[i];

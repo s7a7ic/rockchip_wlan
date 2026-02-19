@@ -1,17 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017 Realtek Corporation. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- *****************************************************************************/
+ ******************************************************************************/
 #define _RTW_AP_C_
 
 #include <drv_types.h>
@@ -33,7 +25,6 @@ void init_mlme_ap_info(_adapter *padapter)
 	_rtw_spinlock_init(&pmlmepriv->bcn_update_lock);
 
 	/* pmlmeext->bstart_bss = _FALSE; */
-
 }
 
 void free_mlme_ap_info(_adapter *padapter)
@@ -42,7 +33,6 @@ void free_mlme_ap_info(_adapter *padapter)
 
 	stop_ap_mode(padapter);
 	_rtw_spinlock_free(&pmlmepriv->bcn_update_lock);
-
 }
 
 static void update_BCNTIM(_adapter *padapter)
@@ -54,8 +44,6 @@ static void update_BCNTIM(_adapter *padapter)
 	unsigned char *pie = pnetwork_mlmeext->IEs;
 
 #if 0
-
-
 	/* update TIM IE */
 	/* if(pstapriv->tim_bitmap) */
 #endif
@@ -2407,7 +2395,6 @@ static int rtw_ap_set_key(_adapter *padapter, u8 *key, u8 alg, int keyid, u8 set
 	pcmd->rsp = NULL;
 	pcmd->rspsz = 0;
 
-
 	_rtw_init_listhead(&pcmd->list);
 
 	res = rtw_enqueue_cmd(pcmdpriv, pcmd);
@@ -2455,15 +2442,12 @@ u8 rtw_ap_bmc_frames_hdl(_adapter *padapter)
 	struct sta_priv  *pstapriv = &padapter->stapriv;
 	bool update_tim = _FALSE;
 
-
 	if (padapter->registrypriv.wifi_spec != 1)
 		return H2C_SUCCESS;
-
 
 	psta_bmc = rtw_get_bcmc_stainfo(padapter);
 	if (!psta_bmc)
 		return H2C_SUCCESS;
-
 
 	_enter_critical_bh(&pxmitpriv->lock, &irqL);
 
@@ -2669,7 +2653,6 @@ static void update_bcn_htinfo_ie(_adapter *padapter)
 	if (pmlmeinfo->HT_info_enable != 1)
 		return;
 
-
 	RTW_INFO("%s current operation mode=0x%X\n",
 		 __FUNCTION__, pmlmepriv->ht_op_mode);
 
@@ -2762,7 +2745,6 @@ static void update_bcn_wps_ie(_adapter *padapter)
 	unsigned char *ie = pnetwork->IEs;
 	u32 ielen = pnetwork->IELength;
 
-
 	RTW_INFO("%s\n", __FUNCTION__);
 
 	pwps_ie = rtw_get_wps_ie(ie + _FIXED_IE_LENGTH_, ielen - _FIXED_IE_LENGTH_, NULL, &wps_ielen);
@@ -2837,8 +2819,6 @@ static void update_bcn_vendor_spec_ie(_adapter *padapter, u8 *oui)
 		update_bcn_p2p_ie(padapter);
 	else
 		RTW_INFO("unknown OUI type!\n");
-
-
 }
 
 void _update_beacon(_adapter *padapter, u8 ie_id, u8 *oui, u8 tx, const char *tag)
@@ -2928,7 +2908,6 @@ void rtw_process_public_act_bsscoex(_adapter *padapter, u8 *pframe, uint frame_l
 	if (psta == NULL)
 		return;
 
-
 	category = frame_body[0];
 	action = frame_body[1];
 
@@ -2964,14 +2943,9 @@ void rtw_process_public_act_bsscoex(_adapter *padapter, u8 *pframe, uint frame_l
 	}
 
 	if (beacon_updated) {
-
 		update_beacon(padapter, _HT_ADD_INFO_IE_, NULL, _TRUE);
-
 		associated_stainfo_update(padapter, psta, STA_INFO_UPDATE_BW);
 	}
-
-
-
 }
 
 void rtw_process_ht_action_smps(_adapter *padapter, u8 *ta, u8 ctrl_field)
@@ -3002,7 +2976,6 @@ void rtw_process_ht_action_smps(_adapter *padapter, u8 *ta, u8 ctrl_field)
 	}
 
 	rtw_dm_ra_mask_wk_cmd(padapter, (u8 *)psta);
-
 }
 
 /*
@@ -3085,7 +3058,6 @@ int rtw_ht_operation_update(_adapter *padapter)
 		 __FUNCTION__, pmlmepriv->ht_op_mode, op_mode_changes);
 
 	return op_mode_changes;
-
 }
 
 #endif /* CONFIG_80211N_HT */
@@ -3196,7 +3168,6 @@ void bss_cap_update_on_sta_join(_adapter *padapter, struct sta_info *psta)
 
 	}
 
-
 #if 0
 	if (!(psta->capability & WLAN_CAPABILITY_SHORT_SLOT) &&
 	    !psta->no_short_slot_time_set) {
@@ -3291,7 +3262,6 @@ void bss_cap_update_on_sta_join(_adapter *padapter, struct sta_info *psta)
 	associated_clients_update(padapter,  beacon_updated, STA_INFO_UPDATE_ALL);
 
 	RTW_INFO("%s, updated=%d\n", __func__, beacon_updated);
-
 }
 
 u8 bss_cap_update_on_sta_leave(_adapter *padapter, struct sta_info *psta)
@@ -3368,7 +3338,6 @@ u8 bss_cap_update_on_sta_leave(_adapter *padapter, struct sta_info *psta)
 	RTW_INFO("%s, updated=%d\n", __func__, beacon_updated);
 
 	return beacon_updated;
-
 }
 
 u8 ap_free_sta(_adapter *padapter, struct sta_info *psta, bool active, u16 reason, bool enqueue)
@@ -3432,9 +3401,7 @@ u8 ap_free_sta(_adapter *padapter, struct sta_info *psta, bool active, u16 reaso
 	rtw_free_stainfo(padapter, psta);
 	/* _exit_critical_bh(&(pstapriv->sta_hash_lock), &irqL); */
 
-
 	return beacon_updated;
-
 }
 
 int rtw_ap_inform_ch_switch(_adapter *padapter, u8 new_ch, u8 ch_offset)
@@ -4237,7 +4204,6 @@ void tx_beacon_handlder(struct dvobj_priv *pdvobj)
 		return;
 	}
 
-
 	bcn_interval_us = DEFAULT_BCN_INTERVAL * NET80211_TU_TO_US;
 	if (0 == bcn_interval_us) {
 		RTW_INFO("[%s] ERROR: beacon interval = 0\n", __func__);
@@ -4253,7 +4219,6 @@ void tx_beacon_handlder(struct dvobj_priv *pdvobj)
 		timestamp[1] = (u32)(time >> 32);
 	}
 	cur_tick = timestamp[0] % bcn_interval_us;
-
 
 	_enter_critical_bh(&pdvobj->ap_if_q.lock, &irqL);
 
@@ -4489,7 +4454,6 @@ u16 rtw_ap_parse_sta_security_ie(_adapter *adapter, struct sta_info *sta, struct
 				status = WLAN_STATUS_PAIRWISE_CIPHER_NOT_VALID;
 		} else
 			status = WLAN_STATUS_INVALID_IE;
-
 	}
 	else if ((sec->wpa_psk & BIT(0)) && elems->wpa_ie) {
 		wpa_ie = elems->wpa_ie;
@@ -4694,4 +4658,3 @@ exit:
 	return;
 }
 #endif /* CONFIG_AP_MODE */
-

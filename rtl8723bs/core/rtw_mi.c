@@ -1,17 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0
 /******************************************************************************
  *
- * Copyright(c) 2007 - 2017 Realtek Corporation.
+ * Copyright(c) 2007 - 2017 Realtek Corporation. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- *****************************************************************************/
+ ******************************************************************************/
 #define _RTW_MI_C_
 
 #include <drv_types.h>
@@ -806,25 +798,6 @@ void rtw_mi_buddy_hal_dump_macaddr(_adapter *padapter)
 	_rtw_mi_process(padapter, _TRUE, NULL, _rtw_mi_hal_dump_macaddr);
 }
 
-#ifdef CONFIG_PCI_HCI
-static u8 _rtw_mi_xmit_tasklet_schedule(_adapter *padapter, void *data)
-{
-	if (rtw_txframes_pending(padapter)) {
-		/* try to deal with the pending packets */
-		tasklet_hi_schedule(&(padapter->xmitpriv.xmit_tasklet));
-	}
-	return _TRUE;
-}
-void rtw_mi_xmit_tasklet_schedule(_adapter *padapter)
-{
-	_rtw_mi_process(padapter, _FALSE, NULL, _rtw_mi_xmit_tasklet_schedule);
-}
-void rtw_mi_buddy_xmit_tasklet_schedule(_adapter *padapter)
-{
-	_rtw_mi_process(padapter, _TRUE, NULL, _rtw_mi_xmit_tasklet_schedule);
-}
-#endif
-
 u8 _rtw_mi_busy_traffic_check(_adapter *padapter, void *data)
 {
 	u32 passtime;
@@ -1397,30 +1370,7 @@ void rtw_mi_buddy_clone_bcmc_packet(_adapter *padapter, union recv_frame *precvf
 			}
 		}
 	}
-
 }
-
-#ifdef CONFIG_PCI_HCI
-/*API be created temporary for MI, caller is interrupt-handler, PCIE's interrupt handler cannot apply to multi-AP*/
-_adapter *rtw_mi_get_ap_adapter(_adapter *padapter)
-{
-	struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
-	int i;
-	_adapter *iface = NULL;
-
-	for (i = 0; i < dvobj->iface_nums; i++) {
-		iface = dvobj->padapters[i];
-		if (!iface)
-			continue;
-
-		if (check_fwstate(&iface->mlmepriv, WIFI_AP_STATE) == _TRUE
-		    && check_fwstate(&iface->mlmepriv, WIFI_ASOC_STATE) == _TRUE)
-			break;
-
-	}
-	return iface;
-}
-#endif
 
 void rtw_mi_update_ap_bmc_camid(_adapter *padapter, u8 camid_a, u8 camid_b)
 {
