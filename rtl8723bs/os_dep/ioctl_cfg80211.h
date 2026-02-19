@@ -357,6 +357,4 @@ void rtw_cfg80211_deinit_rfkill(struct wiphy *wiphy);
 #define NUM_NL80211_BANDS IEEE80211_NUM_BANDS
 #endif
 
-#include "rtw_cfgvendor.h"
-
 #endif /* __IOCTL_CFG80211_H__ */

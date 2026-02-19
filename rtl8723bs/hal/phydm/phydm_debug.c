@@ -20,10 +20,7 @@
 #include "mp_precomp.h"
 #include "phydm_precomp.h"
 
-void
-phydm_init_debug_setting(
-	struct PHY_DM_STRUCT		*p_dm
-)
+void phydm_init_debug_setting(struct PHY_DM_STRUCT *p_dm)
 {
 	p_dm->debug_level = ODM_DBG_TRACE;
 
@@ -74,11 +71,8 @@ phydm_init_debug_setting(
 	p_dm->c2h_cmd_start = 0;
 }
 
-void
-phydm_bb_dbg_port_header_sel(
-	void			*p_dm_void,
-	u32			header_idx
-) {
+void phydm_bb_dbg_port_header_sel(void *p_dm_void, u32 header_idx)
+{
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	
 	if (p_dm->support_ic_type & ODM_IC_11AC_SERIES) {
@@ -103,11 +97,8 @@ phydm_bb_dbg_port_header_sel(
 	}
 }
 
-void
-phydm_bb_dbg_port_clock_en(
-	void			*p_dm_void,
-	u8			enable
-) {
+void phydm_bb_dbg_port_clock_en(void *p_dm_void, u8 enable)
+{
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	u32		reg_value = 0;
 	
@@ -118,12 +109,7 @@ phydm_bb_dbg_port_clock_en(
 	}
 }
 
-u8
-phydm_set_bb_dbg_port(
-	void			*p_dm_void,
-	u8			curr_dbg_priority,
-	u32			debug_port
-)
+u8 phydm_set_bb_dbg_port(void *p_dm_void, u8 curr_dbg_priority, u32 debug_port)
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	u8	dbg_port_result = false;
@@ -148,10 +134,7 @@ phydm_set_bb_dbg_port(
 	return dbg_port_result;
 }
 
-void
-phydm_release_bb_dbg_port(
-	void			*p_dm_void
-)
+void phydm_release_bb_dbg_port(void *p_dm_void)
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 
@@ -162,10 +145,7 @@ phydm_release_bb_dbg_port(
 	PHYDM_DBG(p_dm, ODM_COMP_API, ("Release BB dbg_port\n"));
 }
 
-u32
-phydm_get_bb_dbg_port_value(
-	void			*p_dm_void
-)
+u32 phydm_get_bb_dbg_port_value(void *p_dm_void)
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	u32	dbg_port_value = 0;
@@ -183,8 +163,7 @@ phydm_get_bb_dbg_port_value(
 
 #ifdef CONFIG_PHYDM_DEBUG_FUNCTION
 
-void
-phydm_bb_debug_info_n_series(
+void phydm_bb_debug_info_n_series(
 	void			*p_dm_void,
 	u32			*_used,
 	char				*output,
@@ -350,12 +329,9 @@ phydm_bb_debug_info_n_series(
 
 	PHYDM_SNPRINTF((output + used, out_len - used, "\r\n %-35s = %d / %d", "End CFO(Hz) <A/B>", cfo_end_a, cfo_end_b));
 	PHYDM_SNPRINTF((output + used, out_len - used, "\r\n %-35s = %d / %d", "ACQ CFO(Hz) <A/B>", acq_cfo_a, acq_cfo_b));
-
 }
 
-
-void
-phydm_bb_debug_info(
+void phydm_bb_debug_info(
 	void			*p_dm_void,
 	u32			*_used,
 	char			*output,
@@ -801,16 +777,13 @@ phydm_bb_debug_info(
 	}
 	*_used = used;
 	*_out_len = out_len;
-
 }
 #endif /*#ifdef CONFIG_PHYDM_DEBUG_FUNCTION*/
 
 #if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
 
 #ifdef CONFIG_PHYDM_DEBUG_FUNCTION
-void phydm_sbd_check(
-	struct PHY_DM_STRUCT					*p_dm
-)
+void phydm_sbd_check(struct PHY_DM_STRUCT *p_dm)
 {
 	static u32	pkt_cnt = 0;
 	static boolean sbd_state = 0;
@@ -832,9 +805,7 @@ void phydm_sbd_check(
 }
 #endif
 
-void phydm_sbd_callback(
-	struct timer_list		*p_timer
-)
+void phydm_sbd_callback(struct timer_list *p_timer)
 {
 #ifdef CONFIG_PHYDM_DEBUG_FUNCTION
 	struct _ADAPTER		*adapter = (struct _ADAPTER *)p_timer->Adapter;
@@ -863,10 +834,7 @@ void phydm_sbd_workitem_callback(
 }
 #endif
 
-void
-phydm_reset_rx_rate_distribution(
-	struct PHY_DM_STRUCT	*p_dm_odm
-)
+void phydm_reset_rx_rate_distribution(struct PHY_DM_STRUCT *p_dm_odm)
 {
 	struct _odm_phy_dbg_info_		*p_dbg = &(p_dm_odm->phy_dbg_info);
 
@@ -880,11 +848,7 @@ phydm_reset_rx_rate_distribution(
 #endif
 }
 
-void
-phydm_rx_rate_distribution
-(
-	void			*p_dm_void
-)
+void phydm_rx_rate_distribution(void *p_dm_void)
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct _odm_phy_dbg_info_		*p_dbg = &(p_dm->phy_dbg_info);
@@ -952,14 +916,9 @@ phydm_rx_rate_distribution
 		}
 	}
 #endif
-	
 }
 
-void
-phydm_get_avg_phystatus_val
-(
-	void		*p_dm_void
-)
+void phydm_get_avg_phystatus_val(void		*p_dm_void)
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct phydm_phystatus_statistic		*p_dbg_statistic = &(p_dm->phy_dbg_info.phystatus_statistic_info);
@@ -1066,9 +1025,6 @@ phydm_get_avg_phystatus_val
 			p_dbg_avg->snr_4ss_avg[0], p_dbg_avg->snr_4ss_avg[1], p_dbg_avg->snr_4ss_avg[2], p_dbg_avg->snr_4ss_avg[3]));
 	}
 	#endif
-
-	
-
 }
 
 void
@@ -1195,234 +1151,8 @@ phydm_basic_dbg_message
 #endif
 }
 
-
-void phydm_basic_profile(
-	void			*p_dm_void,
-	u32			*_used,
-	char				*output,
-	u32			*_out_len
-)
-{
 #ifdef CONFIG_PHYDM_DEBUG_FUNCTION
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	char  *cut = NULL;
-	char *ic_type = NULL;
-	u32 used = *_used;
-	u32 out_len = *_out_len;
-	u32	date = 0;
-	char	*commit_by = NULL;
-	u32	release_ver = 0;
-
-	PHYDM_SNPRINTF((output + used, out_len - used, "%-35s\n", "% Basic Profile %"));
-
-	if (p_dm->support_ic_type == ODM_RTL8188E) {
-#if (RTL8188E_SUPPORT == 1)
-		ic_type = "RTL8188E";
-		date = RELEASE_DATE_8188E;
-		commit_by = COMMIT_BY_8188E;
-		release_ver = RELEASE_VERSION_8188E;
-#endif
-	}
-#if (RTL8812A_SUPPORT == 1)
-	else if (p_dm->support_ic_type == ODM_RTL8812) {
-		ic_type = "RTL8812A";
-		date = RELEASE_DATE_8812A;
-		commit_by = COMMIT_BY_8812A;
-		release_ver = RELEASE_VERSION_8812A;
-	}
-#endif
-#if (RTL8821A_SUPPORT == 1)
-	else if (p_dm->support_ic_type == ODM_RTL8821) {
-		ic_type = "RTL8821A";
-		date = RELEASE_DATE_8821A;
-		commit_by = COMMIT_BY_8821A;
-		release_ver = RELEASE_VERSION_8821A;
-	}
-#endif
-#if (RTL8192E_SUPPORT == 1)
-	else if (p_dm->support_ic_type == ODM_RTL8192E) {
-		ic_type = "RTL8192E";
-		date = RELEASE_DATE_8192E;
-		commit_by = COMMIT_BY_8192E;
-		release_ver = RELEASE_VERSION_8192E;
-	}
-#endif
-#if (RTL8723B_SUPPORT == 1)
-	else if (p_dm->support_ic_type == ODM_RTL8723B) {
-		ic_type = "RTL8723B";
-		date = RELEASE_DATE_8723B;
-		commit_by = COMMIT_BY_8723B;
-		release_ver = RELEASE_VERSION_8723B;
-	}
-#endif
-#if (RTL8814A_SUPPORT == 1)
-	else if (p_dm->support_ic_type == ODM_RTL8814A) {
-		ic_type = "RTL8814A";
-		date = RELEASE_DATE_8814A;
-		commit_by = COMMIT_BY_8814A;
-		release_ver = RELEASE_VERSION_8814A;
-	}
-#endif
-#if (RTL8881A_SUPPORT == 1)
-	else if (p_dm->support_ic_type == ODM_RTL8881A) {
-		ic_type = "RTL8881A";
-		/**/
-	}
-#endif
-#if (RTL8822B_SUPPORT == 1)
-	else if (p_dm->support_ic_type == ODM_RTL8822B) {
-		ic_type = "RTL8822B";
-		date = RELEASE_DATE_8822B;
-		commit_by = COMMIT_BY_8822B;
-		release_ver = RELEASE_VERSION_8822B;
-	}
-#endif
-#if (RTL8197F_SUPPORT == 1)
-	else if (p_dm->support_ic_type == ODM_RTL8197F) {
-		ic_type = "RTL8197F";
-		date = RELEASE_DATE_8197F;
-		commit_by = COMMIT_BY_8197F;
-		release_ver = RELEASE_VERSION_8197F;
-	}
-#endif
-
-#if (RTL8703B_SUPPORT == 1)
-	else if (p_dm->support_ic_type == ODM_RTL8703B) {
-
-		ic_type = "RTL8703B";
-		date = RELEASE_DATE_8703B;
-		commit_by = COMMIT_BY_8703B;
-		release_ver = RELEASE_VERSION_8703B;
-
-	}
-#endif
-#if (RTL8195A_SUPPORT == 1)
-	else if (p_dm->support_ic_type == ODM_RTL8195A) {
-		ic_type = "RTL8195A";
-		/**/
-	}
-#endif
-#if (RTL8188F_SUPPORT == 1)
-	else if (p_dm->support_ic_type == ODM_RTL8188F) {
-		ic_type = "RTL8188F";
-		date = RELEASE_DATE_8188F;
-		commit_by = COMMIT_BY_8188F;
-		release_ver = RELEASE_VERSION_8188F;
-	}
-#endif
-#if (RTL8723D_SUPPORT == 1)
-	else if (p_dm->support_ic_type == ODM_RTL8723D) {
-		ic_type = "RTL8723D";
-		date = RELEASE_DATE_8723D;
-		commit_by = COMMIT_BY_8723D;
-		release_ver = RELEASE_VERSION_8723D;
-		/**/
-	}
-#endif
-
-/* JJ ADD 20161014 */
-#if (RTL8710B_SUPPORT == 1)
-	else if (p_dm->support_ic_type == ODM_RTL8710B) {
-		ic_type = "RTL8710B";
-		date = RELEASE_DATE_8710B;
-		commit_by = COMMIT_BY_8710B;
-		release_ver = RELEASE_VERSION_8710B;
-		/**/
-	}
-#endif
-
-#if (RTL8821C_SUPPORT == 1)
-	else if (p_dm->support_ic_type == ODM_RTL8821C) {
-		ic_type = "RTL8821C";
-		date = RELEASE_DATE_8821C;
-		commit_by = COMMIT_BY_8821C;
-		release_ver = RELEASE_VERSION_8821C;
-	}
-#endif
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s (MP Chip: %s)\n", "IC type", ic_type, p_dm->is_mp_chip ? "Yes" : "No"));
-
-	if (p_dm->cut_version == ODM_CUT_A)
-		cut = "A";
-	else if (p_dm->cut_version == ODM_CUT_B)
-		cut = "B";
-	else if (p_dm->cut_version == ODM_CUT_C)
-		cut = "C";
-	else if (p_dm->cut_version == ODM_CUT_D)
-		cut = "D";
-	else if (p_dm->cut_version == ODM_CUT_E)
-		cut = "E";
-	else if (p_dm->cut_version == ODM_CUT_F)
-		cut = "F";
-	else if (p_dm->cut_version == ODM_CUT_I)
-		cut = "I";
-
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %d\n", "RFE type", p_dm->rfe_type));
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "Cut Ver", cut));
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %d\n", "PHY Para Ver", odm_get_hw_img_version(p_dm)));
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %d\n", "PHY Para Commit date", date));
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "PHY Para Commit by", commit_by));
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %d\n", "PHY Para Release Ver", release_ver));
-
-#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
-	{
-		struct _ADAPTER		*adapter = p_dm->adapter;
-		PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %d (Subversion: %d)\n", "FW Ver", adapter->MgntInfo.FirmwareVersion, adapter->MgntInfo.FirmwareSubVersion));
-	}
-#elif (DM_ODM_SUPPORT_TYPE & ODM_AP)
-	{
-		struct rtl8192cd_priv *priv = p_dm->priv;
-		PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %d (Subversion: %d)\n", "FW Ver", priv->pshare->fw_version, priv->pshare->fw_sub_version));
-	}
-#elif (DM_ODM_SUPPORT_TYPE == ODM_CE) && defined(DM_ODM_CE_MAC80211)
-	{
-		struct rtl_priv *rtlpriv = (struct rtl_priv *)p_dm->adapter;
-		struct rtl_hal *rtlhal = rtl_hal(rtlpriv);
-
-		PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %d (Subversion: %d)\n", "FW Ver", rtlhal->fw_version, rtlhal->fw_subversion));
-	}
-#else
-	{
-		struct _ADAPTER		*adapter = p_dm->adapter;
-		HAL_DATA_TYPE		*p_hal_data = GET_HAL_DATA(adapter);
-		PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %d (Subversion: %d)\n", "FW Ver", p_hal_data->firmware_version, p_hal_data->firmware_sub_version));
-	}
-#endif
-	/* 1 PHY DM version List */
-	PHYDM_SNPRINTF((output + used, out_len - used, "%-35s\n", "% PHYDM version %"));
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "Code base", PHYDM_CODE_BASE));
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "Release Date", PHYDM_RELEASE_DATE));
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "Adaptivity", ADAPTIVITY_VERSION));
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "DIG", DIG_VERSION));
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "CFO Tracking", CFO_TRACKING_VERSION));
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "AntDiv", ANTDIV_VERSION));
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "Dynamic TxPower", DYNAMIC_TXPWR_VERSION));
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "RA Info", RAINFO_VERSION));
-#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "AntDetect", ANTDECT_VERSION));
-#endif
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "ACS", ACS_VERSION));
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "PathDiv", PATHDIV_VERSION));
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "LA mode", DYNAMIC_LA_MODE));
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "Primary CCA", PRIMARYCCA_VERSION));
-	PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "DFS", DFS_VERSION));
-
-#if (RTL8822B_SUPPORT == 1)
-	if (p_dm->support_ic_type & ODM_RTL8822B)
-		PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "PHY config 8822B", PHY_CONFIG_VERSION_8822B));
-
-#endif
-#if (RTL8197F_SUPPORT == 1)
-	if (p_dm->support_ic_type & ODM_RTL8197F)
-		PHYDM_SNPRINTF((output + used, out_len - used, "  %-35s: %s\n", "PHY config 8197F", PHY_CONFIG_VERSION_8197F));
-#endif
-	*_used = used;
-	*_out_len = out_len;
-#endif /*#if CONFIG_PHYDM_DEBUG_FUNCTION*/
-}
-
-#ifdef CONFIG_PHYDM_DEBUG_FUNCTION
-void
-phydm_fw_trace_en_h2c(
+void phydm_fw_trace_en_h2c(
 	void		*p_dm_void,
 	boolean		enable,
 	u32		fw_debug_component,
@@ -1453,7 +1183,6 @@ phydm_fw_trace_en_h2c(
 		cmd_length = 3;
 	}
 
-
 	PHYDM_DBG(p_dm, DBG_FW_TRACE, ("---->\n"));
 	if (monitor_mode == 0)
 		PHYDM_DBG(p_dm, DBG_FW_TRACE, ("[H2C] FW_debug_en: (( %d ))\n", enable));
@@ -1462,8 +1191,7 @@ phydm_fw_trace_en_h2c(
 	odm_fill_h2c_cmd(p_dm, PHYDM_H2C_FW_TRACE_EN, cmd_length, h2c_parameter);
 }
 
-void
-phydm_get_per_path_txagc(
+void phydm_get_per_path_txagc(
 	void			*p_dm_void,
 	u8			path,
 	u32			*_used,
@@ -1516,9 +1244,7 @@ phydm_get_per_path_txagc(
 
 }
 
-
-void
-phydm_get_txagc(
+void phydm_get_txagc(
 	void			*p_dm_void,
 	u32			*_used,
 	char			*output,
@@ -1547,11 +1273,9 @@ phydm_get_txagc(
 
 	*_used = used;
 	*_out_len = out_len;
-
 }
 
-void
-phydm_set_txagc(
+void phydm_set_txagc(
 	void			*p_dm_void,
 	u32			*const dm_value,
 	u32			*_used,
@@ -1743,7 +1467,6 @@ phydm_dump_bb_reg(
 	u32			used = *_used;
 	u32			out_len = *_out_len;
 
-
 	/* BB Reg, For Nseries IC we only need to dump page8 to pageF using 3 digits*/
 	for (addr = 0x800; addr < 0xfff; addr += 4) {
 		if (p_dm->support_ic_type & ODM_IC_11N_SERIES)
@@ -1831,70 +1554,6 @@ phydm_dump_all_reg(
 }
 
 void
-phydm_enable_big_jump(
-	struct PHY_DM_STRUCT	*p_dm,
-	boolean		state
-)
-{
-#if (RTL8822B_SUPPORT == 1)
-	struct phydm_dig_struct			*p_dig_t = &p_dm->dm_dig_table;
-
-	if (state == false) {
-		p_dm->dm_dig_table.enable_adjust_big_jump = false;
-		odm_set_bb_reg(p_dm, 0x8c8, 0xfe, ((p_dig_t->big_jump_step3 << 5) | (p_dig_t->big_jump_step2 << 3) | p_dig_t->big_jump_step1));
-	} else
-		p_dm->dm_dig_table.enable_adjust_big_jump = true;
-#endif
-}
-
-#if (RTL8822B_SUPPORT == 1 | RTL8821C_SUPPORT == 1 | RTL8814B_SUPPORT == 1)
-
-void
-phydm_show_rx_rate(
-	struct PHY_DM_STRUCT			*p_dm,
-	u32			*_used,
-	char			*output,
-	u32			*_out_len
-)
-{
-	u32			used = *_used;
-	u32			out_len = *_out_len;
-
-	PHYDM_SNPRINTF((output + used, out_len - used, "=====Rx SU rate Statistics=====\n"));
-	PHYDM_SNPRINTF((output + used, out_len - used, "1SS MCS0 = %d, 1SS MCS1 = %d, 1SS MCS2 = %d, 1SS MCS 3 = %d\n",
-		p_dm->phy_dbg_info.num_qry_vht_pkt[0], p_dm->phy_dbg_info.num_qry_vht_pkt[1], p_dm->phy_dbg_info.num_qry_vht_pkt[2], p_dm->phy_dbg_info.num_qry_vht_pkt[3]));
-	PHYDM_SNPRINTF((output + used, out_len - used, "1SS MCS4 = %d, 1SS MCS5 = %d, 1SS MCS6 = %d, 1SS MCS 7 = %d\n",
-		p_dm->phy_dbg_info.num_qry_vht_pkt[4], p_dm->phy_dbg_info.num_qry_vht_pkt[5], p_dm->phy_dbg_info.num_qry_vht_pkt[6], p_dm->phy_dbg_info.num_qry_vht_pkt[7]));
-	PHYDM_SNPRINTF((output + used, out_len - used, "1SS MCS8 = %d, 1SS MCS9 = %d\n",
-		p_dm->phy_dbg_info.num_qry_vht_pkt[8], p_dm->phy_dbg_info.num_qry_vht_pkt[9]));
-	PHYDM_SNPRINTF((output + used, out_len - used, "2SS MCS0 = %d, 2SS MCS1 = %d, 2SS MCS2 = %d, 2SS MCS 3 = %d\n",
-		p_dm->phy_dbg_info.num_qry_vht_pkt[10], p_dm->phy_dbg_info.num_qry_vht_pkt[11], p_dm->phy_dbg_info.num_qry_vht_pkt[12], p_dm->phy_dbg_info.num_qry_vht_pkt[13]));
-	PHYDM_SNPRINTF((output + used, out_len - used, "2SS MCS4 = %d, 2SS MCS5 = %d, 2SS MCS6 = %d, 2SS MCS 7 = %d\n",
-		p_dm->phy_dbg_info.num_qry_vht_pkt[14], p_dm->phy_dbg_info.num_qry_vht_pkt[15], p_dm->phy_dbg_info.num_qry_vht_pkt[16], p_dm->phy_dbg_info.num_qry_vht_pkt[17]));
-	PHYDM_SNPRINTF((output + used, out_len - used, "2SS MCS8 = %d, 2SS MCS9 = %d\n",
-		p_dm->phy_dbg_info.num_qry_vht_pkt[18], p_dm->phy_dbg_info.num_qry_vht_pkt[19]));
-
-	PHYDM_SNPRINTF((output + used, out_len - used, "=====Rx MU rate Statistics=====\n"));
-	PHYDM_SNPRINTF((output + used, out_len - used, "1SS MCS0 = %d, 1SS MCS1 = %d, 1SS MCS2 = %d, 1SS MCS 3 = %d\n",
-		p_dm->phy_dbg_info.num_qry_mu_vht_pkt[0], p_dm->phy_dbg_info.num_qry_mu_vht_pkt[1], p_dm->phy_dbg_info.num_qry_mu_vht_pkt[2], p_dm->phy_dbg_info.num_qry_mu_vht_pkt[3]));
-	PHYDM_SNPRINTF((output + used, out_len - used, "1SS MCS4 = %d, 1SS MCS5 = %d, 1SS MCS6 = %d, 1SS MCS 7 = %d\n",
-		p_dm->phy_dbg_info.num_qry_mu_vht_pkt[4], p_dm->phy_dbg_info.num_qry_mu_vht_pkt[5], p_dm->phy_dbg_info.num_qry_mu_vht_pkt[6], p_dm->phy_dbg_info.num_qry_mu_vht_pkt[7]));
-	PHYDM_SNPRINTF((output + used, out_len - used, "1SS MCS8 = %d, 1SS MCS9 = %d\n",
-		p_dm->phy_dbg_info.num_qry_mu_vht_pkt[8], p_dm->phy_dbg_info.num_qry_mu_vht_pkt[9]));
-	PHYDM_SNPRINTF((output + used, out_len - used, "2SS MCS0 = %d, 2SS MCS1 = %d, 2SS MCS2 = %d, 2SS MCS 3 = %d\n",
-		p_dm->phy_dbg_info.num_qry_mu_vht_pkt[10], p_dm->phy_dbg_info.num_qry_mu_vht_pkt[11], p_dm->phy_dbg_info.num_qry_mu_vht_pkt[12], p_dm->phy_dbg_info.num_qry_mu_vht_pkt[13]));
-	PHYDM_SNPRINTF((output + used, out_len - used, "2SS MCS4 = %d, 2SS MCS5 = %d, 2SS MCS6 = %d, 2SS MCS 7 = %d\n",
-		p_dm->phy_dbg_info.num_qry_mu_vht_pkt[14], p_dm->phy_dbg_info.num_qry_mu_vht_pkt[15], p_dm->phy_dbg_info.num_qry_mu_vht_pkt[16], p_dm->phy_dbg_info.num_qry_mu_vht_pkt[17]));
-	PHYDM_SNPRINTF((output + used, out_len - used, "2SS MCS8 = %d, 2SS MCS9 = %d\n",
-		p_dm->phy_dbg_info.num_qry_mu_vht_pkt[18], p_dm->phy_dbg_info.num_qry_mu_vht_pkt[19]));
-
-	*_used = used;
-	*_out_len = out_len;
-}
-
-#endif
-
-void
 phydm_api_adjust(
 	void		*p_dm_void,
 	char		input[][16],
@@ -1913,15 +1572,15 @@ phydm_api_adjust(
 	boolean	is_enable_dbg_mode;
 	u8 central_ch, primary_ch_idx;
 	enum channel_width	bandwidth;
-	
+
 #ifdef PHYDM_COMMON_API_SUPPORT
 
 	if ((strcmp(input[1], help) == 0)) {
-		
+
 		PHYDM_SNPRINTF((output + used, out_len - used, "{en} {ch_num} {prm_ch 1/2/3/4/9/10} {0:20M, 1:40M, 2:80M}\n"));
-		
+
 	} else {
-	
+
 		if (p_dm->support_ic_type & (ODM_RTL8822B | ODM_RTL8197F | ODM_RTL8821C)) {
 
 			for (i = 0; i < 4; i++) {
@@ -1979,7 +1638,7 @@ phydm_parameter_adjust(
 		PHYDM_SNPRINTF((output + used, out_len - used, "1. X_cap = ((0x%x))\n", p_cfo_track->crystal_cap));
 
 	} else {
-	
+
 		PHYDM_SSCANF(input[1], DCMD_DECIMAL, &var1[0]);
 
 		if (var1[0] == 0) {
@@ -2050,7 +1709,7 @@ enum PHYDM_CMD_ID {
 struct _PHYDM_COMMAND phy_dm_ary[] = {
 	{"-h", PHYDM_HELP},		/*do not move this element to other position*/
 	{"demo", PHYDM_DEMO},	/*do not move this element to other position*/
-	{"dig", PHYDM_DIG},	
+	{"dig", PHYDM_DIG},
 	{"ra", PHYDM_RA},
 	{"profile", PHYDM_PROFILE},
 	{"antdiv", PHYDM_ANTDIV},
@@ -2098,8 +1757,7 @@ struct _PHYDM_COMMAND phy_dm_ary[] = {
 
 #endif /*#ifdef CONFIG_PHYDM_DEBUG_FUNCTION*/
 
-void
-phydm_cmd_parser(
+void phydm_cmd_parser(
 	struct PHY_DM_STRUCT	*p_dm,
 	char		input[][MAX_ARGV],
 	u32	input_num,
@@ -2234,7 +1892,6 @@ phydm_cmd_parser(
 			phydm_debug_trace(p_dm, (u32 *)var1, &used, output, &out_len);
 		}
 
-
 		break;
 
 	case PHYDM_FW_DEBUG:
@@ -2289,13 +1946,8 @@ phydm_cmd_parser(
 		PHYDM_SNPRINTF((output + used, out_len - used, "TRX IQK Trigger\n"));
 		halrf_iqk_trigger(p_dm, false);
 
-		#if (RTL8822B_SUPPORT == 1 || RTL8821C_SUPPORT == 1)
-		if (p_dm->support_ic_type & (ODM_RTL8822B | ODM_RTL8821C))
-			halrf_iqk_info_dump(p_dm, &used, output, &out_len);
-		#endif
-		
 		break;
-		
+
 	case PHYDM_IQK_DEBUG:
 
 		for (i = 0; i < 5; i++) {
@@ -2305,12 +1957,6 @@ phydm_cmd_parser(
 			}
 		}
 
-		if (input_idx >= 1) {
-			#if (RTL8822B_SUPPORT == 1 || RTL8821C_SUPPORT == 1)
-			if (p_dm->support_ic_type & (ODM_RTL8822B | ODM_RTL8821C))
-				halrf_iqk_debug(p_dm, (u32 *)var1, &used, output, &out_len);
-			#endif
-		}
 		break;
 		
 	case PHYDM_SMART_ANT:
@@ -2342,10 +1988,6 @@ phydm_cmd_parser(
 
 	case PHYDM_API:
 		phydm_api_adjust(p_dm, &input[0], &used, output, &out_len, input_num);
-		break;
-
-	case PHYDM_PROFILE:
-		phydm_basic_profile(p_dm, &used, output, &out_len);
 		break;
 
 	case PHYDM_GET_TXAGC:
@@ -2388,27 +2030,6 @@ phydm_cmd_parser(
 			if (input[i + 1])
 				PHYDM_SSCANF(input[i + 1], DCMD_DECIMAL, &var1[i]);
 		}
-#if (RTL8822B_SUPPORT == 1 || RTL8197F_SUPPORT == 1)
-		if (p_dm->support_ic_type & (ODM_RTL8822B | ODM_RTL8197F)) {
-			u8		tx_path, rx_path;
-			boolean		is_enable_dbg_mode, is_tx2_path;
-
-			is_enable_dbg_mode = (boolean)var1[0];
-			tx_path = (u8) var1[1];
-			rx_path = (u8) var1[2];
-			is_tx2_path = (boolean) var1[3];
-
-			if (is_enable_dbg_mode) {
-				p_dm->is_disable_phy_api = false;
-				phydm_api_trx_mode(p_dm, (enum bb_path) tx_path, (enum bb_path) rx_path, is_tx2_path);
-				p_dm->is_disable_phy_api = true;
-				PHYDM_SNPRINTF((output + used, out_len - used, "tx_path = 0x%x, rx_path = 0x%x, is_tx2_path = %d\n", tx_path, rx_path, is_tx2_path));
-			} else {
-				p_dm->is_disable_phy_api = false;
-				PHYDM_SNPRINTF((output + used, out_len - used, "Disable API debug mode\n"));
-			}
-		} else
-#endif
 			phydm_config_trx_path(p_dm, (u32 *)var1, &used, output, &out_len);
 
 		break;
@@ -2441,16 +2062,6 @@ phydm_cmd_parser(
 
 	case PHYDM_BIG_JUMP:
 	{
-#if (RTL8822B_SUPPORT == 1)
-		if (p_dm->support_ic_type & ODM_RTL8822B) {
-			if (input[1]) {
-				PHYDM_SSCANF(input[1], DCMD_DECIMAL, &var1[0]);
-				phydm_enable_big_jump(p_dm, (boolean)(var1[0]));
-			} else
-				PHYDM_SNPRINTF((output + used, out_len - used, "unknown command!\n"));
-		} else
-			PHYDM_SNPRINTF((output + used, out_len - used, "The command is only for 8822B!\n"));
-#endif
 		break;
 	}
 
@@ -2461,29 +2072,9 @@ phydm_cmd_parser(
 		break;
 
 	case PHYDM_SHOW_RXRATE:
-#if (RTL8822B_SUPPORT == 1 | RTL8821C_SUPPORT == 1 | RTL8814B_SUPPORT == 1)
-		if (p_dm->support_ic_type & PHYDM_IC_SUPPORT_MU_BFEE) {
-			u8	rate_idx;
-
-			if (input[1])
-				PHYDM_SSCANF(input[1], DCMD_DECIMAL, &var1[0]);
-
-			if (var1[0] == 1)
-				phydm_show_rx_rate(p_dm, &used, output, &out_len);
-			else {
-				PHYDM_SNPRINTF((output + used, out_len - used, "Reset Rx rate counter\n"));
-
-				for (rate_idx = 0; rate_idx < 40; rate_idx++) {
-					p_dm->phy_dbg_info.num_qry_vht_pkt[rate_idx] = 0;
-					p_dm->phy_dbg_info.num_qry_mu_vht_pkt[rate_idx] = 0;
-				}
-			}
-		}
-#endif
 		break;
 
 	case PHYDM_NBI_EN:
-
 		for (i = 0; i < 5; i++) {
 			if (input[i + 1]) {
 				PHYDM_SSCANF(input[i + 1], DCMD_DECIMAL, &var1[i]);
@@ -2497,11 +2088,9 @@ phydm_cmd_parser(
 			/**/
 		}
 
-
 		break;
 
 	case PHYDM_CSI_MASK_EN:
-
 		for (i = 0; i < 5; i++) {
 			if (input[i + 1]) {
 				PHYDM_SSCANF(input[i + 1], DCMD_DECIMAL, &var1[i]);
@@ -2514,7 +2103,6 @@ phydm_cmd_parser(
 			phydm_api_debug(p_dm, PHYDM_API_CSI_MASK, (u32 *)var1, &used, output, &out_len);
 			/**/
 		}
-
 
 		break;
 
@@ -2733,7 +2321,6 @@ phydm_cmd_parser(
 		if (input_idx >= 1)
 			phydm_h2C_debug(p_dm, (u32 *)var1, &used, output, &out_len);
 
-
 		break;
 
 	case PHYDM_ANT_SWITCH:
@@ -2753,7 +2340,6 @@ phydm_cmd_parser(
 			PHYDM_SNPRINTF((output + used, out_len - used, "Not Support IC"));
 #endif
 		}
-
 
 		break;
 
@@ -2979,20 +2565,13 @@ phydm_cmd(
 }
 #endif
 
-
-void
-phydm_fw_trace_handler(
-	void	*p_dm_void,
-	u8	*cmd_buf,
-	u8	cmd_len
-)
+void phydm_fw_trace_handler(void *p_dm_void, u8 *cmd_buf, u8 cmd_len)
 {
 #ifdef CONFIG_PHYDM_DEBUG_FUNCTION
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 
 	/*u8	debug_trace_11byte[60];*/
 	u8		freg_num, c2h_seq, buf_0 = 0;
-
 
 	if (!(p_dm->support_ic_type & PHYDM_IC_3081_SERIES))
 		return;
@@ -3012,8 +2591,6 @@ phydm_fw_trace_handler(
 	/*PHYDM_DBG(p_dm, DBG_FW_TRACE,("[FW debug message] %s\n", debug_trace_11byte));*/
 	/*PHYDM_DBG(p_dm, DBG_FW_TRACE,("[FW debug message] cmd_len = (( %d ))\n", cmd_len));*/
 	/*PHYDM_DBG(p_dm, DBG_FW_TRACE,("[FW debug message] c2h_cmd_start  = (( %d ))\n", p_dm->c2h_cmd_start));*/
-
-
 
 	/*PHYDM_DBG(p_dm, DBG_FW_TRACE,("pre_seq = (( %d )), current_seq = (( %d ))\n", p_dm->pre_c2h_seq, c2h_seq));*/
 	/*PHYDM_DBG(p_dm, DBG_FW_TRACE,("fw_buff_is_enpty = (( %d ))\n", p_dm->fw_buff_is_enpty));*/
@@ -3051,12 +2628,7 @@ phydm_fw_trace_handler(
 #endif /*#ifdef CONFIG_PHYDM_DEBUG_FUNCTION*/
 }
 
-void
-phydm_fw_trace_handler_code(
-	void	*p_dm_void,
-	u8	*buffer,
-	u8	cmd_len
-)
+void phydm_fw_trace_handler_code(void *p_dm_void, u8 *buffer, u8 cmd_len)
 {
 #ifdef CONFIG_PHYDM_DEBUG_FUNCTION
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
@@ -3234,12 +2806,7 @@ phydm_fw_trace_handler_code(
 #endif /*#ifdef CONFIG_PHYDM_DEBUG_FUNCTION*/
 }
 
-void
-phydm_fw_trace_handler_8051(
-	void	*p_dm_void,
-	u8	*buffer,
-	u8	cmd_len
-)
+void phydm_fw_trace_handler_8051(void *p_dm_void, u8 *buffer, u8 cmd_len)
 {
 #ifdef CONFIG_PHYDM_DEBUG_FUNCTION
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
@@ -3290,7 +2857,6 @@ go_backfor_aggre_dbg_pkt:
 			goto go_backfor_aggre_dbg_pkt;
 		}
 	}
-
 
 #endif
 #endif /*#ifdef CONFIG_PHYDM_DEBUG_FUNCTION*/

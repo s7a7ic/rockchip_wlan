@@ -2208,7 +2208,7 @@ u32 halbtcoutsrc_GetPhydmVersion(void *pBtcContext)
 	PADAPTER		Adapter = pBtCoexist->Adapter;
 
 #ifdef CONFIG_RTL8723B
-	return RELEASE_VERSION_8723B;
+	return 29; // RELEASE_VERSION_8723B
 #endif
 }
 
@@ -2411,11 +2411,7 @@ u8 EXhalbtcoutsrc_InitlizeVariables(void *padapter)
 
 	halbtcoutsrc_coex_offload_init();
 
-#ifdef CONFIG_PCI_HCI
-	pBtCoexist->chip_interface = BTC_INTF_PCI;
-#elif defined(CONFIG_USB_HCI)
-	pBtCoexist->chip_interface = BTC_INTF_USB;
-#elif defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
 	pBtCoexist->chip_interface = BTC_INTF_SDIO;
 #else
 	pBtCoexist->chip_interface = BTC_INTF_UNKNOWN;
