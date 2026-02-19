@@ -188,14 +188,6 @@ void rtw_enable_tdls_func(_adapter *padapter)
 	if (rtw_is_tdls_enabled(padapter) == _TRUE)
 		return;
 
-#if 0
-#ifdef CONFIG_MCC_MODE
-	if (rtw_hal_check_mcc_status(padapter, MCC_STATUS_DOING_MCC) == _TRUE) {
-		RTW_INFO("[TDLS] MCC is running, can't enable TDLS !\n");
-		return;
-	}
-#endif
-#endif
 	rtw_set_tdls_enable(padapter, _TRUE);
 }
 

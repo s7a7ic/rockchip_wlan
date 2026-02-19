@@ -54,7 +54,6 @@ CONFIG_REDUCE_TX_CPU_LOADING = n
 CONFIG_BR_EXT = y
 CONFIG_TDLS = n
 CONFIG_WIFI_MONITOR = n
-CONFIG_MCC_MODE = n
 CONFIG_APPEND_VENDOR_IE_ENABLE = n
 CONFIG_RTW_NAPI = y
 CONFIG_RTW_GRO = y
@@ -123,7 +122,6 @@ _HAL_INTFS_FILES :=	hal/hal_intf.o \
 			hal/hal_btcoex_wifionly.o \
 			hal/hal_btcoex.o \
 			hal/hal_mp.o \
-			hal/hal_mcc.o \
 			hal/hal_$(HCI_NAME).o
 
 _BTC_FILES += hal/HalBtc8723bWifiOnly.o
@@ -344,10 +342,6 @@ endif
 
 ifeq ($(CONFIG_WIFI_MONITOR), y)
 ccflags-y += -DCONFIG_WIFI_MONITOR
-endif
-
-ifeq ($(CONFIG_MCC_MODE), y)
-ccflags-y += -DCONFIG_MCC_MODE
 endif
 
 ifeq ($(CONFIG_RTW_NAPI), y)

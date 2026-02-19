@@ -51,18 +51,10 @@
 	#define NR_XMITBUFF	(128)
 #endif
 
-#ifdef PLATFORM_OS_CE
-	#define XMITBUF_ALIGN_SZ 4
+#ifdef USB_XMITBUF_ALIGN_SZ
+	#define XMITBUF_ALIGN_SZ (USB_XMITBUF_ALIGN_SZ)
 #else
-	#ifdef CONFIG_PCI_HCI
-		#define XMITBUF_ALIGN_SZ 4
-	#else
-		#ifdef USB_XMITBUF_ALIGN_SZ
-			#define XMITBUF_ALIGN_SZ (USB_XMITBUF_ALIGN_SZ)
-		#else
-			#define XMITBUF_ALIGN_SZ 512
-		#endif
-	#endif
+	#define XMITBUF_ALIGN_SZ 512
 #endif
 
 /* xmit extension buff defination */
@@ -74,13 +66,7 @@
 	#define NR_XMIT_EXTBUFF	(32)
 #endif
 
-#ifdef CONFIG_RTL8812A
-	#define MAX_CMDBUF_SZ	(512 * 17)
-#elif defined(CONFIG_RTL8723D) && defined(CONFIG_LPS_POFF)
-	#define MAX_CMDBUF_SZ	(128*70) /*(8960)*/
-#else
-	#define MAX_CMDBUF_SZ	(5120)	/* (4096) */
-#endif
+#define MAX_CMDBUF_SZ	(5120)	/* (4096) */
 
 #define MAX_NUMBLKS		(1)
 
@@ -100,14 +86,6 @@
 
 #define HW_QUEUE_ENTRY	8
 
-#ifdef CONFIG_PCI_HCI
-	#ifdef CONFIG_TRX_BD_ARCH
-		#define TX_BD_NUM			(128+1)	/* +1 result from ring buffer */
-	#else
-		#define TXDESC_NUM			128
-	#endif
-#endif
-
 #define WEP_IV(pattrib_iv, dot11txpn, keyidx)\
 	do {\
 		pattrib_iv[0] = dot11txpn._byte_.TSC0;\
@@ -116,7 +94,6 @@
 		pattrib_iv[3] = ((keyidx & 0x3)<<6);\
 		dot11txpn.val = (dot11txpn.val == 0xffffff) ? 0 : (dot11txpn.val+1);\
 	} while (0)
-
 
 #define TKIP_IV(pattrib_iv, dot11txpn, keyidx)\
 	do {\
@@ -175,10 +152,6 @@
 	defined(CONFIG_RTL8814A) || defined(CONFIG_RTL8703B) ||\
 	defined(CONFIG_RTL8188F) || defined(CONFIG_RTL8723D)
 	#define TXDESC_SIZE 40
-#elif defined(CONFIG_RTL8822B)
-	#define TXDESC_SIZE 48		/* HALMAC_TX_DESC_SIZE_8822B */
-#elif defined(CONFIG_RTL8821C)
-	#define TXDESC_SIZE 48		/* HALMAC_TX_DESC_SIZE_8821C */
 #else
 	#define TXDESC_SIZE 32 /* old IC (ex: 8188E) */
 #endif
@@ -187,33 +160,9 @@
 	#define EARLY_MODE_INFO_SIZE	8
 #endif
 
-
 #if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
 	#define TXDESC_OFFSET TXDESC_SIZE
 #endif
-
-#ifdef CONFIG_USB_HCI
-	#ifdef USB_PACKET_OFFSET_SZ
-		#define PACKET_OFFSET_SZ (USB_PACKET_OFFSET_SZ)
-	#else
-		#define PACKET_OFFSET_SZ (8)
-	#endif
-	#define TXDESC_OFFSET (TXDESC_SIZE + PACKET_OFFSET_SZ)
-#endif
-
-#ifdef CONFIG_PCI_HCI
-	#if defined(CONFIG_RTL8192E) || defined(CONFIG_RTL8814A) || defined(CONFIG_RTL8822B) || defined(CONFIG_RTL8821C) || defined(CONFIG_TRX_BD_ARCH)
-		/* this section is defined for buffer descriptor ring architecture */
-		#define TX_WIFI_INFO_SIZE (TXDESC_SIZE) /* it may add 802.11 hdr or others... */
-		/* tx desc and payload are in the same buf */
-		#define TXDESC_OFFSET (TX_WIFI_INFO_SIZE)
-	#else
-		/* tx desc and payload are NOT in the same buf */
-		#define TXDESC_OFFSET (0)
-		/* 8188ee/8723be/8812ae/8821ae has extra PCI DMA info in tx desc */
-		#define TX_DESC_NEXT_DESC_OFFSET	(TXDESC_SIZE + 8)
-	#endif
-#endif /* CONFIG_PCI_HCI */
 
 enum TXDESC_SC {
 	SC_DONT_CARE = 0x00,
@@ -222,11 +171,7 @@ enum TXDESC_SC {
 	SC_DUPLICATE = 0x03
 };
 
-#ifdef CONFIG_PCI_HCI
-	#ifndef CONFIG_TRX_BD_ARCH	/* CONFIG_TRX_BD_ARCH doesn't need this */
-		#define TXDESC_64_BYTES
-	#endif
-#elif defined(CONFIG_RTL8812A) || defined(CONFIG_RTL8821A) || defined(CONFIG_RTL8723B) \
+#if defined(CONFIG_RTL8812A) || defined(CONFIG_RTL8821A) || defined(CONFIG_RTL8723B) \
 	|| defined(CONFIG_RTL8188F) || defined(CONFIG_RTL8723D)
 	#define TXDESC_40_BYTES
 #endif
@@ -289,42 +234,6 @@ union txdesc {
 	struct tx_desc txdesc;
 	unsigned int value[TXDESC_SIZE >> 2];
 };
-#endif
-
-#ifdef CONFIG_PCI_HCI
-#define PCI_MAX_TX_QUEUE_COUNT	8	/* == HW_QUEUE_ENTRY */
-
-struct rtw_tx_ring {
-	unsigned char	qid;
-#ifdef CONFIG_TRX_BD_ARCH
-	struct tx_buf_desc	*buf_desc;
-#else
-	struct tx_desc	*desc;
-#endif
-	dma_addr_t	dma;
-	unsigned int	idx;
-	unsigned int	entries;
-	_queue		queue;
-	u32		qlen;
-#ifdef CONFIG_TRX_BD_ARCH
-	u16		hw_rp_cache;
-#endif
-};
-
-#ifdef DBG_TXBD_DESC_DUMP
-
-#define TX_BAK_FRMAE_CNT	10
-#define TX_BAK_DESC_LEN	48	/* byte */
-#define TX_BAK_DATA_LEN		30	/* byte */
-
-struct rtw_tx_desc_backup {
-	int tx_bak_rp;
-	int tx_bak_wp;
-	u8 tx_bak_desc[TX_BAK_DESC_LEN];
-	u8 tx_bak_data_hdr[TX_BAK_DATA_LEN];
-	u8 tx_desc_size;
-};
-#endif
 #endif
 
 struct	hw_xmit	{
@@ -513,9 +422,7 @@ struct  submit_ctx {
 	systime submit_time; /* */
 	u32 timeout_ms; /* <0: not synchronous, 0: wait forever, >0: up to ms waiting */
 	int status; /* status for operation */
-#ifdef PLATFORM_LINUX
 	struct completion done;
-#endif
 };
 
 enum {
@@ -535,7 +442,6 @@ enum {
 	RTW_SCTX_DONE_CMD_DROP,
 	RTX_SCTX_CSTR_WAIT_RPT2,
 };
-
 
 void rtw_sctx_init(struct submit_ctx *sctx, int timeout_ms);
 int rtw_sctx_wait(struct submit_ctx *sctx, const char *msg);
@@ -704,9 +610,7 @@ struct	xmit_priv	{
 
 #if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
 #ifdef CONFIG_SDIO_TX_TASKLET
-#ifdef PLATFORM_LINUX
 	struct tasklet_struct xmit_tasklet;
-#endif /* PLATFORM_LINUX */
 #else
 	_thread_hdl_	SdioXmitThread;
 	_sema		SdioXmitSema;

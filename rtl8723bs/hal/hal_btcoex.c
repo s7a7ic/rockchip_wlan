@@ -506,18 +506,6 @@ u8 halbtcoutsrc_is_fw_ready(PBTC_COEXIST pBtCoexist)
 
 u8 halbtcoutsrc_IsDualBandConnected(PADAPTER padapter)
 {
-#ifdef CONFIG_MCC_MODE
-	if (MCC_EN(padapter) && (rtw_hal_check_mcc_status(padapter, MCC_STATUS_DOING_MCC))) {
-		struct dvobj_priv *dvobj = adapter_to_dvobj(padapter);
-		struct mcc_obj_priv *mccobjpriv = &(dvobj->mcc_objpriv);
-		u8 band0 = mccobjpriv->iface[0]->mlmeextpriv.cur_channel > 14 ? BAND_ON_5G : BAND_ON_2_4G;
-		u8 band1 = mccobjpriv->iface[1]->mlmeextpriv.cur_channel > 14 ? BAND_ON_5G : BAND_ON_2_4G;
-
-		if (band0 != band1)
-			return _TRUE;
-	}
-#endif
-
 	return _FALSE;
 }
 

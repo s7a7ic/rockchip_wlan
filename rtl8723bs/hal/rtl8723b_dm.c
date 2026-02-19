@@ -8,8 +8,6 @@
  * Description:
  *
  * This file is for 92CE/92CU dynamic mechanism only
- *
- *
  * ************************************************************ */
 #define _RTL8723B_DM_C_
 
@@ -162,16 +160,12 @@ dm_InterruptMigration(
 	}
 #endif
 }
-
 #endif
 
 /*
  * Initialize GPIO setting registers
  *   */
-static void
-dm_InitGPIOSetting(
-	IN	PADAPTER	Adapter
-)
+static void dm_InitGPIOSetting(IN PADAPTER Adapter)
 {
 	PHAL_DATA_TYPE		pHalData = GET_HAL_DATA(Adapter);
 
@@ -182,10 +176,8 @@ dm_InitGPIOSetting(
 
 	rtw_write8(Adapter, REG_GPIO_MUXCFG, tmp1byte);
 }
-/* ************************************************************
- * functions
- * ************************************************************ */
-static void Init_ODM_ComInfo_8723b(PADAPTER	Adapter)
+
+static void Init_ODM_ComInfo_8723b(PADAPTER Adapter)
 {
 	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(Adapter);
 	struct PHY_DM_STRUCT		*pDM_Odm = &(pHalData->odmpriv);
@@ -203,10 +195,7 @@ static void Init_ODM_ComInfo_8723b(PADAPTER	Adapter)
 	odm_cmn_info_init(pDM_Odm, ODM_CMNINFO_CUT_VER, cut_ver);
 }
 
-void
-rtl8723b_InitHalDm(
-	IN	PADAPTER	Adapter
-)
+void rtl8723b_InitHalDm(IN PADAPTER Adapter)
 {
 	PHAL_DATA_TYPE	pHalData = GET_HAL_DATA(Adapter);
 	struct PHY_DM_STRUCT		*pDM_Odm = &(pHalData->odmpriv);
@@ -215,7 +204,6 @@ rtl8723b_InitHalDm(
 	dm_InitGPIOSetting(Adapter);
 #endif
 	odm_dm_init(pDM_Odm);
-
 }
 
 VOID rtl8723b_HalDmWatchDog(IN PADAPTER Adapter)
@@ -244,7 +232,6 @@ VOID rtl8723b_HalDmWatchDog(IN PADAPTER Adapter)
 	if (Adapter->wdinfo.p2p_ps_mode)
 		bFwPSAwake = _FALSE;
 #endif /* CONFIG_P2P */
-
 
 	if ((rtw_is_hw_init_completed(Adapter))
 	    && ((!bFwCurrentInPSMode) && bFwPSAwake)) {

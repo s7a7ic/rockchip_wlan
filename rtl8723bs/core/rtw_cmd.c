@@ -2679,11 +2679,6 @@ void rtw_dynamic_chk_wk_hdl(_adapter *padapter)
 	/* always call rtw_ps_processor() at last one. */
 	rtw_ps_processor(padapter);
 #endif
-
-#ifdef CONFIG_MCC_MODE
-	rtw_hal_mcc_sw_status_check(padapter);
-#endif /* CONFIG_MCC_MODE */
-
 }
 
 #ifdef CONFIG_LPS

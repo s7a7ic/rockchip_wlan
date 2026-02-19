@@ -667,12 +667,6 @@ void	rtw_hal_get_tx_power_level(_adapter *padapter, s32 *powerlevel)
 
 void	rtw_hal_dm_watchdog(_adapter *padapter)
 {
-#ifdef CONFIG_MCC_MODE
-	if (MCC_EN(padapter)) {
-		if (rtw_hal_check_mcc_status(padapter, MCC_STATUS_DOING_MCC))
-			return;
-	}
-#endif /* CONFIG_MCC_MODE */
 	rtw_hal_turbo_edca(padapter);
 	padapter->hal_func.hal_dm_watchdog(padapter);
 
@@ -876,12 +870,6 @@ s32 c2h_handler(_adapter *adapter, u8 id, u8 seq, u8 plen, u8 *payload)
 		break;
 	case C2H_BCN_EARLY_RPT:
 		rtw_tdls_ch_sw_back_to_base_chnl(adapter);
-		break;
-#endif
-
-#ifdef CONFIG_MCC_MODE
-	case C2H_MCC:
-		rtw_hal_mcc_c2h_handler(adapter, plen, payload);
 		break;
 #endif
 

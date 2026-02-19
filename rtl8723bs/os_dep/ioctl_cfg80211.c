@@ -5382,14 +5382,6 @@ static int _cfg80211_rtw_mgmt_tx(_adapter *padapter, u8 tx_ch, u8 no_cck, const 
 	}
 #endif /* CONFIG_P2P */
 
-#ifdef CONFIG_MCC_MODE
-	if (MCC_EN(padapter)) {
-		if (rtw_hal_check_mcc_status(padapter, MCC_STATUS_DOING_MCC))
-			/* don't set channel, issue frame directly */
-			goto issue_mgmt_frame;
-	}
-#endif /* CONFIG_MCC_MODE */
-
 #ifdef CONFIG_CONCURRENT_MODE
 	if (rtw_mi_check_status(padapter, MI_LINKED)) {
 		u8 union_ch = rtw_mi_get_union_chan(padapter);

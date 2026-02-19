@@ -9043,10 +9043,6 @@ static void _rtw_hal_set_fw_rsvd_page(_adapter *adapter, bool finished, u8 *page
 	struct sreset_priv *psrtpriv;
 #endif /* DBG_CONFIG_ERROR_DETECT */
 
-#ifdef CONFIG_MCC_MODE
-	u8 dl_mcc_page = _FAIL;
-#endif /* CONFIG_MCC_MODE */
-
 	pHalData = GET_HAL_DATA(adapter);
 #ifdef DBG_CONFIG_ERROR_DETECT
 	psrtpriv = &pHalData->srestpriv;
@@ -9172,17 +9168,6 @@ static void _rtw_hal_set_fw_rsvd_page(_adapter *adapter, bool finished, u8 *page
 	}
 #endif /* CONFIG_BT_COEXIT */
 
-#ifdef CONFIG_MCC_MODE
-	if (MCC_EN(adapter)) {
-		dl_mcc_page = rtw_hal_dl_mcc_fw_rsvd_page(adapter, ReservedPagePacket,
-				&BufIndex, TxDescLen, PageSize,
-				&TotalPageNum, &TotalPacketLen, &RsvdPageLoc);
-	} else {
-		dl_mcc_page = _FAIL;
-	}
-
-	if (dl_mcc_page == _FAIL)
-#endif /* CONFIG_MCC_MODE */
 	{
 		/* null data * 1 page */
 		RsvdPageLoc.LocNullData = TotalPageNum;

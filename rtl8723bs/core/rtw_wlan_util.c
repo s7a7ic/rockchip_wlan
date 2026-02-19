@@ -25,7 +25,6 @@ unsigned char BROADCOM_OUI1[] = {0x00, 0x10, 0x18};
 unsigned char BROADCOM_OUI2[] = {0x00, 0x0a, 0xf7};
 unsigned char BROADCOM_OUI3[] = {0x00, 0x05, 0xb5};
 
-
 unsigned char CISCO_OUI[] = {0x00, 0x40, 0x96};
 unsigned char MARVELL_OUI[] = {0x00, 0x50, 0x43};
 unsigned char RALINK_OUI[] = {0x00, 0x0c, 0x43};
@@ -597,7 +596,7 @@ void set_channel_bwmode(_adapter *padapter, unsigned char channel, unsigned char
 {
 	u8 center_ch, chnl_offset80 = HAL_PRIME_CHNL_OFFSET_DONT_CARE;
 	struct mlme_ext_priv *pmlmeext = &padapter->mlmeextpriv;
-#if (defined(CONFIG_TDLS) && defined(CONFIG_TDLS_CH_SW)) || defined(CONFIG_MCC_MODE)
+#if (defined(CONFIG_TDLS) && defined(CONFIG_TDLS_CH_SW))
 	u8 iqk_info_backup = _FALSE;
 #endif
 
@@ -615,16 +614,6 @@ void set_channel_bwmode(_adapter *padapter, unsigned char channel, unsigned char
 			chnl_offset80 = HAL_PRIME_CHNL_OFFSET_DONT_CARE;
 	}
 	_enter_critical_mutex(&(adapter_to_dvobj(padapter)->setch_mutex), NULL);
-
-#ifdef CONFIG_MCC_MODE
-	if (MCC_EN(padapter)) {
-		/* driver doesn't set channel setting reg under MCC */
-		if (rtw_hal_check_mcc_status(padapter, MCC_STATUS_DOING_MCC)) {
-			RTW_INFO("Warning: Do not set channel setting reg MCC mode\n");
-			rtw_warn_on(1);
-		}
-	}
-#endif
 
 #ifdef CONFIG_DFS_MASTER
 	{
@@ -645,7 +634,7 @@ void set_channel_bwmode(_adapter *padapter, unsigned char channel, unsigned char
 		rtw_set_oper_bw(padapter, bwmode);
 		rtw_set_oper_choffset(padapter, channel_offset);
 
-#if (defined(CONFIG_TDLS) && defined(CONFIG_TDLS_CH_SW)) || defined(CONFIG_MCC_MODE)
+#if (defined(CONFIG_TDLS) && defined(CONFIG_TDLS_CH_SW))
 		/* To check if we need to backup iqk info after switch chnl & bw */
 		{
 			u8 take_care_iqk, do_iqk;
@@ -659,7 +648,7 @@ void set_channel_bwmode(_adapter *padapter, unsigned char channel, unsigned char
 
 		rtw_hal_set_chnl_bw(padapter, center_ch, bwmode, channel_offset, chnl_offset80); /* set center channel */
 
-#if (defined(CONFIG_TDLS) && defined(CONFIG_TDLS_CH_SW)) || defined(CONFIG_MCC_MODE)
+#if (defined(CONFIG_TDLS) && defined(CONFIG_TDLS_CH_SW))
 		if (iqk_info_backup == _TRUE)
 			rtw_hal_ch_sw_iqk_info_backup(padapter);
 #endif
@@ -3579,14 +3568,6 @@ void rtw_alloc_macid(_adapter *padapter, struct sta_info *psta)
 	}
 #endif
 
-#ifdef CONFIG_MCC_MODE
-	if (MCC_EN(padapter)) {
-		if (MLME_IS_AP(padapter))
-			/* GO/AP assign client macid from 8 */
-			last_id = 8;
-	}
-#endif /* CONFIG_MCC_MODE */
-
 	_enter_critical_bh(&macid_ctl->lock, &irqL);
 
 	for (i = last_id; i < macid_ctl->num; i++) {
@@ -3594,16 +3575,6 @@ void rtw_alloc_macid(_adapter *padapter, struct sta_info *psta)
 		if (i == 1)
 			continue;
 #endif
-
-#ifdef CONFIG_MCC_MODE
-		/* macid 0/1 reserve for mcc for mgnt queue macid */
-		if (MCC_EN(padapter)) {
-			if (i == MCC_ROLE_STA_GC_MGMT_QUEUE_MACID)
-				continue;
-			if (i == MCC_ROLE_SOFTAP_GO_MGMT_QUEUE_MACID)
-				continue;
-		}
-#endif /* CONFIG_MCC_MODE */
 
 		if (is_bc_sta) {/*for SoftAP's Broadcast sta-info*/
 			/*TODO:non-security AP may allociated macid = 1*/

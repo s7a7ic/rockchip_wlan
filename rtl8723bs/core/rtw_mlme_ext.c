@@ -7277,10 +7277,6 @@ void update_mgntframe_attrib(_adapter *padapter, struct pkt_attrib *pattrib)
 	}
 	pattrib->qsel = QSLT_MGNT;
 
-#ifdef CONFIG_MCC_MODE
-	update_mcc_mgntframe_attrib(padapter, pattrib);
-#endif
-
 	pattrib->pktlen = 0;
 
 	if (IS_CCK_RATE(pmlmeext->tx_rate))
@@ -7674,10 +7670,6 @@ void issue_beacon(_adapter *padapter, int timeout_ms)
 			pframe += len;
 			pattrib->pktlen += len;
 
-#ifdef CONFIG_MCC_MODE
-			pframe = rtw_hal_mcc_append_go_p2p_ie(padapter, pframe, &pattrib->pktlen);
-#endif /* CONFIG_MCC_MODE*/
-
 #ifdef CONFIG_WFD
 			len = rtw_append_beacon_wfd_ie(padapter, pframe);
 			pframe += len;
@@ -7990,10 +7982,6 @@ void issue_probersp(_adapter *padapter, unsigned char *da, u8 is_valid_p2p_probe
 
 		pframe += len;
 		pattrib->pktlen += len;
-
-#ifdef CONFIG_MCC_MODE
-		pframe = rtw_hal_mcc_append_go_p2p_ie(padapter, pframe, &pattrib->pktlen);
-#endif /* CONFIG_MCC_MODE*/
 
 #ifdef CONFIG_WFD
 		len = rtw_append_probe_resp_wfd_ie(padapter, pframe);
@@ -9169,21 +9157,6 @@ int issue_nulldata(_adapter *padapter, unsigned char *da, unsigned int power_mod
 	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
 	struct sta_info *psta;
 	u8 macid_sleep_reg_access = _TRUE;
-
-#ifdef CONFIG_MCC_MODE
-	if (MCC_EN(padapter)) {
-		/* driver doesn't access macid sleep reg under MCC */
-		if (rtw_hal_check_mcc_status(padapter, MCC_STATUS_DOING_MCC)) {
-			macid_sleep_reg_access = _FALSE;
-
-			if (da == NULL) {
-				RTW_INFO("Warning: Do not tx null data to AP under MCC mode\n");
-				rtw_warn_on(1);
-			}
-
-		}
-	}
-#endif
 
 	if (rtw_rfctl_is_tx_blocked_by_ch_waiting(adapter_to_rfctl(padapter)))
 		goto exit;
@@ -11812,11 +11785,6 @@ static void rtw_mlmeext_disconnect(_adapter *padapter)
 	}
 	pmlmeinfo->state = WIFI_FW_NULL_STATE;
 
-#ifdef CONFIG_MCC_MODE
-	/* mcc disconnect setting before download LPS rsvd page */
-	rtw_hal_set_mcc_setting_disconnect(padapter);
-#endif /* CONFIG_MCC_MODE */
-
 	if (state_backup == WIFI_FW_STATION_STATE) {
 		if (rtw_port_switch_chk(padapter) == _TRUE) {
 			rtw_hal_set_hwreg(padapter, HW_VAR_PORT_SWITCH, NULL);
@@ -12317,15 +12285,6 @@ void linked_status_chk(_adapter *padapter, u8 from_timer)
 			}
 		}
 #endif
-#ifdef CONFIG_MCC_MODE
-		/*
-		 * due to tx ps null date to ao, so ap doest not tx pkt to driver
-		 * we may check chk_ap_is_alive fail, and may issue_probereq to wrong channel under sitesurvey
-		 * don't keep alive check under MCC
-		 */
-		if (rtw_hal_mcc_link_status_chk(padapter, __func__) == _FALSE)
-			return;
-#endif
 
 #if defined(DBG_ROAMING_TEST) || defined(CONFIG_RTW_REPEATER_SON)
 		rx_chk_limit = 1;
@@ -12390,13 +12349,8 @@ void linked_status_chk(_adapter *padapter, u8 from_timer)
 				tx_chk = _FAIL;
 
 #if defined(CONFIG_ACTIVE_KEEP_ALIVE_CHECK) && !defined(CONFIG_LPS_LCLK_WD_TIMER)
-			if (pmlmeext->active_keep_alive_check && (rx_chk == _FAIL || tx_chk == _FAIL)
-				#ifdef CONFIG_MCC_MODE
-				/* Driver don't know operation channel under MCC*/
-				/* So driver don't  do KEEP_ALIVE_CHECK */
-				&& (!rtw_hal_check_mcc_status(padapter, MCC_STATUS_NEED_MCC))
-				#endif
-			) {
+			if (pmlmeext->active_keep_alive_check && (rx_chk == _FAIL || tx_chk == _FAIL))
+			{
 				u8 backup_ch = 0, backup_bw = 0, backup_offset = 0;
 				u8 union_ch = 0, union_bw, union_offset;
 
@@ -12442,12 +12396,8 @@ bypass_active_keep_alive:
 					}
 				}
 
-				if (tx_chk != _SUCCESS && pmlmeinfo->link_count++ == link_count_limit
-#ifdef CONFIG_MCC_MODE
-				    /* FW tx nulldata under MCC mode, we just check  ap is alive */
-				    && (!rtw_hal_check_mcc_status(padapter, MCC_STATUS_NEED_MCC))
-#endif /* CONFIG_MCC_MODE */
-				   ) {
+				if (tx_chk != _SUCCESS && pmlmeinfo->link_count++ == link_count_limit)
+				{
 #ifdef DBG_EXPIRATION_CHK
 					RTW_INFO("%s issue_nulldata(%d)\n", __FUNCTION__, from_timer ? 1 : 0);
 #endif
@@ -13887,15 +13837,6 @@ void survey_done_set_ch_bw(_adapter *padapter)
 	u8 cur_bwmode;
 	u8 cur_ch_offset;
 
-#ifdef CONFIG_MCC_MODE
-	if (!rtw_hal_mcc_change_scan_flag(padapter, &cur_channel, &cur_bwmode, &cur_ch_offset)) {
-		if (0)
-			RTW_INFO(FUNC_ADPT_FMT" back to AP channel - ch:%u, bw:%u, offset:%u\n",
-				FUNC_ADPT_ARG(padapter), cur_channel, cur_bwmode, cur_ch_offset);
-		goto exit;
-	}
-#endif
-
 	if (rtw_mi_get_ch_setting_union(padapter, &cur_channel, &cur_bwmode, &cur_ch_offset) != 0) {
 		if (0)
 			RTW_INFO(FUNC_ADPT_FMT" back to linked/linking union - ch:%u, bw:%u, offset:%u\n",
@@ -14118,10 +14059,6 @@ operation_by_state:
 		* prepare to leave operating channel
 		*/
 
-#ifdef CONFIG_MCC_MODE
-		rtw_hal_set_mcc_setting_scan_start(padapter);
-#endif /* CONFIG_MCC_MODE */
-
 		/* apply rx ampdu setting */
 		if (ss->rx_ampdu_accept != RX_AMPDU_ACCEPT_INVALID
 			|| ss->rx_ampdu_size != RX_AMPDU_SIZE_INVALID)
@@ -14242,11 +14179,6 @@ operation_by_state:
 	case SCAN_BACKING_OP: {
 		u8 back_ch, back_bw, back_ch_offset;
 		u8 need_ch_setting_union = _TRUE;
-
-#ifdef CONFIG_MCC_MODE
-		need_ch_setting_union = rtw_hal_mcc_change_scan_flag(padapter,
-				&back_ch, &back_bw, &back_ch_offset);
-#endif /* CONFIG_MCC_MODE */
 
 		if (need_ch_setting_union) {
 			if (rtw_mi_get_ch_setting_union(padapter, &back_ch, &back_bw, &back_ch_offset) == 0)
@@ -14402,10 +14334,6 @@ operation_by_state:
 
 		sitesurvey_set_igi(padapter);
 
-#ifdef CONFIG_MCC_MODE
-		/* start MCC fail, then tx null data */
-		if (!rtw_hal_set_mcc_setting_scan_complete(padapter))
-#endif /* CONFIG_MCC_MODE */
 			sitesurvey_ps_annc(padapter, 0);
 
 		/* apply rx ampdu setting */
@@ -15046,12 +14974,6 @@ void rtw_join_done_chk_ch(_adapter *adapter, int join_res)
 
 	if (join_res >= 0) {
 
-#ifdef CONFIG_MCC_MODE
-		/* MCC setting success, don't go to ch union process */
-		if (rtw_hal_set_mcc_setting_join_done_chk_ch(adapter))
-			return;
-#endif /* CONFIG_MCC_MODE */
-
 		if (rtw_mi_get_ch_setting_union(adapter, &u_ch, &u_bw, &u_offset) <= 0) {
 			dump_adapters_status(RTW_DBGDUMP , dvobj);
 			rtw_warn_on(1);
@@ -15192,12 +15114,6 @@ int rtw_chk_start_clnt_join(_adapter *adapter, u8 *ch, u8 *bw, u8 *offset)
 
 		RTW_INFO(FUNC_ADPT_FMT" chbw_allow:%d\n"
 			 , FUNC_ADPT_ARG(adapter), chbw_allow);
-
-#ifdef CONFIG_MCC_MODE
-		/* check setting success, don't go to ch union process */
-		if (rtw_hal_set_mcc_setting_chk_start_clnt_join(adapter, &u_ch, &u_bw, &u_offset, chbw_allow))
-			goto exit;
-#endif
 
 		if (chbw_allow == _TRUE) {
 			rtw_sync_chbw(&cur_ch, &cur_bw, &cur_ch_offset, &u_ch, &u_bw, &u_offset);

@@ -1592,7 +1592,6 @@ u8 HalQueryTxBufferStatus8723BSdio(PADAPTER padapter)
 	u32 NumOfFreePage;
 	/* _irqL irql; */
 
-
 	phal = GET_HAL_DATA(padapter);
 
 	NumOfFreePage = SdioLocalCmd53Read4Byte(padapter, SDIO_REG_FREE_TXPG);
@@ -1607,7 +1606,7 @@ u8 HalQueryTxBufferStatus8723BSdio(PADAPTER padapter)
 /*
  *	Description:
  *		Query SDIO Local register to get the current number of TX OQT Free Space.
- *   */
+ */
 u8 HalQueryTxOQTBufferStatus8723BSdio(PADAPTER padapter)
 {
 	HAL_DATA_TYPE *pHalData = GET_HAL_DATA(padapter);

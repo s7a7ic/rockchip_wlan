@@ -126,10 +126,6 @@ typedef struct _ADAPTER _adapter, ADAPTER, *PADAPTER;
 	#include <rtw_btcoex.h>
 #endif /* CONFIG_BT_COEXIST */
 
-#ifdef CONFIG_MCC_MODE
-	#include <rtw_mcc.h>
-#endif /*CONFIG_MCC_MODE */
-
 #ifdef CONFIG_RTW_REPEATER_SON
 	#include <rtw_rson.h>
 #endif /*CONFIG_RTW_REPEATER_SON */
@@ -361,24 +357,6 @@ struct registry_priv {
 #ifdef CONFIG_DFS_MASTER
 	u8 dfs_region_domain;
 #endif
-
-#ifdef CONFIG_MCC_MODE
-	u8 en_mcc;
-	u32 rtw_mcc_single_tx_cri;
-	u32 rtw_mcc_ap_bw20_target_tx_tp;
-	u32 rtw_mcc_ap_bw40_target_tx_tp;
-	u32 rtw_mcc_ap_bw80_target_tx_tp;
-	u32 rtw_mcc_sta_bw20_target_tx_tp;
-	u32 rtw_mcc_sta_bw40_target_tx_tp;
-	u32 rtw_mcc_sta_bw80_target_tx_tp;
-	s8 rtw_mcc_policy_table_idx;
-	u8 rtw_mcc_duration;
-	u8 rtw_mcc_tsf_sync_offset;
-	u8 rtw_mcc_start_time_offset;
-	u8 rtw_mcc_interval;
-	s8 rtw_mcc_guard_offset0;
-	s8 rtw_mcc_guard_offset1;
-#endif /* CONFIG_MCC_MODE */
 
 #ifdef CONFIG_RTW_NAPI
 	u8 en_napi;
@@ -987,10 +965,6 @@ struct dvobj_priv {
 #ifdef INTF_OPS
 	INTF_OPS intf_ops;
 #endif
-
-#ifdef CONFIG_MCC_MODE
-	struct mcc_obj_priv mcc_objpriv;
-#endif /*CONFIG_MCC_MODE */
 };
 
 #define DEV_STA_NUM(_dvobj)			MSTATE_STA_NUM(&((_dvobj)->iface_state))
@@ -1244,10 +1218,6 @@ struct _ADAPTER {
 	struct proc_dir_entry *dir_dev;/* for proc directory */
 	struct proc_dir_entry *dir_odm;
 
-#ifdef CONFIG_MCC_MODE
-	struct proc_dir_entry *dir_mcc;
-#endif /* CONFIG_MCC_MODE */
-
 #ifdef CONFIG_IOCTL_CFG80211
 	struct wireless_dev *rtw_wdev;
 	struct rtw_wdev_priv wdev_data;
@@ -1361,10 +1331,6 @@ struct _ADAPTER {
 	struct tx_logs tx_logs;
 	struct int_logs int_logs;
 #endif
-
-#ifdef CONFIG_MCC_MODE
-	struct mcc_adapter_priv mcc_adapterpriv;
-#endif /* CONFIG_MCC_MODE */
 };
 
 #define adapter_to_dvobj(adapter) ((adapter)->dvobj)
