@@ -51,7 +51,6 @@ sint rtw_endofpktfile(struct pkt_file *pfile)
 
 void rtw_set_tx_chksum_offload(_pkt *pkt, struct pkt_attrib *pattrib)
 {
-
 #ifdef CONFIG_TCP_CSUM_OFFLOAD_TX
 	struct sk_buff *skb = (struct sk_buff *)pkt;
 	pattrib->hw_tcp_csum = 0;
@@ -104,23 +103,6 @@ void rtw_os_xmit_resource_free(_adapter *padapter, struct xmit_buf *pxmitbuf, u3
 		if (pxmitbuf->pallocated_buf)
 			rtw_mfree(pxmitbuf->pallocated_buf, free_sz);
 	}
-}
-
-void dump_os_queue(void *sel, _adapter *padapter)
-{
-	struct net_device *ndev = padapter->pnetdev;
-
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 35))
-	int i;
-
-	for (i = 0; i < 4; i++) {
-		RTW_PRINT_SEL(sel, "os_queue[%d]:%s\n"
-			, i, __netif_subqueue_stopped(ndev, i) ? "stopped" : "waked");
-	}
-#else
-	RTW_PRINT_SEL(sel, "os_queue:%s\n"
-		      , netif_queue_stopped(ndev) ? "stopped" : "waked");
-#endif
 }
 
 #define WMM_XMIT_THRESHOLD	(NR_XMITFRAME*2/5)
@@ -207,7 +189,6 @@ void rtw_os_xmit_schedule(_adapter *padapter)
 
 	if (_rtw_queue_empty(&padapter->xmitpriv.pending_xmitbuf_queue) == _FALSE)
 		_rtw_up_sema(&pri_adapter->xmitpriv.xmit_sema);
-
 #else
 	_irqL  irqL;
 	struct xmit_priv *pxmitpriv;
@@ -223,12 +204,6 @@ void rtw_os_xmit_schedule(_adapter *padapter)
 		tasklet_hi_schedule(&pxmitpriv->xmit_tasklet);
 
 	_exit_critical_bh(&pxmitpriv->lock, &irqL);
-	
-#if defined(CONFIG_PCI_HCI) && defined(CONFIG_XMIT_THREAD_MODE)
-	if (_rtw_queue_empty(&padapter->xmitpriv.pending_xmitbuf_queue) == _FALSE)
-		_rtw_up_sema(&padapter->xmitpriv.xmit_sema);
-#endif
-
 #endif
 }
 

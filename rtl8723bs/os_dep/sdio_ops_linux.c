@@ -64,7 +64,6 @@ u8 sd_f0_read8(struct intf_hdl *pintfhdl, u32 addr, s32 *err)
 	if (err && *err)
 		RTW_ERR("%s: FAIL!(%d) addr=0x%05x\n", __func__, *err, addr);
 
-
 	return v;
 }
 
@@ -96,7 +95,6 @@ void sd_f0_write8(struct intf_hdl *pintfhdl, u32 addr, u8 v, s32 *err)
 		sdio_release_host(func);
 	if (err && *err)
 		RTW_ERR("%s: FAIL!(%d) addr=0x%05x val=0x%02x\n", __func__, *err, addr, v);
-
 }
 
 /*
@@ -131,7 +129,6 @@ s32 _sd_cmd52_read(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *pdata)
 			break;
 		}
 	}
-
 
 	return err;
 }
@@ -382,7 +379,6 @@ u32 _sd_read32(struct intf_hdl *pintfhdl, u32 addr, s32 *err)
 					rtw_set_surprise_removed(padapter);
 					break;
 				}
-
 			}
 		}
 
@@ -690,7 +686,6 @@ s32 _sd_read(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, void *pdata)
 	if (err == (-ESHUTDOWN) || err == (-ENODEV) || err == (-ENOMEDIUM) || err == (-ETIMEDOUT))
 		rtw_set_surprise_removed(padapter);
 
-
 	return err;
 }
 
@@ -792,7 +787,6 @@ s32 _sd_write(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, void *pdata)
 	err = sdio_memcpy_toio(func, addr, pdata, size);
 	if (err)
 		RTW_ERR("%s: FAIL(%d)! ADDR=%#x Size=%d(%d)\n", __func__, err, addr, cnt, size);
-
 
 	return err;
 }

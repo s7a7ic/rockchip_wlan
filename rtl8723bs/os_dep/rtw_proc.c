@@ -14,7 +14,7 @@
 
 #ifdef CONFIG_PROC_DEBUG
 
-static struct proc_dir_entry *rtw_proc = NULL;
+static struct proc_dir_entry *rtw_proc;
 
 inline struct proc_dir_entry *get_rtw_drv_proc(void)
 {

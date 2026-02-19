@@ -42,38 +42,6 @@ static const struct sdio_device_id sdio_ids[] = {
 	{ SDIO_DEVICE(0x024c, 0x0623), .driver_data = RTL8723B},
 	{ SDIO_DEVICE(0x024c, 0x0626), .driver_data = RTL8723B},
 #endif
-#ifdef CONFIG_RTL8188E
-	{ SDIO_DEVICE(0x024c, 0x8179), .driver_data = RTL8188E},
-#endif /* CONFIG_RTL8188E */
-
-#ifdef CONFIG_RTL8821A
-	{ SDIO_DEVICE(0x024c, 0x8821), .driver_data = RTL8821},
-#endif /* CONFIG_RTL8821A */
-
-#ifdef CONFIG_RTL8192E
-	{ SDIO_DEVICE(0x024c, 0x818B), .driver_data = RTL8192E},
-#endif /* CONFIG_RTL8192E */
-
-#ifdef CONFIG_RTL8703B
-	{ SDIO_DEVICE(0x024c, 0xB703), .driver_data = RTL8703B},
-#endif
-
-#ifdef CONFIG_RTL8188F
-	{SDIO_DEVICE(0x024c, 0xF179), .driver_data = RTL8188F},
-#endif
-#ifdef CONFIG_RTL8822B
-	{SDIO_DEVICE(0x024c, 0xB822), .driver_data = RTL8822B},
-#endif
-
-#ifdef CONFIG_RTL8723D
-	{ SDIO_DEVICE(0x024c, 0xD723), .driver_data = RTL8723D},
-	{ SDIO_DEVICE(0x024c, 0xD724), .driver_data = RTL8723D},
-#endif
-
-#ifdef CONFIG_RTL8821C
-	{SDIO_DEVICE(0x024C, 0xB821), .driver_data = RTL8821C},
-	{SDIO_DEVICE(0x024C, 0xC821), .driver_data = RTL8821C},
-#endif
 
 #if defined(RTW_ENABLE_WIFI_CONTROL_FUNC) /* temporarily add this to accept all sdio wlan id */
 	{ SDIO_DEVICE_CLASS(SDIO_CLASS_WLAN) },
@@ -323,7 +291,6 @@ static u32 sdio_init(struct dvobj_priv *dvobj)
 	struct sdio_func *func;
 	int err;
 
-
 	psdio_data = &dvobj->intf_data;
 	func = psdio_data->func;
 
@@ -363,7 +330,6 @@ static u32 sdio_init(struct dvobj_priv *dvobj)
 #endif
 	SDIO_CARD_INFO_DUMP(dvobj);
 
-
 release:
 	sdio_release_host(func);
 
@@ -378,8 +344,6 @@ static void sdio_deinit(struct dvobj_priv *dvobj)
 {
 	struct sdio_func *func;
 	int err;
-
-
 
 	func = dvobj->intf_data.func;
 
@@ -399,65 +363,9 @@ static void rtw_decide_chip_type_by_device_id(struct dvobj_priv *dvobj, const st
 {
 	dvobj->chip_type = pdid->driver_data;
 
-#if defined(CONFIG_RTL8188E)
-	if (dvobj->chip_type == RTL8188E) {
-		dvobj->HardwareType = HARDWARE_TYPE_RTL8188ES;
-		RTW_INFO("CHIP TYPE: RTL8188E\n");
-	}
-#endif
-
 #if defined(CONFIG_RTL8723B)
 	dvobj->chip_type = RTL8723B;
 	dvobj->HardwareType = HARDWARE_TYPE_RTL8723BS;
-#endif
-
-#if defined(CONFIG_RTL8821A)
-	if (dvobj->chip_type == RTL8821) {
-		dvobj->HardwareType = HARDWARE_TYPE_RTL8821S;
-		RTW_INFO("CHIP TYPE: RTL8821A\n");
-	}
-#endif
-
-#if defined(CONFIG_RTL8192E)
-	if (dvobj->chip_type == RTL8192E) {
-		dvobj->HardwareType = HARDWARE_TYPE_RTL8192ES;
-		RTW_INFO("CHIP TYPE: RTL8192E\n");
-	}
-#endif
-
-#if defined(CONFIG_RTL8703B)
-	if (dvobj->chip_type == RTL8703B) {
-		dvobj->HardwareType = HARDWARE_TYPE_RTL8703BS;
-		RTW_INFO("CHIP TYPE: RTL8703B\n");
-	}
-#endif
-
-#if defined(CONFIG_RTL8723D)
-	if (dvobj->chip_type == RTL8723D) {
-		dvobj->HardwareType = HARDWARE_TYPE_RTL8723DS;
-		RTW_INFO("CHIP TYPE: RTL8723D\n");
-	}
-#endif
-
-#if defined(CONFIG_RTL8188F)
-	if (dvobj->chip_type == RTL8188F) {
-		dvobj->HardwareType = HARDWARE_TYPE_RTL8188FS;
-		RTW_INFO("CHIP TYPE: RTL8188F\n");
-	}
-#endif
-
-#if defined(CONFIG_RTL8822B)
-	if (dvobj->chip_type == RTL8822B) {
-		dvobj->HardwareType = HARDWARE_TYPE_RTL8822BS;
-		RTW_INFO("CHIP TYPE: RTL8822B\n");
-	}
-#endif
-
-#if defined(CONFIG_RTL8821C)
-	if (dvobj->chip_type == RTL8821C) {
-		dvobj->HardwareType = HARDWARE_TYPE_RTL8821CS;
-		RTW_INFO("CHIP TYPE: RTL8821C\n");
-	}
 #endif
 }
 
@@ -519,51 +427,9 @@ u8 rtw_set_hal_ops(PADAPTER padapter)
 	if (rtw_hal_data_init(padapter) == _FAIL)
 		return _FAIL;
 
-#if defined(CONFIG_RTL8188E)
-	if (rtw_get_chip_type(padapter) == RTL8188E)
-		rtl8188es_set_hal_ops(padapter);
-#endif
-
 #if defined(CONFIG_RTL8723B)
 	if (rtw_get_chip_type(padapter) == RTL8723B)
 		rtl8723bs_set_hal_ops(padapter);
-#endif
-
-#if defined(CONFIG_RTL8821A)
-	if (rtw_get_chip_type(padapter) == RTL8821)
-		rtl8821as_set_hal_ops(padapter);
-#endif
-
-#if defined(CONFIG_RTL8192E)
-	if (rtw_get_chip_type(padapter) == RTL8192E)
-		rtl8192es_set_hal_ops(padapter);
-#endif
-
-#if defined(CONFIG_RTL8703B)
-	if (rtw_get_chip_type(padapter) == RTL8703B)
-		rtl8703bs_set_hal_ops(padapter);
-#endif
-
-#if defined(CONFIG_RTL8723D)
-	if (rtw_get_chip_type(padapter) == RTL8723D)
-		rtl8723ds_set_hal_ops(padapter);
-#endif
-
-#if defined(CONFIG_RTL8188F)
-	if (rtw_get_chip_type(padapter) == RTL8188F)
-		rtl8188fs_set_hal_ops(padapter);
-#endif
-
-#if defined(CONFIG_RTL8822B)
-	if (rtw_get_chip_type(padapter) == RTL8822B)
-		rtl8822bs_set_hal_ops(padapter);
-#endif
-
-#if defined(CONFIG_RTL8821C)
-	if (rtw_get_chip_type(padapter) == RTL8821C) {
-		if (rtl8821cs_set_hal_ops(padapter) == _FAIL)
-			return _FAIL;
-	}
 #endif
 
 	if (rtw_hal_ops_check(padapter) == _FAIL)
@@ -596,7 +462,6 @@ static void sd_intf_stop(PADAPTER padapter)
 	/* hal dep */
 	rtw_hal_disable_interrupt(padapter);
 }
-
 
 #ifdef RTW_SUPPORT_PLATFORM_SHUTDOWN
 PADAPTER g_test_adapter = NULL;
@@ -817,8 +682,6 @@ static int rtw_drv_init(
 #endif
 #endif /* CONFIG_PLATFORM_INTEL_BYT */
 
-
-
 	dvobj = sdio_dvobj_init(func, id);
 	if (dvobj == NULL) {
 		goto exit;
@@ -877,7 +740,6 @@ static int rtw_drv_init(
 	}
 #endif
 
-
 	status = _SUCCESS;
 
 os_ndevs_deinit:
@@ -906,8 +768,6 @@ static void rtw_dev_remove(struct sdio_func *func)
 	struct dvobj_priv *dvobj = sdio_get_drvdata(func);
 	struct pwrctrl_priv *pwrctl = dvobj_to_pwrctl(dvobj);
 	PADAPTER padapter = dvobj_get_primary_adapter(dvobj);
-
-
 
 	dvobj->processing_dev_remove = _TRUE;
 
@@ -958,9 +818,8 @@ static void rtw_dev_remove(struct sdio_func *func)
 #endif
 
 	sdio_dvobj_deinit(func);
-
-
 }
+
 extern int pm_netdev_open(struct net_device *pnetdev, u8 bnormal);
 extern int pm_netdev_close(struct net_device *pnetdev, u8 bnormal);
 
@@ -1078,7 +937,6 @@ static int rtw_sdio_resume(struct device *dev)
 	pmlmeext->last_scan_time = rtw_get_current_time();
 	RTW_INFO("<========  %s return %d\n", __FUNCTION__, ret);
 	return ret;
-
 }
 
 static int rtw_drv_entry(void)

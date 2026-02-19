@@ -34,7 +34,6 @@ CONFIG_SDIO_HCI = y
 ########################## Features ###########################
 CONFIG_MP_INCLUDED = y
 CONFIG_POWER_SAVING = n
-CONFIG_USB_AUTOSUSPEND = n
 CONFIG_HW_PWRP_DETECTION = n
 CONFIG_WIFI_TEST = n
 CONFIG_BT_COEXIST = y
@@ -74,7 +73,7 @@ CONFIG_HIGH_ACTIVE = n
 CONFIG_PNO_SUPPORT = n
 CONFIG_PNO_SET_DEBUG = n
 CONFIG_AP_WOWLAN = n
-######### Notify SDIO Host Keep Power During Syspend ##########
+######### Notify SDIO Host Keep Power During Suspend ##########
 CONFIG_RTW_SDIO_PM_KEEP_POWER = y
 ###################### MP HW TX MODE FOR VHT #######################
 CONFIG_MP_VHT_HW_TX_MODE = n

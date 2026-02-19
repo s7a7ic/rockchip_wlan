@@ -215,7 +215,7 @@ u32 sdio_read32(struct intf_hdl *pintfhdl, u32 addr)
 		u8 *ptmpbuf;
 
 		ptmpbuf = (u8 *)rtw_malloc(8);
-		if (NULL == ptmpbuf) {
+		if (!ptmpbuf) {
 			RTW_ERR("%s: Allocate memory FAIL!(size=8) addr=0x%x\n", __func__, addr);
 			return SDIO_ERR_VAL32;
 		}
@@ -273,7 +273,7 @@ s32 sdio_readN(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *pbuf)
 		ftaddr &= ~(u16)0x3;
 		n = cnt + shift;
 		ptmpbuf = rtw_malloc(n);
-		if (NULL == ptmpbuf)
+		if (!ptmpbuf)
 			return -1;
 		err = sd_read(pintfhdl, ftaddr, n, ptmpbuf);
 		if (!err)
@@ -357,7 +357,7 @@ s32 sdio_write32(struct intf_hdl *pintfhdl, u32 addr, u32 val)
 		u8 *ptmpbuf;
 
 		ptmpbuf = (u8 *)rtw_malloc(8);
-		if (NULL == ptmpbuf)
+		if (!ptmpbuf)
 			return -1;
 
 		ftaddr &= ~(u16)0x3;
@@ -374,7 +374,6 @@ s32 sdio_write32(struct intf_hdl *pintfhdl, u32 addr, u32 val)
 	}
 #endif
 
-
 	return err;
 }
 
@@ -387,7 +386,6 @@ s32 sdio_writeN(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *pbuf)
 	u32 ftaddr;
 	u8 shift;
 	s32 err;
-
 
 	padapter = pintfhdl->padapter;
 	err = 0;
@@ -416,7 +414,7 @@ s32 sdio_writeN(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *pbuf)
 		ftaddr &= ~(u16)0x3;
 		n = cnt + shift;
 		ptmpbuf = rtw_malloc(n);
-		if (NULL == ptmpbuf)
+		if (!ptmpbuf)
 			return -1;
 		err = sd_read(pintfhdl, ftaddr, 4, ptmpbuf);
 		if (err) {
@@ -427,7 +425,6 @@ s32 sdio_writeN(struct intf_hdl *pintfhdl, u32 addr, u32 cnt, u8 *pbuf)
 		err = sd_write(pintfhdl, ftaddr, n, ptmpbuf);
 		rtw_mfree(ptmpbuf, n);
 	}
-
 
 	return err;
 }
@@ -485,11 +482,7 @@ static u32 sdio_read_port(
 	PSDIO_DATA psdio;
 	PHAL_DATA_TYPE phal;
 	u32 oldcnt;
-#ifdef SDIO_DYNAMIC_ALLOC_MEM
-	u8 *oldmem;
-#endif
 	s32 err;
-
 
 	padapter = pintfhdl->padapter;
 	psdio = &adapter_to_dvobj(padapter)->intf_data;
@@ -502,29 +495,7 @@ static u32 sdio_read_port(
 		cnt = _RND(cnt, psdio->block_transfer_len);
 	/*	cnt = sdio_align_size(cnt); */
 
-	if (oldcnt != cnt) {
-#ifdef SDIO_DYNAMIC_ALLOC_MEM
-		oldmem = mem;
-		mem = rtw_malloc(cnt);
-		if (mem == NULL) {
-			RTW_WARN("%s: allocate memory %d bytes fail!\n", __func__, cnt);
-			mem = oldmem;
-			oldmem == NULL;
-		}
-#else
-		/* in this case, caller should gurante the buffer is big enough */
-		/* to receive data after alignment */
-#endif
-	}
-
 	err = _sd_read(pintfhdl, addr, cnt, mem);
-
-#ifdef SDIO_DYNAMIC_ALLOC_MEM
-	if ((oldcnt != cnt) && (oldmem)) {
-		_rtw_memcpy(oldmem, mem, oldcnt);
-		rtw_mfree(mem, cnt);
-	}
-#endif
 
 	if (err)
 		return _FAIL;

@@ -269,7 +269,6 @@ _pkt *rtw_os_alloc_msdu_pkt(union recv_frame *prframe, u16 nSubframe_Length, u8 
 		_rtw_memcpy(skb_push(sub_skb, ETH_ALEN), pdata + 6, ETH_ALEN);
 		_rtw_memcpy(skb_push(sub_skb, ETH_ALEN), pdata, ETH_ALEN);
 	}
-
 	return sub_skb;
 }
 
@@ -281,7 +280,6 @@ static int napi_recv(_adapter *padapter, int budget)
 	int work_done = 0;
 	struct registry_priv *pregistrypriv = &padapter->registrypriv;
 	u8 rx_ok;
-
 
 	while ((work_done < budget) &&
 	       (!skb_queue_empty(&precvpriv->rx_napi_skb_queue))) {
@@ -314,7 +312,6 @@ next:
 			DBG_COUNTER(padapter->rx_logs.os_netif_err);
 		}
 	}
-
 	return work_done;
 }
 
@@ -323,7 +320,6 @@ int rtw_recv_napi_poll(struct napi_struct *napi, int budget)
 	_adapter *padapter = container_of(napi, _adapter, napi);
 	int work_done = 0;
 	struct recv_priv *precvpriv = &padapter->recvpriv;
-
 
 	work_done = napi_recv(padapter, budget);
 	if (work_done < budget) {
@@ -536,7 +532,6 @@ void rtw_hostapd_mlme_rx(_adapter *padapter, union recv_frame *precv_frame)
 	struct hostapd_priv *phostapdpriv  = padapter->phostapdpriv;
 	struct net_device *pmgnt_netdev = phostapdpriv->pmgnt_netdev;
 
-
 	skb = precv_frame->u.hdr.pkt;
 
 	if (skb == NULL)
@@ -607,9 +602,7 @@ static void rtw_os_ksocket_send(_adapter *padapter, union recv_frame *precv_fram
 			/* RTW_INFO("ksocket_send size=%d\n", send_sz);  */
 #endif
 		}
-
 	}
-
 }
 #endif /* CONFIG_AUTO_AP_MODE */
 
@@ -656,7 +649,6 @@ _recv_drop:
 		rtw_free_recvframe(precv_frame, pfree_recv_queue);
 
 	return ret;
-
 }
 
 int rtw_recv_indicatepkt(_adapter *padapter, union recv_frame *precv_frame)
@@ -684,7 +676,6 @@ int rtw_recv_indicatepkt(_adapter *padapter, union recv_frame *precv_frame)
 	if (skb == NULL) {
 		goto _recv_indicatepkt_drop;
 	}
-
 
 	skb->data = precv_frame->u.hdr.rx_data;
 

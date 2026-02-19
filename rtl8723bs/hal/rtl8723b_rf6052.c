@@ -161,7 +161,7 @@ static int phy_RF6052_Config_ParaFile(IN PADAPTER Adapter)
 			break;
 		}
 
-		/*----Restore RFENV control type----*/;
+		/*----Restore RFENV control type----*/
 		switch (eRFPath) {
 		case RF_PATH_A:
 		case RF_PATH_C:
@@ -179,7 +179,6 @@ static int phy_RF6052_Config_ParaFile(IN PADAPTER Adapter)
 		if (rtStatus != _SUCCESS) {
 			goto phy_RF6052_Config_ParaFile_Fail;
 		}
-
 	}
 
 	/* 3 Configuration of Tx Power Tracking */
