@@ -128,7 +128,6 @@ _OS_INTFS_FILES += os_dep/ioctl_mp.o
 endif
 
 ifeq ($(CONFIG_SDIO_HCI), y)
-_OS_INTFS_FILES += os_dep/custom_gpio_linux.o
 _OS_INTFS_FILES += os_dep/$(HCI_NAME)_ops_linux.o
 endif
 

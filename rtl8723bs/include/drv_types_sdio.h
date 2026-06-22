@@ -13,11 +13,6 @@
 #include <linux/mmc/host.h>
 #include <linux/mmc/card.h>
 
-#ifdef CONFIG_PLATFORM_SPRD
-	#include <linux/gpio.h>
-	#include <custom_gpio.h>
-#endif /* CONFIG_PLATFORM_SPRD */
-
 #define RTW_SDIO_CLK_33M	33000000
 #define RTW_SDIO_CLK_40M	40000000
 #define RTW_SDIO_CLK_80M	80000000
