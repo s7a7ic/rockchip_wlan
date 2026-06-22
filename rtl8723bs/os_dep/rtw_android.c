@@ -868,13 +868,6 @@ int rtw_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 		break;
 #endif /* CONFIG_GTK_OL		 */
 	case ANDROID_WIFI_CMD_P2P_DISABLE: {
-#ifdef CONFIG_P2P
-		struct mlme_ext_priv	*pmlmeext = &padapter->mlmeextpriv;
-		u8 channel, ch_offset;
-		u16 bwmode;
-
-		rtw_p2p_enable(padapter, P2P_ROLE_DISABLE);
-#endif /* CONFIG_P2P */
 		break;
 	}
 	case ANDROID_WIFI_CMD_DRIVERVERSION: {

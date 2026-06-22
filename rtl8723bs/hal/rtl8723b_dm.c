@@ -226,13 +226,6 @@ VOID rtl8723b_HalDmWatchDog(IN PADAPTER Adapter)
 	rtw_hal_get_hwreg(Adapter, HW_VAR_FWLPS_RF_ON, &bFwPSAwake);
 #endif
 
-#ifdef CONFIG_P2P
-	/* Fw is under p2p powersaving mode, driver should stop dynamic mechanism. */
-	/* modifed by thomas. 2011.06.11. */
-	if (Adapter->wdinfo.p2p_ps_mode)
-		bFwPSAwake = _FALSE;
-#endif /* CONFIG_P2P */
-
 	if ((rtw_is_hw_init_completed(Adapter))
 	    && ((!bFwCurrentInPSMode) && bFwPSAwake)) {
 

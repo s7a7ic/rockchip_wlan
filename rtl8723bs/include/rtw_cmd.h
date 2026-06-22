@@ -140,16 +140,6 @@ struct P2P_PS_CTWPeriod_t {
 	u8 CTWPeriod;	/* TU */
 };
 
-#ifdef CONFIG_P2P_WOWLAN
-
-struct P2P_WoWlan_Offload_t {
-	u8 Disconnect_Wkup_Drv:1;
-	u8 role:2;
-	u8 Wps_Config[2];
-};
-
-#endif /* CONFIG_P2P_WOWLAN */
-
 extern u32 rtw_enqueue_cmd(struct cmd_priv *pcmdpriv, struct cmd_obj *obj);
 extern struct cmd_obj *rtw_dequeue_cmd(struct cmd_priv *pcmdpriv);
 extern void rtw_free_cmd_obj(struct cmd_obj *pcmd);
@@ -170,39 +160,7 @@ extern u32 rtw_init_evt_priv(struct evt_priv *pevtpriv);
 extern void rtw_free_evt_priv(struct evt_priv *pevtpriv);
 extern void rtw_cmd_clr_isr(struct cmd_priv *pcmdpriv);
 extern void rtw_evt_notify_isr(struct evt_priv *pevtpriv);
-#ifdef CONFIG_P2P
-u8 p2p_protocol_wk_cmd(_adapter *padapter, int intCmdType);
 
-#ifdef CONFIG_IOCTL_CFG80211
-struct p2p_roch_parm {
-	u64 cookie;
-	struct wireless_dev *wdev;
-	struct ieee80211_channel ch;
-	enum nl80211_channel_type ch_type;
-	unsigned int duration;
-};
-
-u8 p2p_roch_cmd(_adapter *adapter
-	, u64 cookie, struct wireless_dev *wdev
-	, struct ieee80211_channel *ch, enum nl80211_channel_type ch_type
-	, unsigned int duration
-	, u8 flags
-);
-u8 p2p_cancel_roch_cmd(_adapter *adapter, u64 cookie, struct wireless_dev *wdev, u8 flags);
-
-struct mgnt_tx_parm {
-	u8 tx_ch;
-	u8 no_cck;
-	const u8 *buf;
-	size_t len;
-	int wait_ack;
-};
-u8 rtw_mgnt_tx_cmd(_adapter *adapter, u8 tx_ch, u8 no_cck, const u8 *buf, size_t len, int wait_ack, u8 flags);
-#endif /* CONFIG_IOCTL_CFG80211 */
-#endif /* CONFIG_P2P */
-
-#else
-/* #include <ieee80211.h> */
 #endif	/* CONFIG_RTL8711FW */
 
 enum rtw_drvextra_cmd_id {

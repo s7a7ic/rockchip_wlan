@@ -181,12 +181,6 @@ bool rtw_pwr_unassociated_idle(_adapter *adapter)
 	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
 	struct xmit_priv *pxmit_priv = &adapter->xmitpriv;
 	struct mlme_priv *pmlmepriv;
-#ifdef CONFIG_P2P
-	struct wifidirect_info	*pwdinfo;
-#ifdef CONFIG_IOCTL_CFG80211
-	struct cfg80211_wifidirect_info *pcfg80211_wdinfo;
-#endif
-#endif
 
 	bool ret = _FALSE;
 
@@ -204,29 +198,13 @@ bool rtw_pwr_unassociated_idle(_adapter *adapter)
 		iface = dvobj->padapters[i];
 		if ((iface) && rtw_is_adapter_up(iface)) {
 			pmlmepriv = &(iface->mlmepriv);
-#ifdef CONFIG_P2P
-			pwdinfo = &(iface->wdinfo);
-#ifdef CONFIG_IOCTL_CFG80211
-			pcfg80211_wdinfo = &iface->cfg80211_wdinfo;
-#endif
-#endif
 			if (check_fwstate(pmlmepriv, WIFI_ASOC_STATE | WIFI_SITE_MONITOR)
 				|| check_fwstate(pmlmepriv, WIFI_UNDER_LINKING | WIFI_UNDER_WPS)
 				|| MLME_IS_AP(iface)
 				|| MLME_IS_MESH(iface)
 				|| check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE | WIFI_ADHOC_STATE)
-				#if defined(CONFIG_P2P) && defined(CONFIG_IOCTL_CFG80211)
-				|| rtw_cfg80211_get_is_roch(iface) == _TRUE
-				#elif defined(CONFIG_P2P)
-				|| rtw_p2p_chk_state(pwdinfo, P2P_STATE_IDLE)
-				|| rtw_p2p_chk_state(pwdinfo, P2P_STATE_LISTEN)
-				#endif
-				#if defined(CONFIG_P2P) && defined(CONFIG_IOCTL_CFG80211)
-				|| rtw_get_passing_time_ms(pcfg80211_wdinfo->last_ro_ch_time) < 3000
-				#endif
 			)
 				goto exit;
-
 		}
 	}
 
@@ -260,9 +238,6 @@ exit:
  */
 void rtw_ps_processor(_adapter *padapter)
 {
-#ifdef CONFIG_P2P
-	struct wifidirect_info	*pwdinfo = &(padapter->wdinfo);
-#endif /* CONFIG_P2P */
 	struct pwrctrl_priv *pwrpriv = adapter_to_pwrctl(padapter);
 	struct mlme_priv *pmlmepriv = &(padapter->mlmepriv);
 	struct dvobj_priv *psdpriv = padapter->dvobj;
@@ -581,12 +556,12 @@ void rtw_set_rpwm(PADAPTER padapter, u8 pslv)
 #ifdef CONFIG_DETECT_CPWM_BY_POLLING
 		rtw_cpwm_polling(padapter, cpwm_orig);
 		#else
-		#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN) || defined(CONFIG_P2P_WOWLAN)
+		#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)
 		if (pwrpriv->wowlan_mode == _TRUE ||
 			pwrpriv->wowlan_ap_mode == _TRUE ||
 			pwrpriv->wowlan_p2p_mode == _TRUE)
 				rtw_cpwm_polling(padapter, cpwm_orig);
-		#endif /*#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN) || defined(CONFIG_P2P_WOWLAN)*/
+		#endif /*#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)*/
 		#endif /*#ifdef CONFIG_DETECT_CPWM_BY_POLLING*/
 	} else
 #endif /* CONFIG_LPS_LCLK */
@@ -600,12 +575,6 @@ u8 PS_RDY_CHECK(_adapter *padapter)
 	u32 delta_ms;
 	struct pwrctrl_priv	*pwrpriv = adapter_to_pwrctl(padapter);
 	struct mlme_priv	*pmlmepriv = &(padapter->mlmepriv);
-#ifdef CONFIG_P2P
-	struct wifidirect_info *pwdinfo = &(padapter->wdinfo);
-#ifdef CONFIG_IOCTL_CFG80211
-	struct cfg80211_wifidirect_info *pcfg80211_wdinfo = &padapter->cfg80211_wdinfo;
-#endif /* CONFIG_IOCTL_CFG80211 */
-#endif /* CONFIG_P2P */
 
 #if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)
 	if (_TRUE == pwrpriv->bInSuspend && pwrpriv->wowlan_mode)
@@ -628,9 +597,6 @@ u8 PS_RDY_CHECK(_adapter *padapter)
 		|| MLME_IS_AP(padapter)
 		|| MLME_IS_MESH(padapter)
 		|| check_fwstate(pmlmepriv, WIFI_ADHOC_MASTER_STATE | WIFI_ADHOC_STATE)
-		#if defined(CONFIG_P2P) && defined(CONFIG_IOCTL_CFG80211)
-		|| rtw_cfg80211_get_is_roch(padapter) == _TRUE
-		#endif
 		|| rtw_is_scan_deny(padapter)
 		#ifdef CONFIG_TDLS
 		/* TDLS link is established. */
@@ -774,9 +740,6 @@ void rtw_set_ps_mode(PADAPTER padapter, u8 ps_mode, u8 smart_ps, u8 bcn_ant_mode
 	struct dvobj_priv *psdpriv = padapter->dvobj;
 	struct debug_priv *pdbgpriv = &psdpriv->drv_dbg;
 	struct registry_priv *pregistrypriv = &padapter->registrypriv;
-#ifdef CONFIG_P2P
-	struct wifidirect_info	*pwdinfo = &(padapter->wdinfo);
-#endif /* CONFIG_P2P */
 #ifdef CONFIG_TDLS
 	struct sta_priv *pstapriv = &padapter->stapriv;
 	_irqL irqL;
@@ -832,17 +795,11 @@ void rtw_set_ps_mode(PADAPTER padapter, u8 ps_mode, u8 smart_ps, u8 bcn_ant_mode
 		if (1
 #ifdef CONFIG_BT_COEXIST
 		    && (((rtw_btcoex_IsBtControlLps(padapter) == _FALSE)
-#ifdef CONFIG_P2P_PS
-			 && (pwdinfo->opp_ps == 0)
-#endif /* CONFIG_P2P_PS */
 			)
 			|| ((rtw_btcoex_IsBtControlLps(padapter) == _TRUE)
 			    && (rtw_btcoex_IsLpsOn(padapter) == _FALSE))
 		       )
 #else /* !CONFIG_BT_COEXIST */
-#ifdef CONFIG_P2P_PS
-		    && (pwdinfo->opp_ps == 0)
-#endif /* CONFIG_P2P_PS */
 #endif /* !CONFIG_BT_COEXIST */
 		   ) {
 			RTW_INFO(FUNC_ADPT_FMT" Leave 802.11 power save - %s\n",
@@ -870,7 +827,7 @@ void rtw_set_ps_mode(PADAPTER padapter, u8 ps_mode, u8 smart_ps, u8 bcn_ant_mode
 			pwrpriv->pwr_mode = ps_mode;
 			rtw_set_rpwm(padapter, PS_STATE_S4);
 
-#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN) || defined(CONFIG_P2P_WOWLAN)
+#if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)
 			if (pwrpriv->wowlan_mode == _TRUE ||
 			    pwrpriv->wowlan_ap_mode == _TRUE ||
 			    pwrpriv->wowlan_p2p_mode == _TRUE) {
@@ -927,9 +884,6 @@ void rtw_set_ps_mode(PADAPTER padapter, u8 ps_mode, u8 smart_ps, u8 bcn_ant_mode
 		    || ((rtw_btcoex_IsBtControlLps(padapter) == _TRUE)
 			&& (rtw_btcoex_IsLpsOn(padapter) == _TRUE))
 #endif
-#ifdef CONFIG_P2P_WOWLAN
-		    || (_TRUE == pwrpriv->wowlan_p2p_mode)
-#endif /* CONFIG_P2P_WOWLAN */
 		   ) {
 			u8 pslv;
 
@@ -974,12 +928,6 @@ void rtw_set_ps_mode(PADAPTER padapter, u8 ps_mode, u8 smart_ps, u8 bcn_ant_mode
 #endif /* CONFIG_WMMPS_STA */
 			
 			rtw_hal_set_hwreg(padapter, HW_VAR_H2C_FW_PWRMODE, (u8 *)(&ps_mode));
-
-#ifdef CONFIG_P2P_PS
-			/* Set CTWindow after LPS */
-			if (pwdinfo->opp_ps == 1)
-				p2p_ps_wk_cmd(padapter, P2P_PS_ENABLE, 0);
-#endif /* CONFIG_P2P_PS */
 
 			pslv = PS_STATE_S2;
 #ifdef CONFIG_LPS_LCLK
@@ -1084,12 +1032,6 @@ void LPS_Enter(PADAPTER padapter, const char *msg)
 		if (PS_RDY_CHECK(dvobj->padapters[i]) == _FALSE)
 			return;
 	}
-
-#ifdef CONFIG_P2P_PS
-	if (padapter->wdinfo.p2p_ps_mode == P2P_PS_NOA) {
-		return;/* supporting p2p client ps NOA via H2C_8723B_P2P_PS_OFFLOAD */
-	}
-#endif /* CONFIG_P2P_PS */
 
 	if (pwrpriv->bLeisurePs) {
 		/* Idle for a while if we connect to AP a while ago. */
@@ -1258,10 +1200,6 @@ void LeaveAllPowerSaveModeDirect(PADAPTER Adapter)
 		_exit_pwrlock(&pwrpriv->lock);
 #endif
 
-#ifdef CONFIG_P2P_PS
-		p2p_ps_wk_cmd(pri_padapter, P2P_PS_DISABLE, 0);
-#endif /* CONFIG_P2P_PS */
-
 #ifdef CONFIG_LPS
 		rtw_lps_ctrl_wk_cmd(pri_padapter, LPS_CTRL_LEAVE, 0);
 #endif
@@ -1323,16 +1261,6 @@ void LeaveAllPowerSaveMode(IN PADAPTER Adapter)
 #ifdef CONFIG_LPS_LCLK
 		enqueue = 1;
 #endif
-
-#ifdef CONFIG_P2P_PS
-		for (i = 0; i < dvobj->iface_nums; i++) {
-			_adapter *iface = dvobj->padapters[i];
-			struct wifidirect_info *pwdinfo = &(iface->wdinfo);
-
-			if (pwdinfo->p2p_ps_mode > P2P_PS_NONE)
-				p2p_ps_wk_cmd(iface, P2P_PS_DISABLE, enqueue);
-		}
-#endif /* CONFIG_P2P_PS */
 
 #ifdef CONFIG_LPS
 		rtw_lps_ctrl_wk_cmd(Adapter, LPS_CTRL_LEAVE, enqueue);
@@ -1841,17 +1769,6 @@ void rtw_unregister_tx_alive(PADAPTER padapter)
 	}
 #endif /* CONFIG_BT_COEXIST */
 
-#ifdef CONFIG_P2P_PS
-	for (i = 0; i < dvobj->iface_nums; i++) {
-		iface = dvobj->padapters[i];
-		if ((iface) && rtw_is_adapter_up(iface)) {
-			if (iface->wdinfo.p2p_ps_mode > P2P_PS_NONE) {
-				pslv = PS_STATE_S2;
-				break;
-			}
-		}
-	}
-#endif
 	_enter_pwrlock(&pwrctrl->lock);
 
 	unregister_task_alive(pwrctrl, XMIT_ALIVE);
@@ -1896,18 +1813,6 @@ void rtw_unregister_cmd_alive(PADAPTER padapter)
 
 	}
 #endif /* CONFIG_BT_COEXIST */
-
-#ifdef CONFIG_P2P_PS
-	for (i = 0; i < dvobj->iface_nums; i++) {
-		iface = dvobj->padapters[i];
-		if ((iface) && rtw_is_adapter_up(iface)) {
-			if (iface->wdinfo.p2p_ps_mode > P2P_PS_NONE) {
-				pslv = PS_STATE_S2;
-				break;
-			}
-		}
-	}
-#endif
 
 	_enter_pwrlock(&pwrctrl->lock);
 

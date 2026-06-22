@@ -376,24 +376,11 @@ void dump_adapters_status(void *sel, struct dvobj_priv *dvobj)
 		, dev_is_drv_stopped(dvobj) ? " DS" : ""
 	);
 
-#ifdef CONFIG_P2P
-#define P2P_INFO_TITLE_FMT	" %-3s %-4s"
-#define P2P_INFO_TITLE_ARG	, "lch", "p2ps"
-#ifdef CONFIG_IOCTL_CFG80211
-#define P2P_INFO_VALUE_FMT	" %3u %c%3u"
-#define P2P_INFO_VALUE_ARG	, iface->wdinfo.listen_channel, iface->wdev_data.p2p_enabled ? 'e' : ' ', rtw_p2p_state(&iface->wdinfo)
-#else
-#define P2P_INFO_VALUE_FMT	" %3u %4u"
-#define P2P_INFO_VALUE_ARG	, iface->wdinfo.listen_channel, rtw_p2p_state(&iface->wdinfo)
-#endif
-#define P2P_INFO_DASH		"---------"
-#else
 #define P2P_INFO_TITLE_FMT	""
 #define P2P_INFO_TITLE_ARG
 #define P2P_INFO_VALUE_FMT	""
 #define P2P_INFO_VALUE_ARG
 #define P2P_INFO_DASH
-#endif
 
 	RTW_PRINT_SEL(sel, "%-2s %-15s %c %-3s %-3s %-3s %-17s %-4s %-7s"
 		P2P_INFO_TITLE_FMT
@@ -4313,38 +4300,6 @@ ssize_t proc_set_wowlan_gpio_info(struct file *file, const char __user *buffer,
 	return count;
 }
 #endif /* CONFIG_GPIO_WAKEUP */
-
-#ifdef CONFIG_P2P_WOWLAN
-int proc_get_p2p_wowlan_info(struct seq_file *m, void *v)
-{
-	struct net_device *dev = m->private;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	struct wifidirect_info	*pwdinfo = &(padapter->wdinfo);
-	struct p2p_wowlan_info	 peerinfo = pwdinfo->p2p_wow_info;
-	if (_TRUE == peerinfo.is_trigger) {
-		RTW_PRINT_SEL(m, "is_trigger: TRUE\n");
-		switch (peerinfo.wowlan_recv_frame_type) {
-		case P2P_WOWLAN_RECV_NEGO_REQ:
-			RTW_PRINT_SEL(m, "Frame Type: Nego Request\n");
-			break;
-		case P2P_WOWLAN_RECV_INVITE_REQ:
-			RTW_PRINT_SEL(m, "Frame Type: Invitation Request\n");
-			break;
-		case P2P_WOWLAN_RECV_PROVISION_REQ:
-			RTW_PRINT_SEL(m, "Frame Type: Provision Request\n");
-			break;
-		default:
-			break;
-		}
-		RTW_PRINT_SEL(m, "Peer Addr: "MAC_FMT"\n", MAC_ARG(peerinfo.wowlan_peer_addr));
-		RTW_PRINT_SEL(m, "Peer WPS Config: %x\n", peerinfo.wowlan_peer_wpsconfig);
-		RTW_PRINT_SEL(m, "Persistent Group: %d\n", peerinfo.wowlan_peer_is_persistent);
-		RTW_PRINT_SEL(m, "Intivation Type: %d\n", peerinfo.wowlan_peer_invitation_type);
-	} else
-		RTW_PRINT_SEL(m, "is_trigger: False\n");
-	return 0;
-}
-#endif /* CONFIG_P2P_WOWLAN */
 
 int proc_get_new_bcn_max(struct seq_file *m, void *v)
 {

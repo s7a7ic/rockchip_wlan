@@ -537,9 +537,6 @@ _adapter *rtw_sdio_primary_adapter_init(struct dvobj_priv *dvobj)
 #ifdef CONFIG_MI_WITH_MBSSID_CAM
 	rtw_mbid_camid_alloc(padapter, adapter_mac_addr(padapter));
 #endif
-#ifdef CONFIG_P2P
-	rtw_init_wifidirect_addrs(padapter, adapter_mac_addr(padapter), adapter_mac_addr(padapter));
-#endif /* CONFIG_P2P */
 
 	rtw_hal_disable_interrupt(padapter);
 

@@ -83,22 +83,10 @@ void rtw_wfd_st_switch(struct sta_info *sta, bool on);
 #define MLME_IS_MESH(adapter) (MLME_STATE((adapter)) & WIFI_MESH_STATE)
 #define MLME_IS_MONITOR(adapter) (MLME_STATE((adapter)) & WIFI_MONITOR_STATE)
 #define MLME_IS_MP(adapter) (MLME_STATE((adapter)) & WIFI_MP_STATE)
-#ifdef CONFIG_P2P
-	#define MLME_IS_PD(adapter) rtw_p2p_chk_role(&(adapter)->wdinfo, P2P_ROLE_DEVICE)
-	#define MLME_IS_GC(adapter) rtw_p2p_chk_role(&(adapter)->wdinfo, P2P_ROLE_CLIENT)
-	#define MLME_IS_GO(adapter) rtw_p2p_chk_role(&(adapter)->wdinfo, P2P_ROLE_GO)
-#else /* !CONFIG_P2P */
-	#define MLME_IS_PD(adapter) 0
-	#define MLME_IS_GC(adapter) 0
-	#define MLME_IS_GO(adapter) 0
-#endif /* !CONFIG_P2P */
-
-#if defined(CONFIG_IOCTL_CFG80211) && defined(CONFIG_P2P)
-#define MLME_IS_ROCH(adapter) (rtw_cfg80211_get_is_roch(adapter) == _TRUE)
-#else
+#define MLME_IS_PD(adapter) 0
+#define MLME_IS_GC(adapter) 0
+#define MLME_IS_GO(adapter) 0
 #define MLME_IS_ROCH(adapter) 0
-#endif
-
 #define MLME_IS_MSRC(adapter) rtw_chk_miracast_mode((adapter), MIRACAST_SOURCE)
 #define MLME_IS_MSINK(adapter) rtw_chk_miracast_mode((adapter), MIRACAST_SINK)
 
@@ -321,26 +309,6 @@ struct cfg80211_wifidirect_info {
 };
 #endif /* CONFIG_IOCTL_CFG80211 */
 
-#ifdef CONFIG_P2P_WOWLAN
-
-enum P2P_WOWLAN_RECV_FRAME_TYPE {
-	P2P_WOWLAN_RECV_NEGO_REQ = 0,
-	P2P_WOWLAN_RECV_INVITE_REQ = 1,
-	P2P_WOWLAN_RECV_PROVISION_REQ = 2,
-};
-
-struct p2p_wowlan_info {
-
-	u8						is_trigger;
-	enum P2P_WOWLAN_RECV_FRAME_TYPE	wowlan_recv_frame_type;
-	u8						wowlan_peer_addr[ETH_ALEN];
-	u16						wowlan_peer_wpsconfig;
-	u8						wowlan_peer_is_persistent;
-	u8						wowlan_peer_invitation_type;
-};
-
-#endif /* CONFIG_P2P_WOWLAN */
-
 struct wifidirect_info {
 	_adapter				*padapter;
 	_timer					find_phase_timer;
@@ -366,10 +334,6 @@ struct wifidirect_info {
 #ifdef CONFIG_WFD
 	struct wifi_display_info		*wfd_info;
 #endif
-
-#ifdef CONFIG_P2P_WOWLAN
-	struct p2p_wowlan_info		p2p_wow_info;
-#endif /* CONFIG_P2P_WOWLAN */
 
 	enum P2P_ROLE			role;
 	enum P2P_STATE			pre_p2p_state;
@@ -430,18 +394,6 @@ struct wifidirect_info {
 	u16						ext_listen_interval;	/*	The interval to be available with legacy AP (ms) */
 	u16						ext_listen_period;	/*	The time period to be available for P2P listen state (ms) */
 #endif
-#ifdef CONFIG_P2P_PS
-	enum P2P_PS_MODE		p2p_ps_mode; /* indicate p2p ps mode */
-	enum P2P_PS_STATE		p2p_ps_state; /* indicate p2p ps state */
-	u8						noa_index; /* Identifies and instance of Notice of Absence timing. */
-	u8						ctwindow; /* Client traffic window. A period of time in TU after TBTT. */
-	u8						opp_ps; /* opportunistic power save. */
-	u8						noa_num; /* number of NoA descriptor in P2P IE. */
-	u8						noa_count[P2P_MAX_NOA_NUM]; /* Count for owner, Type of client. */
-	u32						noa_duration[P2P_MAX_NOA_NUM]; /* Max duration for owner, preferred or min acceptable duration for client. */
-	u32						noa_interval[P2P_MAX_NOA_NUM]; /* Length of interval for owner, preferred or max acceptable interval of client. */
-	u32						noa_start_time[P2P_MAX_NOA_NUM]; /* schedule expressed in terms of the lower 4 bytes of the TSF timer. */
-#endif /* CONFIG_P2P_PS */
 };
 
 struct tdls_ss_record {	/* signal strength record */
