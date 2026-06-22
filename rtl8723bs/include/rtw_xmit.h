@@ -111,7 +111,7 @@
 #define HWXMIT_ENTRY	4
 
 /* For Buffer Descriptor ring architecture */
-#if defined(BUF_DESC_ARCH) || defined(CONFIG_TRX_BD_ARCH)
+#if defined(BUF_DESC_ARCH)
 	#if defined(CONFIG_RTL8192E)
 		#define TX_BUFFER_SEG_NUM	1 /* 0:2 seg, 1: 4 seg, 2: 8 seg. */
 	#elif defined(CONFIG_RTL8814A)

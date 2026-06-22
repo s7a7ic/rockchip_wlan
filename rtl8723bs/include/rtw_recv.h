@@ -189,20 +189,6 @@ struct rx_pkt_attrib	{
 #define RXDESC_SIZE	24
 #define RXDESC_OFFSET RXDESC_SIZE
 
-#ifdef CONFIG_TRX_BD_ARCH
-struct rx_buf_desc {
-	/* RX has exactly one segment */
-#ifdef CONFIG_64BIT_DMA
-	unsigned int dword[4];
-#else
-	unsigned int dword[2];
-#endif
-};
-
-struct recv_stat {
-	unsigned int rxdw[8];
-};
-#else
 struct recv_stat {
 	unsigned int rxdw0;
 
@@ -215,7 +201,6 @@ struct recv_stat {
 
 #endif /* if BUF_DESC_ARCH is defined, rx_buf_desc occupy 4 double words */
 };
-#endif
 
 #define EOR BIT(30)
 
