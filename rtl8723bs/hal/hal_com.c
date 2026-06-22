@@ -1867,7 +1867,6 @@ void rtw_hal_update_sta_smps_cap(_adapter *adapter, struct sta_info *psta)
 	/*Spatial Multiplexing Power Save*/
 #if 0
 	if (check_fwstate(&adapter->mlmepriv, WIFI_AP_STATE) == _TRUE) {
-		#ifdef CONFIG_80211N_HT
 		if (psta->htpriv.ht_option) {
 			if (psta->htpriv.smps_cap == 0)
 				psta->cmn.sm_ps = SM_PS_STATIC;
@@ -1876,7 +1875,6 @@ void rtw_hal_update_sta_smps_cap(_adapter *adapter, struct sta_info *psta)
 			else
 				psta->cmn.sm_ps = SM_PS_DISABLE;
 		}
-		#endif /* CONFIG_80211N_HT */
 	} else
 #endif
 		psta->cmn.sm_ps = SM_PS_DISABLE;
@@ -1915,7 +1913,6 @@ void rtw_hal_update_sta_rate_mask(PADAPTER padapter, struct sta_info *psta)
 			tx_ra_bitmap |= rtw_get_bit_value_from_ieee_value(psta->bssrateset[i] & 0x7f);
 	}
 
-#ifdef CONFIG_80211N_HT
 	rtw_hal_get_hwreg(padapter, HW_VAR_RF_TYPE, (u8 *)(&rf_type));
 	tx_nss = rtw_min(rf_type_to_rf_tx_cnt(rf_type), hal_spec->tx_nss_num);
 	if (psta->htpriv.ht_option) {
@@ -1932,7 +1929,7 @@ void rtw_hal_update_sta_rate_mask(PADAPTER padapter, struct sta_info *psta)
 
 		tx_ra_bitmap |= (rtw_ht_mcs_set_to_bitmap(psta->htpriv.ht_cap.supp_mcs_set, tx_nss) << 12);
 	}
-#endif /* CONFIG_80211N_HT */
+
 	psta->cmn.ra_info.ramask = tx_ra_bitmap;
 	psta->init_rate = get_highest_rate_idx(tx_ra_bitmap) & 0x3f;
 }

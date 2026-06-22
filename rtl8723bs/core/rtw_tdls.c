@@ -431,7 +431,6 @@ void rtw_tdls_set_key(_adapter *padapter, struct sta_info *ptdls_sta)
 	rtw_setstakey_cmd(padapter, ptdls_sta, TDLS_KEY, _TRUE);
 }
 
-#ifdef CONFIG_80211N_HT
 void rtw_tdls_process_ht_cap(_adapter *padapter, struct sta_info *ptdls_sta, u8 *data, u8 Length)
 {
 	struct mlme_ext_priv	*pmlmeext = &padapter->mlmeextpriv;
@@ -536,7 +535,6 @@ u8 *rtw_tdls_set_ht_cap(_adapter *padapter, u8 *pframe, struct pkt_attrib *pattr
 
 	return pframe + pattrib->pktlen;
 }
-#endif
 
 u8 *rtw_tdls_set_sup_ch(_adapter *adapter, u8 *pframe, struct pkt_attrib *pattrib)
 {
@@ -1756,11 +1754,9 @@ sint On_TDLS_Setup_Req(_adapter *padapter, union recv_frame *precv_frame, struct
 				break;
 			case _RIC_Descriptor_IE_:
 				break;
-#ifdef CONFIG_80211N_HT
 			case _HT_CAPABILITY_IE_:
 				rtw_tdls_process_ht_cap(padapter, ptdls_sta, pIE->data, pIE->Length);
 				break;
-#endif
 			case EID_BSSCoexistence:
 				break;
 			case _LINK_ID_IE_:
@@ -1927,11 +1923,9 @@ int On_TDLS_Setup_Rsp(_adapter *padapter, union recv_frame *precv_frame, struct 
 			break;
 		case _RIC_Descriptor_IE_:
 			break;
-#ifdef CONFIG_80211N_HT
 		case _HT_CAPABILITY_IE_:
 			rtw_tdls_process_ht_cap(padapter, ptdls_sta, pIE->data, pIE->Length);
 			break;
-#endif
 		case EID_BSSCoexistence:
 			break;
 		case _LINK_ID_IE_:
@@ -2057,10 +2051,8 @@ int On_TDLS_Setup_Cfm(_adapter *padapter, union recv_frame *precv_frame, struct 
 		case _TIMEOUT_ITVL_IE_:
 			ptimeout_ie = (u8 *)pIE;
 			break;
-#ifdef CONFIG_80211N_HT
 		case _HT_EXTRA_INFO_IE_:
 			break;
-#endif
 		case _LINK_ID_IE_:
 			plinkid_ie = (u8 *)pIE;
 			break;
@@ -2608,11 +2600,9 @@ void rtw_build_tdls_setup_req_ies(_adapter *padapter, struct xmit_frame *pxmitfr
 		pframe = rtw_tdls_set_timeout_interval(ptxmgmt, pframe, pattrib, _TRUE, ptdls_sta);
 	}
 
-#ifdef CONFIG_80211N_HT
 	/* Sup_reg_classes(optional) */
 	if (pregistrypriv->ht_enable == _TRUE)
 		pframe = rtw_tdls_set_ht_cap(padapter, pframe_head, pattrib);
-#endif
 
 	pframe = rtw_tdls_set_bss_coexist(padapter, pframe, pattrib);
 
@@ -2687,11 +2677,9 @@ void rtw_build_tdls_setup_rsp_ies(_adapter *padapter, struct xmit_frame *pxmitfr
 		pframe = rtw_tdls_set_timeout_interval(ptxmgmt, pframe, pattrib, _FALSE, ptdls_sta);
 	}
 
-#ifdef CONFIG_80211N_HT
 	/* Sup_reg_classes(optional) */
 	if (pregistrypriv->ht_enable == _TRUE)
 		pframe = rtw_tdls_set_ht_cap(padapter, pframe_head, pattrib);
-#endif
 
 	pframe = rtw_tdls_set_bss_coexist(padapter, pframe, pattrib);
 
@@ -2841,10 +2829,8 @@ void rtw_build_tdls_dis_rsp_ies(_adapter *padapter, struct xmit_frame *pxmitfram
 		pframe = rtw_tdls_set_timeout_interval(ptxmgmt, pframe, pattrib,  _TRUE, NULL);
 	}
 
-#ifdef CONFIG_80211N_HT
 	if (pregistrypriv->ht_enable == _TRUE)
 		pframe = rtw_tdls_set_ht_cap(padapter, pframe_head - pktlen_index, pattrib);
-#endif
 
 	pframe = rtw_tdls_set_bss_coexist(padapter, pframe, pattrib);
 	pframe = rtw_tdls_set_linkid(pframe, pattrib, _FALSE);

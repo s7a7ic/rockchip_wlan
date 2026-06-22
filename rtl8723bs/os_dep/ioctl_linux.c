@@ -19,9 +19,7 @@
 #define  iwe_stream_add_point(a, b, c, d, e)  iwe_stream_add_point(b, c, d, e)
 #endif
 
-#ifdef CONFIG_80211N_HT
 extern int rtw_ht_enable;
-#endif
 
 #define RTL_IOCTL_WPA_SUPPLICANT	(SIOCIWFIRSTPRIV+30)
 
@@ -6183,9 +6181,7 @@ static int rtw_dbg_port(struct net_device *dev,
 			break;
 		case 0x03:
 			RTW_INFO("qos_option=%d\n", pmlmepriv->qospriv.qos_option);
-#ifdef CONFIG_80211N_HT
 			RTW_INFO("ht_option=%d\n", pmlmepriv->htpriv.ht_option);
-#endif /* CONFIG_80211N_HT */
 			break;
 		case 0x04:
 			RTW_INFO("cur_ch=%d\n", pmlmeext->cur_channel);
@@ -6206,13 +6202,11 @@ static int rtw_dbg_port(struct net_device *dev,
 				RTW_INFO("rtsen=%d, cts2slef=%d\n", psta->rtsen, psta->cts2self);
 				RTW_INFO("state=0x%x, aid=%d, macid=%d, raid=%d\n",
 					psta->state, psta->cmn.aid, psta->cmn.mac_id, psta->cmn.ra_info.rate_id);
-#ifdef CONFIG_80211N_HT
 				RTW_INFO("qos_en=%d, ht_en=%d, init_rate=%d\n", psta->qos_option, psta->htpriv.ht_option, psta->init_rate);
 				RTW_INFO("bwmode=%d, ch_offset=%d, sgi_20m=%d,sgi_40m=%d\n"
 					, psta->cmn.bw_mode, psta->htpriv.ch_offset, psta->htpriv.sgi_20m, psta->htpriv.sgi_40m);
 				RTW_INFO("ampdu_enable = %d\n", psta->htpriv.ampdu_enable);
 				RTW_INFO("agg_enable_bitmap=%x, candidate_tid_bitmap=%x\n", psta->htpriv.agg_enable_bitmap, psta->htpriv.candidate_tid_bitmap);
-#endif /* CONFIG_80211N_HT */
 
 				sta_rx_reorder_ctl_dump(RTW_DBGDUMP, psta);
 			} else
@@ -6267,14 +6261,12 @@ static int rtw_dbg_port(struct net_device *dev,
 						RTW_INFO("rtsen=%d, cts2slef=%d\n", psta->rtsen, psta->cts2self);
 						RTW_INFO("state=0x%x, aid=%d, macid=%d, raid=%d\n",
 							psta->state, psta->cmn.aid, psta->cmn.mac_id, psta->cmn.ra_info.rate_id);
-#ifdef CONFIG_80211N_HT
 						RTW_INFO("qos_en=%d, ht_en=%d, init_rate=%d\n", psta->qos_option, psta->htpriv.ht_option, psta->init_rate);
 						RTW_INFO("bwmode=%d, ch_offset=%d, sgi_20m=%d,sgi_40m=%d\n",
 							psta->cmn.bw_mode, psta->htpriv.ch_offset, psta->htpriv.sgi_20m,
 							psta->htpriv.sgi_40m);
 						RTW_INFO("ampdu_enable = %d\n", psta->htpriv.ampdu_enable);
 						RTW_INFO("agg_enable_bitmap=%x, candidate_tid_bitmap=%x\n", psta->htpriv.agg_enable_bitmap, psta->htpriv.candidate_tid_bitmap);
-#endif /* CONFIG_80211N_HT */
 
 #ifdef CONFIG_AP_MODE
 						RTW_INFO("capability=0x%x\n", psta->capability);
@@ -6376,12 +6368,9 @@ static int rtw_dbg_port(struct net_device *dev,
 				/* RTW_INFO("linked_info_dump =%s\n", (padapter->bLinkInfoDump)?"enable":"disable") */
 				linked_info_dump(padapter, extra_arg);
 			}
-
-
-
 		}
 			break;
-#ifdef CONFIG_80211N_HT
+
 		case 0x12: { /* set rx_stbc */
 			struct registry_priv	*pregpriv = &padapter->registrypriv;
 			/* 0: disable, bit(0):enable 2.4g, bit(1):enable 5g, 0x3: enable both 2.4g and 5g */
@@ -6391,9 +6380,9 @@ static int rtw_dbg_port(struct net_device *dev,
 				RTW_INFO("set rx_stbc=%d\n", pregpriv->rx_stbc);
 			} else
 				RTW_INFO("get rx_stbc=%d\n", pregpriv->rx_stbc);
-
 		}
 			break;
+
 		case 0x13: { /* set ampdu_enable */
 			struct registry_priv	*pregpriv = &padapter->registrypriv;
 			/* 0: disable, 0x1:enable */
@@ -6405,7 +6394,7 @@ static int rtw_dbg_port(struct net_device *dev,
 
 		}
 			break;
-#endif
+
 		case 0x14: { /* get wifi_spec */
 			struct registry_priv	*pregpriv = &padapter->registrypriv;
 			RTW_INFO("get wifi_spec=%d\n", pregpriv->wifi_spec);
@@ -6422,7 +6411,7 @@ static int rtw_dbg_port(struct net_device *dev,
 		}
 			break;
 #endif
-#ifdef CONFIG_80211N_HT
+
 		case 0x19: {
 			struct registry_priv	*pregistrypriv = &padapter->registrypriv;
 			/* extra_arg : */
@@ -6451,16 +6440,14 @@ static int rtw_dbg_port(struct net_device *dev,
 			}
 		}
 			break;
-#endif /* CONFIG_80211N_HT */
+
 		case 0x1b: {
 			struct registry_priv	*pregistrypriv = &padapter->registrypriv;
 
 			if (arg == 0) {
 				RTW_INFO("disable driver ctrl max_rx_rate, reset to default_rate_set\n");
 				init_mlme_default_rate_set(padapter);
-#ifdef CONFIG_80211N_HT
 				pregistrypriv->ht_enable = (u8)rtw_ht_enable;
-#endif /* CONFIG_80211N_HT */
 			} else if (arg == 1) {
 
 				int i;
@@ -6471,16 +6458,12 @@ static int rtw_dbg_port(struct net_device *dev,
 				max_rx_rate = (u8)extra_arg;
 
 				if (max_rx_rate < 0xc) { /* max_rx_rate < MSC0->B or G -> disable HT */
-#ifdef CONFIG_80211N_HT
 					pregistrypriv->ht_enable = 0;
-#endif /* CONFIG_80211N_HT */
 					for (i = 0; i < NumRates; i++) {
 						if (pmlmeext->datarate[i] > max_rx_rate)
 							pmlmeext->datarate[i] = 0xff;
 					}
-
 				}
-#ifdef CONFIG_80211N_HT
 				else if (max_rx_rate < 0x1c) { /* mcs0~mcs15 */
 					u32 mcs_bitmap = 0x0;
 
@@ -6489,7 +6472,6 @@ static int rtw_dbg_port(struct net_device *dev,
 
 					set_mcs_rate_by_mask(pmlmeext->default_supported_mcs_set, mcs_bitmap);
 				}
-#endif /* CONFIG_80211N_HT							 */
 			}
 		}
 			break;
@@ -6516,7 +6498,6 @@ static int rtw_dbg_port(struct net_device *dev,
 		}
 			break;
 #endif
-
 
 #if defined(CONFIG_SDIO_HCI) && defined(CONFIG_SDIO_INDIRECT_ACCESS) && defined(DBG_SDIO_INDIRECT_ACCESS)
 		case 0x1f:
@@ -7336,8 +7317,6 @@ static int rtw_add_sta(struct net_device *dev, struct ieee_param *param)
 		if (pmlmepriv->qospriv.qos_option == 0)
 			psta->qos_option = 0;
 
-
-#ifdef CONFIG_80211N_HT
 		/* chec 802.11n ht cap. */
 		if (WLAN_STA_HT & flags) {
 			psta->htpriv.ht_option = _TRUE;
@@ -7348,11 +7327,8 @@ static int rtw_add_sta(struct net_device *dev, struct ieee_param *param)
 
 		if (pmlmepriv->htpriv.ht_option == _FALSE)
 			psta->htpriv.ht_option = _FALSE;
-#endif
-
 
 		update_sta_info_apmode(padapter, psta);
-
 
 	} else
 		ret = -ENOMEM;
@@ -7471,9 +7447,7 @@ static int rtw_ioctl_get_sta_data(struct net_device *dev, struct ieee_param *par
 
 		psta_data->tx_supp_rates_len =  psta->bssratelen;
 		_rtw_memcpy(psta_data->tx_supp_rates, psta->bssrateset, psta->bssratelen);
-#ifdef CONFIG_80211N_HT
 		_rtw_memcpy(&psta_data->ht_cap, &psta->htpriv.ht_cap, sizeof(struct rtw_ieee80211_ht_cap));
-#endif /* CONFIG_80211N_HT */
 		psta_data->rx_pkts = psta->sta_stats.rx_data_pkts;
 		psta_data->rx_bytes = psta->sta_stats.rx_bytes;
 		psta_data->rx_drops = psta->sta_stats.rx_drops;
@@ -7482,12 +7456,10 @@ static int rtw_ioctl_get_sta_data(struct net_device *dev, struct ieee_param *par
 		psta_data->tx_bytes = psta->sta_stats.tx_bytes;
 		psta_data->tx_drops = psta->sta_stats.tx_drops;
 
-
 	} else
 		ret = -1;
 
 	return ret;
-
 }
 
 static int rtw_get_sta_wpaie(struct net_device *dev, struct ieee_param *param)
