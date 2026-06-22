@@ -3126,6 +3126,8 @@ int process_recv_indicatepkts(_adapter *padapter, union recv_frame *prframe)
 	struct sta_info *psta = prframe->u.hdr.psta;
 #endif /* CONFIG_TDLS */
 
+#ifdef CONFIG_80211N_HT
+
 	struct ht_priv	*phtpriv = &pmlmepriv->htpriv;
 
 	DBG_COUNTER(padapter->rx_logs.core_rx_post_indicate);
@@ -3153,6 +3155,7 @@ int process_recv_indicatepkts(_adapter *padapter, union recv_frame *prframe)
 			}
 		}
 	} else /* B/G mode */
+#endif
 	{
 		retval = wlanhdr_to_ethhdr(prframe);
 		if (retval != _SUCCESS) {
@@ -3916,6 +3919,7 @@ int recv_func_posthandle(_adapter *padapter, union recv_frame *prframe)
 
 	count_rx_stats(padapter, prframe, NULL);
 
+#ifdef CONFIG_80211N_HT
 	ret = process_recv_indicatepkts(padapter, prframe);
 	if (ret != _SUCCESS) {
 		#ifdef DBG_RX_DROP_FRAME
@@ -3926,7 +3930,7 @@ int recv_func_posthandle(_adapter *padapter, union recv_frame *prframe)
 		DBG_COUNTER(padapter->rx_logs.core_rx_post_indicate_err);
 		goto _recv_data_drop;
 	}
-
+#else /* CONFIG_80211N_HT */
 	if (!pattrib->amsdu) {
 		ret = wlanhdr_to_ethhdr(prframe);
 		if (ret != _SUCCESS) {
@@ -3978,6 +3982,7 @@ int recv_func_posthandle(_adapter *padapter, union recv_frame *prframe)
 		#endif
 		goto _recv_data_drop;
 	}
+#endif /* CONFIG_80211N_HT */
 
 _exit_recv_func:
 	return ret;

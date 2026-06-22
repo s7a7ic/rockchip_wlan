@@ -1011,7 +1011,9 @@ int proc_get_ht_option(struct seq_file *m, void *v)
 	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
 	struct mlme_priv *pmlmepriv = &(padapter->mlmepriv);
 
+#ifdef CONFIG_80211N_HT
 	RTW_PRINT_SEL(m, "ht_option=%d\n", pmlmepriv->htpriv.ht_option);
+#endif /* CONFIG_80211N_HT */
 
 	return 0;
 }
@@ -1042,10 +1044,17 @@ int proc_get_scan_param(struct seq_file *m, void *v)
 #define SCAN_PARAM_VALUE_FMT "%-10u"
 #define SCAN_PARAM_TITLE_ARG , "scan_ch_ms"
 #define SCAN_PARAM_VALUE_ARG , ss->scan_ch_ms
+#ifdef CONFIG_80211N_HT
 #define SCAN_PARAM_TITLE_FMT_HT " %15s %13s"
 #define SCAN_PARAM_VALUE_FMT_HT " %-15u %-13u"
 #define SCAN_PARAM_TITLE_ARG_HT , "rx_ampdu_accept", "rx_ampdu_size"
 #define SCAN_PARAM_VALUE_ARG_HT , ss->rx_ampdu_accept, ss->rx_ampdu_size
+#else
+#define SCAN_PARAM_TITLE_FMT_HT ""
+#define SCAN_PARAM_VALUE_FMT_HT ""
+#define SCAN_PARAM_TITLE_ARG_HT
+#define SCAN_PARAM_VALUE_ARG_HT
+#endif
 #ifdef CONFIG_SCAN_BACKOP
 #define SCAN_PARAM_TITLE_FMT_BACKOP " %9s %12s"
 #define SCAN_PARAM_VALUE_FMT_BACKOP " %-9u %-12u"
@@ -1093,10 +1102,15 @@ ssize_t proc_set_scan_param(struct file *file, const char __user *buffer, size_t
 	u16 scan_ch_ms;
 #define SCAN_PARAM_INPUT_FMT "%hu"
 #define SCAN_PARAM_INPUT_ARG , &scan_ch_ms
+#ifdef CONFIG_80211N_HT
 	u8 rx_ampdu_accept;
 	u8 rx_ampdu_size;
 #define SCAN_PARAM_INPUT_FMT_HT " %hhu %hhu"
 #define SCAN_PARAM_INPUT_ARG_HT , &rx_ampdu_accept, &rx_ampdu_size
+#else
+#define SCAN_PARAM_INPUT_FMT_HT ""
+#define SCAN_PARAM_INPUT_ARG_HT
+#endif
 #ifdef CONFIG_SCAN_BACKOP
 	u16 backop_ms;
 	u8 scan_cnt_max;
@@ -1128,12 +1142,12 @@ ssize_t proc_set_scan_param(struct file *file, const char __user *buffer, size_t
 
 		if (num-- > 0)
 			ss->scan_ch_ms = scan_ch_ms;
-
+#ifdef CONFIG_80211N_HT
 		if (num-- > 0)
 			ss->rx_ampdu_accept = rx_ampdu_accept;
 		if (num-- > 0)
 			ss->rx_ampdu_size = rx_ampdu_size;
-
+#endif
 #ifdef CONFIG_SCAN_BACKOP
 		if (num-- > 0)
 			ss->backop_ms = backop_ms;
@@ -1452,12 +1466,14 @@ int proc_get_ap_info(struct seq_file *m, void *v)
 		RTW_PRINT_SEL(m, "wireless_mode=0x%x, rtsen=%d, cts2slef=%d\n", psta->wireless_mode, psta->rtsen, psta->cts2self);
 		RTW_PRINT_SEL(m, "state=0x%x, aid=%d, macid=%d, raid=%d\n",
 			psta->state, psta->cmn.aid, psta->cmn.mac_id, psta->cmn.ra_info.rate_id);
+#ifdef CONFIG_80211N_HT
 		RTW_PRINT_SEL(m, "qos_en=%d, ht_en=%d, init_rate=%d\n", psta->qos_option, psta->htpriv.ht_option, psta->init_rate);
 		RTW_PRINT_SEL(m, "bwmode=%d, ch_offset=%d, sgi_20m=%d,sgi_40m=%d\n"
 			, psta->cmn.bw_mode, psta->htpriv.ch_offset, psta->htpriv.sgi_20m, psta->htpriv.sgi_40m);
 		RTW_PRINT_SEL(m, "ampdu_enable = %d\n", psta->htpriv.ampdu_enable);
 		RTW_PRINT_SEL(m, "agg_enable_bitmap=%x, candidate_tid_bitmap=%x\n", psta->htpriv.agg_enable_bitmap, psta->htpriv.candidate_tid_bitmap);
 		RTW_PRINT_SEL(m, "ldpc_cap=0x%x, stbc_cap=0x%x, beamform_cap=0x%x\n", psta->htpriv.ldpc_cap, psta->htpriv.stbc_cap, psta->htpriv.beamform_cap);
+#endif /* CONFIG_80211N_HT */
 
 		sta_rx_reorder_ctl_dump(m, psta);
 	} else
@@ -2488,6 +2504,7 @@ ssize_t proc_set_rx_signal(struct file *file, const char __user *buffer, size_t 
 	return count;
 
 }
+#ifdef CONFIG_80211N_HT
 
 int proc_get_ht_enable(struct seq_file *m, void *v)
 {
@@ -3001,6 +3018,7 @@ ssize_t proc_set_tx_amsdu_rate(struct file *file, const char __user *buffer, siz
 	return count;
 }
 #endif /* CONFIG_TX_AMSDU */
+#endif /* CONFIG_80211N_HT */
 
 int proc_get_en_fwps(struct seq_file *m, void *v)
 {
@@ -3062,7 +3080,7 @@ int proc_get_two_path_rssi(struct seq_file *m, void *v)
 	return 0;
 }
 */
-
+#ifdef CONFIG_80211N_HT
 void rtw_dump_dft_phy_cap(void *sel, _adapter *adapter)
 {
 	struct mlme_priv *pmlmepriv = &adapter->mlmepriv;
@@ -3304,6 +3322,7 @@ ssize_t proc_set_txbf_cap(struct file *file, const char __user *buffer, size_t c
 	return count;
 }
 #endif
+#endif /* CONFIG_80211N_HT */
 
 /*int proc_get_rssi_disp(struct seq_file *m, void *v)
 {
@@ -3389,12 +3408,14 @@ int proc_get_all_sta_info(struct seq_file *m, void *v)
 				RTW_PRINT_SEL(m, "rtsen=%d, cts2slef=%d\n", psta->rtsen, psta->cts2self);
 				RTW_PRINT_SEL(m, "state=0x%x, aid=%d, macid=%d, raid=%d\n",
 					psta->state, psta->cmn.aid, psta->cmn.mac_id, psta->cmn.ra_info.rate_id);
+#ifdef CONFIG_80211N_HT
 				RTW_PRINT_SEL(m, "qos_en=%d, ht_en=%d, init_rate=%d\n", psta->qos_option, psta->htpriv.ht_option, psta->init_rate);
 				RTW_PRINT_SEL(m, "bwmode=%d, ch_offset=%d, sgi_20m=%d,sgi_40m=%d\n"
 					, psta->cmn.bw_mode, psta->htpriv.ch_offset, psta->htpriv.sgi_20m, psta->htpriv.sgi_40m);
 				RTW_PRINT_SEL(m, "ampdu_enable = %d\n", psta->htpriv.ampdu_enable);
 				RTW_PRINT_SEL(m, "tx_amsdu_enable = %d\n", psta->htpriv.tx_amsdu_enable);
 				RTW_PRINT_SEL(m, "agg_enable_bitmap=%x, candidate_tid_bitmap=%x\n", psta->htpriv.agg_enable_bitmap, psta->htpriv.candidate_tid_bitmap);
+#endif /* CONFIG_80211N_HT */
 				RTW_PRINT_SEL(m, "sleepq_len=%d\n", psta->sleepq_len);
 				RTW_PRINT_SEL(m, "sta_xmitpriv.vo_q_qcnt=%d\n", psta->sta_xmitpriv.vo_q.qcnt);
 				RTW_PRINT_SEL(m, "sta_xmitpriv.vi_q_qcnt=%d\n", psta->sta_xmitpriv.vi_q.qcnt);

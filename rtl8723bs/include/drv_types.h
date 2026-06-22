@@ -39,7 +39,9 @@ typedef struct _ADAPTER _adapter, ADAPTER, *PADAPTER;
 #include <rtw_sta_info.h>
 #include <rtw_rf.h>
 
-#include <rtw_ht.h>
+#ifdef CONFIG_80211N_HT
+	#include <rtw_ht.h>
+#endif
 
 #ifdef CONFIG_INTEL_WIDI
 	#include <rtw_intel_widi.h>
@@ -191,6 +193,7 @@ struct registry_priv {
 #ifdef CONFIG_AP_MODE
 	u8 bmc_tx_rate;
 #endif
+#ifdef CONFIG_80211N_HT
 	u8	ht_enable;
 	/* 0: 20 MHz, 1: 40 MHz, 2: 80 MHz, 3: 160MHz */
 	/* 2.4G use bit 0 ~ 3, 5G use bit 4 ~ 7 */
@@ -222,6 +225,8 @@ struct registry_priv {
 	u8	beamform_cap;
 	u8	beamformer_rf_num;
 	u8	beamformee_rf_num;
+#endif /* CONFIG_80211N_HT */
+
 	u8	lowrate_two_xmit;
 
 	u8	rf_config ;
