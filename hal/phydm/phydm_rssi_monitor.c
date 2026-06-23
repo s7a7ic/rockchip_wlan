@@ -171,11 +171,6 @@ odm_rssi_monitor_check_mp(
 	PMGNT_INFO		p_mgnt_info = &adapter->MgntInfo;
 	PMGNT_INFO		p_default_mgnt_info = &adapter->MgntInfo;
 	u64			cur_tx_ok_cnt = 0, cur_rx_ok_cnt = 0;
-#if (BEAMFORMING_SUPPORT == 1)
-#ifndef BEAMFORMING_VERSION_1
-	enum beamforming_cap beamform_cap = BEAMFORMING_CAP_NONE;
-#endif
-#endif
 	struct _ADAPTER	*p_loop_adapter = GetDefaultAdapter(adapter);
 
 	if (p_dm->support_ic_type == ODM_RTL8188E) {
@@ -214,17 +209,6 @@ odm_rssi_monitor_check_mp(
 					RT_DISP(FDM, DM_PWDB, ("p_entry->rssi = 0x%x(%d)\n",
 						GET_STA_INFO(p_entry).rssi_stat.rssi, GET_STA_INFO(p_entry).rssi_stat.rssi));
 
-					/* 2 BF_en */
-#if (BEAMFORMING_SUPPORT == 1)
-#ifndef BEAMFORMING_VERSION_1
-					beamform_cap = phydm_beamforming_get_entry_beam_cap_by_mac_id(p_dm, GET_STA_INFO(p_entry).mac_id);
-					if (beamform_cap & (BEAMFORMER_CAP_HT_EXPLICIT | BEAMFORMER_CAP_VHT_SU))
-						tx_bf_en = 1;
-#else
-					if (Beamform_GetSupportBeamformerCap(GetDefaultAdapter(adapter), p_entry))
-						tx_bf_en = 1;
-#endif
-#endif
 					/* 2 STBC_en */
 					if ((IS_WIRELESS_MODE_AC(adapter) && TEST_FLAG(p_entry->VHTInfo.STBC, STBC_VHT_ENABLE_TX)) ||
 						TEST_FLAG(p_entry->HTInfo.STBC, STBC_HT_ENABLE_TX))
@@ -297,19 +281,6 @@ odm_rssi_monitor_check_mp(
 
 			PRT_HIGH_THROUGHPUT			p_ht_info = GET_HT_INFO(p_default_mgnt_info);
 			PRT_VERY_HIGH_THROUGHPUT	p_vht_info = GET_VHT_INFO(p_default_mgnt_info);
-
-			/* BF_en*/
-#if (BEAMFORMING_SUPPORT == 1)
-#ifndef BEAMFORMING_VERSION_1
-			beamform_cap = phydm_beamforming_get_entry_beam_cap_by_mac_id(p_dm, p_default_mgnt_info->m_mac_id);
-
-			if (beamform_cap & (BEAMFORMER_CAP_HT_EXPLICIT | BEAMFORMER_CAP_VHT_SU))
-				tx_bf_en = 1;
-#else
-			if (Beamform_GetSupportBeamformerCap(GetDefaultAdapter(adapter), NULL))
-				tx_bf_en = 1;
-#endif
-#endif
 
 			/* STBC_en*/
 			if ((IS_WIRELESS_MODE_AC(adapter) && TEST_FLAG(p_vht_info->VhtCurStbc, STBC_VHT_ENABLE_TX)) ||

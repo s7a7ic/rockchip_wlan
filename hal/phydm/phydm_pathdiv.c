@@ -344,27 +344,6 @@ phydm_dynamic_tx_path(
 		return;
 
 	/* 2 [Check Bfer] */
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-#if (BEAMFORMING_SUPPORT == 1)
-	{
-		enum beamforming_cap		beamform_cap = (p_dm->beamforming_info.beamform_cap);
-
-		if (beamform_cap & BEAMFORMER_CAP) { /* BFmer On  &&   Div On->Div Off */
-			if (p_dm_path_div->fix_path_bfer == 0) {
-				PHYDM_DBG(p_dm, DBG_PATH_DIV, ("[ PathDiv : OFF ]   BFmer ==1\n"));
-				p_dm_path_div->fix_path_bfer = 1 ;
-			}
-			return;
-		} else { /* BFmer Off   &&   Div Off->Div On */
-			if (p_dm_path_div->fix_path_bfer == 1) {
-				PHYDM_DBG(p_dm, DBG_PATH_DIV, ("[ PathDiv : ON ]   BFmer ==0\n"));
-				p_dm_path_div->fix_path_bfer = 0;
-			}
-		}
-	}
-#endif
-#endif
-
 	if (p_dm_path_div->use_path_a_as_default_ant == 1) {
 		phydm_find_default_path(p_dm);
 		phydm_candidate_dtp_update(p_dm);

@@ -391,412 +391,7 @@ odm_update_tx_ant(
 
 }
 
-#ifdef BEAMFORMING_SUPPORT
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
-
-void
-odm_bdc_init(
-	void		*p_dm_void
-)
-{
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _BF_DIV_COEX_	*p_dm_bdc_table = &p_dm->dm_bdc_table;
-
-	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("\n[ BDC Initialization......]\n"));
-	p_dm_bdc_table->BDC_state = BDC_DIV_TRAIN_STATE;
-	p_dm_bdc_table->bdc_mode = BDC_MODE_NULL;
-	p_dm_bdc_table->bdc_try_flag = 0;
-	p_dm_bdc_table->bd_ccoex_type_wbfer = 0;
-	p_dm->bdc_holdstate = 0xff;
-
-	if (p_dm->support_ic_type == ODM_RTL8192E) {
-		odm_set_bb_reg(p_dm, 0xd7c, 0x0FFFFFFF, 0x1081008);
-		odm_set_bb_reg(p_dm, 0xd80, 0x0FFFFFFF, 0);
-	} else if (p_dm->support_ic_type == ODM_RTL8812) {
-		odm_set_bb_reg(p_dm, 0x9b0, 0x0FFFFFFF, 0x1081008);     /* 0x9b0[30:0] = 01081008 */
-		odm_set_bb_reg(p_dm, 0x9b4, 0x0FFFFFFF, 0);                 /* 0x9b4[31:0] = 00000000 */
-	}
-
-}
-
-
-void
-odm_CSI_on_off(
-	void		*p_dm_void,
-	u8			CSI_en
-)
-{
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	if (CSI_en == CSI_ON) {
-		if (p_dm->support_ic_type == ODM_RTL8192E)
-			odm_set_mac_reg(p_dm, 0xd84, BIT(11), 1);  /* 0xd84[11]=1 */
-		else if (p_dm->support_ic_type == ODM_RTL8812)
-			odm_set_mac_reg(p_dm, 0x9b0, BIT(31), 1);  /* 0x9b0[31]=1 */
-
-	} else if (CSI_en == CSI_OFF) {
-		if (p_dm->support_ic_type == ODM_RTL8192E)
-			odm_set_mac_reg(p_dm, 0xd84, BIT(11), 0);  /* 0xd84[11]=0 */
-		else if (p_dm->support_ic_type == ODM_RTL8812)
-			odm_set_mac_reg(p_dm, 0x9b0, BIT(31), 0);  /* 0x9b0[31]=0 */
-	}
-}
-
-void
-odm_bd_ccoex_type_with_bfer_client(
-	void		*p_dm_void,
-	u8			swch
-)
-{
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _BF_DIV_COEX_	*p_dm_bdc_table = &p_dm->dm_bdc_table;
-	u8     bd_ccoex_type_wbfer;
-
-	if (swch == DIVON_CSIOFF) {
-		PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[BDCcoexType: 1] {DIV,CSI} ={1,0}\n"));
-		bd_ccoex_type_wbfer = 1;
-
-		if (bd_ccoex_type_wbfer != p_dm_bdc_table->bd_ccoex_type_wbfer) {
-			odm_ant_div_on_off(p_dm, ANTDIV_ON);
-			odm_CSI_on_off(p_dm, CSI_OFF);
-			p_dm_bdc_table->bd_ccoex_type_wbfer = 1;
-		}
-	} else if (swch == DIVOFF_CSION) {
-		PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[BDCcoexType: 2] {DIV,CSI} ={0,1}\n"));
-		bd_ccoex_type_wbfer = 2;
-
-		if (bd_ccoex_type_wbfer != p_dm_bdc_table->bd_ccoex_type_wbfer) {
-			odm_ant_div_on_off(p_dm, ANTDIV_OFF);
-			odm_CSI_on_off(p_dm, CSI_ON);
-			p_dm_bdc_table->bd_ccoex_type_wbfer = 2;
-		}
-	}
-}
-
-void
-odm_bf_ant_div_mode_arbitration(
-	void		*p_dm_void
-)
-{
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _BF_DIV_COEX_			*p_dm_bdc_table = &p_dm->dm_bdc_table;
-	u8			current_bdc_mode;
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
-	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("\n"));
-
-	/* 2 mode 1 */
-	if ((p_dm_bdc_table->num_txbfee_client != 0) && (p_dm_bdc_table->num_txbfer_client == 0)) {
-		current_bdc_mode = BDC_MODE_1;
-
-		if (current_bdc_mode != p_dm_bdc_table->bdc_mode) {
-			p_dm_bdc_table->bdc_mode = BDC_MODE_1;
-			odm_bd_ccoex_type_with_bfer_client(p_dm, DIVON_CSIOFF);
-			p_dm_bdc_table->bdc_rx_idle_update_counter = 1;
-			PHYDM_DBG(p_dm, DBG_ANT_DIV, ("Change to (( Mode1 ))\n"));
-		}
-
-		PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[Antdiv + BF coextance mode] : (( Mode1 ))\n"));
-	}
-	/* 2 mode 2 */
-	else if ((p_dm_bdc_table->num_txbfee_client == 0) && (p_dm_bdc_table->num_txbfer_client != 0)) {
-		current_bdc_mode = BDC_MODE_2;
-
-		if (current_bdc_mode != p_dm_bdc_table->bdc_mode) {
-			p_dm_bdc_table->bdc_mode = BDC_MODE_2;
-			p_dm_bdc_table->BDC_state = BDC_DIV_TRAIN_STATE;
-			p_dm_bdc_table->bdc_try_flag = 0;
-			PHYDM_DBG(p_dm, DBG_ANT_DIV, ("Change to (( Mode2 ))\n"));
-
-		}
-		PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[Antdiv + BF coextance mode] : (( Mode2 ))\n"));
-	}
-	/* 2 mode 3 */
-	else if ((p_dm_bdc_table->num_txbfee_client != 0) && (p_dm_bdc_table->num_txbfer_client != 0)) {
-		current_bdc_mode = BDC_MODE_3;
-
-		if (current_bdc_mode != p_dm_bdc_table->bdc_mode) {
-			p_dm_bdc_table->bdc_mode = BDC_MODE_3;
-			p_dm_bdc_table->BDC_state = BDC_DIV_TRAIN_STATE;
-			p_dm_bdc_table->bdc_try_flag = 0;
-			p_dm_bdc_table->bdc_rx_idle_update_counter = 1;
-			PHYDM_DBG(p_dm, DBG_ANT_DIV, ("Change to (( Mode3 ))\n"));
-		}
-
-		PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[Antdiv + BF coextance mode] : (( Mode3 ))\n"));
-	}
-	/* 2 mode 4 */
-	else if ((p_dm_bdc_table->num_txbfee_client == 0) && (p_dm_bdc_table->num_txbfer_client == 0)) {
-		current_bdc_mode = BDC_MODE_4;
-
-		if (current_bdc_mode != p_dm_bdc_table->bdc_mode) {
-			p_dm_bdc_table->bdc_mode = BDC_MODE_4;
-			odm_bd_ccoex_type_with_bfer_client(p_dm, DIVON_CSIOFF);
-			PHYDM_DBG(p_dm, DBG_ANT_DIV, ("Change to (( Mode4 ))\n"));
-		}
-
-		PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[Antdiv + BF coextance mode] : (( Mode4 ))\n"));
-	}
-#endif
-
-}
-
-void
-odm_div_train_state_setting(
-	void		*p_dm_void
-)
-{
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _BF_DIV_COEX_	*p_dm_bdc_table = &p_dm->dm_bdc_table;
-
-	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("\n*****[S T A R T ]*****  [2-0. DIV_TRAIN_STATE]\n"));
-	p_dm_bdc_table->bdc_try_counter = 2;
-	p_dm_bdc_table->bdc_try_flag = 1;
-	p_dm_bdc_table->BDC_state = bdc_bfer_train_state;
-	odm_bd_ccoex_type_with_bfer_client(p_dm, DIVON_CSIOFF);
-}
-
-void
-odm_bd_ccoex_bfee_rx_div_arbitration(
-	void		*p_dm_void
-)
-{
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _BF_DIV_COEX_    *p_dm_bdc_table = &p_dm->dm_bdc_table;
-	boolean stop_bf_flag;
-	u8	bdc_active_mode;
-
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
-
-	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("***{ num_BFee,  num_BFer, num_client}  = (( %d  ,  %d  ,  %d))\n", p_dm_bdc_table->num_txbfee_client, p_dm_bdc_table->num_txbfer_client, p_dm_bdc_table->num_client));
-	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("***{ num_BF_tars,  num_DIV_tars }  = ((  %d  ,  %d ))\n", p_dm_bdc_table->num_bf_tar, p_dm_bdc_table->num_div_tar));
-
-	/* 2 [ MIB control ] */
-	if (p_dm->bdc_holdstate == 2) {
-		odm_bd_ccoex_type_with_bfer_client(p_dm, DIVOFF_CSION);
-		p_dm_bdc_table->BDC_state = BDC_BF_HOLD_STATE;
-		PHYDM_DBG(p_dm, DBG_ANT_DIV, ("Force in [ BF STATE]\n"));
-		return;
-	} else if (p_dm->bdc_holdstate == 1) {
-		p_dm_bdc_table->BDC_state = BDC_DIV_HOLD_STATE;
-		odm_bd_ccoex_type_with_bfer_client(p_dm, DIVON_CSIOFF);
-		PHYDM_DBG(p_dm, DBG_ANT_DIV, ("Force in [ DIV STATE]\n"));
-		return;
-	}
-
-	/* ------------------------------------------------------------ */
-
-
-
-	/* 2 mode 2 & 3 */
-	if (p_dm_bdc_table->bdc_mode == BDC_MODE_2 || p_dm_bdc_table->bdc_mode == BDC_MODE_3) {
-
-		PHYDM_DBG(p_dm, DBG_ANT_DIV, ("\n{ Try_flag,  Try_counter } = {  %d , %d  }\n", p_dm_bdc_table->bdc_try_flag, p_dm_bdc_table->bdc_try_counter));
-		PHYDM_DBG(p_dm, DBG_ANT_DIV, ("BDCcoexType = (( %d ))\n\n", p_dm_bdc_table->bd_ccoex_type_wbfer));
-
-		/* All Client have Bfer-Cap------------------------------- */
-		if (p_dm_bdc_table->num_txbfer_client == p_dm_bdc_table->num_client) { /* BFer STA Only?: yes */
-			PHYDM_DBG(p_dm, DBG_ANT_DIV, ("BFer STA only?  (( Yes ))\n"));
-			p_dm_bdc_table->bdc_try_flag = 0;
-			p_dm_bdc_table->BDC_state = BDC_DIV_TRAIN_STATE;
-			odm_bd_ccoex_type_with_bfer_client(p_dm, DIVOFF_CSION);
-			return;
-		} else
-			PHYDM_DBG(p_dm, DBG_ANT_DIV, ("BFer STA only?  (( No ))\n"));
-		/*  */
-		if (p_dm_bdc_table->is_all_bf_sta_idle == false && p_dm_bdc_table->is_all_div_sta_idle == true) {
-			PHYDM_DBG(p_dm, DBG_ANT_DIV, ("All DIV-STA are idle, but BF-STA not\n"));
-			p_dm_bdc_table->bdc_try_flag = 0;
-			p_dm_bdc_table->BDC_state = bdc_bfer_train_state;
-			odm_bd_ccoex_type_with_bfer_client(p_dm, DIVOFF_CSION);
-			return;
-		} else if (p_dm_bdc_table->is_all_bf_sta_idle == true && p_dm_bdc_table->is_all_div_sta_idle == false) {
-			PHYDM_DBG(p_dm, DBG_ANT_DIV, ("All BF-STA are idle, but DIV-STA not\n"));
-			p_dm_bdc_table->bdc_try_flag = 0;
-			p_dm_bdc_table->BDC_state = BDC_DIV_TRAIN_STATE;
-			odm_bd_ccoex_type_with_bfer_client(p_dm, DIVON_CSIOFF);
-			return;
-		}
-
-		/* Select active mode-------------------------------------- */
-		if (p_dm_bdc_table->num_bf_tar == 0) { /* Selsect_1,  Selsect_2 */
-			if (p_dm_bdc_table->num_div_tar == 0) { /* Selsect_3 */
-				PHYDM_DBG(p_dm, DBG_ANT_DIV, ("Select active mode (( 1 ))\n"));
-				p_dm_bdc_table->bdc_active_mode = 1;
-			} else {
-				PHYDM_DBG(p_dm, DBG_ANT_DIV, ("Select active mode  (( 2 ))\n"));
-				p_dm_bdc_table->bdc_active_mode = 2;
-			}
-			p_dm_bdc_table->bdc_try_flag = 0;
-			p_dm_bdc_table->BDC_state = BDC_DIV_TRAIN_STATE;
-			odm_bd_ccoex_type_with_bfer_client(p_dm, DIVON_CSIOFF);
-			return;
-		} else { /* num_bf_tar > 0 */
-			if (p_dm_bdc_table->num_div_tar == 0) { /* Selsect_3 */
-				PHYDM_DBG(p_dm, DBG_ANT_DIV, ("Select active mode (( 3 ))\n"));
-				p_dm_bdc_table->bdc_active_mode = 3;
-				p_dm_bdc_table->bdc_try_flag = 0;
-				p_dm_bdc_table->BDC_state = bdc_bfer_train_state;
-				odm_bd_ccoex_type_with_bfer_client(p_dm, DIVOFF_CSION);
-				return;
-			} else { /* Selsect_4 */
-				bdc_active_mode = 4;
-				PHYDM_DBG(p_dm, DBG_ANT_DIV, ("Select active mode (( 4 ))\n"));
-
-				if (bdc_active_mode != p_dm_bdc_table->bdc_active_mode) {
-					p_dm_bdc_table->bdc_active_mode = 4;
-					PHYDM_DBG(p_dm, DBG_ANT_DIV, ("Change to active mode (( 4 ))  &  return!!!\n"));
-					return;
-				}
-			}
-		}
-
-#if 1
-		if (p_dm->bdc_holdstate == 0xff) {
-			p_dm_bdc_table->BDC_state = BDC_DIV_HOLD_STATE;
-			odm_bd_ccoex_type_with_bfer_client(p_dm, DIVON_CSIOFF);
-			PHYDM_DBG(p_dm, DBG_ANT_DIV, ("Force in [ DIV STATE]\n"));
-			return;
-		}
-#endif
-
-		/* Does Client number changed ? ------------------------------- */
-		if (p_dm_bdc_table->num_client != p_dm_bdc_table->pre_num_client) {
-			p_dm_bdc_table->bdc_try_flag = 0;
-			p_dm_bdc_table->BDC_state = BDC_DIV_TRAIN_STATE;
-			PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[  The number of client has been changed !!!]   return to (( BDC_DIV_TRAIN_STATE ))\n"));
-		}
-		p_dm_bdc_table->pre_num_client = p_dm_bdc_table->num_client;
-
-		if (p_dm_bdc_table->bdc_try_flag == 0) {
-			/* 2 DIV_TRAIN_STATE (mode 2-0) */
-			if (p_dm_bdc_table->BDC_state == BDC_DIV_TRAIN_STATE)
-				odm_div_train_state_setting(p_dm);
-			/* 2 BFer_TRAIN_STATE (mode 2-1) */
-			else if (p_dm_bdc_table->BDC_state == bdc_bfer_train_state) {
-				PHYDM_DBG(p_dm, DBG_ANT_DIV, ("*****[2-1. BFer_TRAIN_STATE ]*****\n"));
-
-				/* if(p_dm_bdc_table->num_bf_tar==0) */
-				/* { */
-				/*	PHYDM_DBG(p_dm,DBG_ANT_DIV, ("BF_tars exist?  : (( No )),   [ bdc_bfer_train_state ] >> [BDC_DIV_TRAIN_STATE]\n")); */
-				/*	odm_div_train_state_setting( p_dm); */
-				/* } */
-				/* else */ /* num_bf_tar != 0 */
-				/* { */
-				p_dm_bdc_table->bdc_try_counter = 2;
-				p_dm_bdc_table->bdc_try_flag = 1;
-				p_dm_bdc_table->BDC_state = BDC_DECISION_STATE;
-				odm_bd_ccoex_type_with_bfer_client(p_dm, DIVOFF_CSION);
-				PHYDM_DBG(p_dm, DBG_ANT_DIV, ("BF_tars exist?  : (( Yes )),   [ bdc_bfer_train_state ] >> [BDC_DECISION_STATE]\n"));
-				/* } */
-			}
-			/* 2 DECISION_STATE (mode 2-2) */
-			else if (p_dm_bdc_table->BDC_state == BDC_DECISION_STATE) {
-				PHYDM_DBG(p_dm, DBG_ANT_DIV, ("*****[2-2. DECISION_STATE]*****\n"));
-				/* if(p_dm_bdc_table->num_bf_tar==0) */
-				/* { */
-				/*	ODM_AntDiv_Printk(("BF_tars exist?  : (( No )),   [ DECISION_STATE ] >> [BDC_DIV_TRAIN_STATE]\n")); */
-				/*	odm_div_train_state_setting( p_dm); */
-				/* } */
-				/* else */ /* num_bf_tar != 0 */
-				/* { */
-				if (p_dm_bdc_table->BF_pass == false || p_dm_bdc_table->DIV_pass == false)
-					stop_bf_flag = true;
-				else
-					stop_bf_flag = false;
-
-				PHYDM_DBG(p_dm, DBG_ANT_DIV, ("BF_tars exist?  : (( Yes )),  {BF_pass, DIV_pass, stop_bf_flag }  = { %d, %d, %d }\n", p_dm_bdc_table->BF_pass, p_dm_bdc_table->DIV_pass, stop_bf_flag));
-
-				if (stop_bf_flag == true) { /* DIV_en */
-					p_dm_bdc_table->bdc_hold_counter = 10; /* 20 */
-					odm_bd_ccoex_type_with_bfer_client(p_dm, DIVON_CSIOFF);
-					p_dm_bdc_table->BDC_state = BDC_DIV_HOLD_STATE;
-					PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[ stop_bf_flag= ((true)),   BDC_DECISION_STATE ] >> [BDC_DIV_HOLD_STATE]\n"));
-				} else { /* BF_en */
-					p_dm_bdc_table->bdc_hold_counter = 10; /* 20 */
-					odm_bd_ccoex_type_with_bfer_client(p_dm, DIVOFF_CSION);
-					p_dm_bdc_table->BDC_state = BDC_BF_HOLD_STATE;
-					PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[stop_bf_flag= ((false)),   BDC_DECISION_STATE ] >> [BDC_BF_HOLD_STATE]\n"));
-				}
-				/* } */
-			}
-			/* 2 BF-HOLD_STATE (mode 2-3) */
-			else if (p_dm_bdc_table->BDC_state == BDC_BF_HOLD_STATE) {
-				PHYDM_DBG(p_dm, DBG_ANT_DIV, ("*****[2-3. BF_HOLD_STATE ]*****\n"));
-
-				PHYDM_DBG(p_dm, DBG_ANT_DIV, ("bdc_hold_counter = (( %d ))\n", p_dm_bdc_table->bdc_hold_counter));
-
-				if (p_dm_bdc_table->bdc_hold_counter == 1) {
-					PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[ BDC_BF_HOLD_STATE ] >> [BDC_DIV_TRAIN_STATE]\n"));
-					odm_div_train_state_setting(p_dm);
-				} else {
-					p_dm_bdc_table->bdc_hold_counter--;
-
-					/* if(p_dm_bdc_table->num_bf_tar==0) */
-					/* { */
-					/*	PHYDM_DBG(p_dm,DBG_ANT_DIV, ("BF_tars exist?  : (( No )),   [ BDC_BF_HOLD_STATE ] >> [BDC_DIV_TRAIN_STATE]\n")); */
-					/*	odm_div_train_state_setting( p_dm); */
-					/* } */
-					/* else */ /* num_bf_tar != 0 */
-					/* { */
-					/* PHYDM_DBG(p_dm,DBG_ANT_DIV, ("BF_tars exist?  : (( Yes ))\n")); */
-					p_dm_bdc_table->BDC_state = BDC_BF_HOLD_STATE;
-					odm_bd_ccoex_type_with_bfer_client(p_dm, DIVOFF_CSION);
-					PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[ BDC_BF_HOLD_STATE ] >> [BDC_BF_HOLD_STATE]\n"));
-					/* } */
-				}
-
-			}
-			/* 2 DIV-HOLD_STATE (mode 2-4) */
-			else if (p_dm_bdc_table->BDC_state == BDC_DIV_HOLD_STATE) {
-				PHYDM_DBG(p_dm, DBG_ANT_DIV, ("*****[2-4. DIV_HOLD_STATE ]*****\n"));
-
-				PHYDM_DBG(p_dm, DBG_ANT_DIV, ("bdc_hold_counter = (( %d ))\n", p_dm_bdc_table->bdc_hold_counter));
-
-				if (p_dm_bdc_table->bdc_hold_counter == 1) {
-					PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[ BDC_DIV_HOLD_STATE ] >> [BDC_DIV_TRAIN_STATE]\n"));
-					odm_div_train_state_setting(p_dm);
-				} else {
-					p_dm_bdc_table->bdc_hold_counter--;
-					p_dm_bdc_table->BDC_state = BDC_DIV_HOLD_STATE;
-					odm_bd_ccoex_type_with_bfer_client(p_dm, DIVON_CSIOFF);
-					PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[ BDC_DIV_HOLD_STATE ] >> [BDC_DIV_HOLD_STATE]\n"));
-				}
-
-			}
-
-		} else if (p_dm_bdc_table->bdc_try_flag == 1) {
-			/* 2 Set Training counter */
-			if (p_dm_bdc_table->bdc_try_counter > 1) {
-				p_dm_bdc_table->bdc_try_counter--;
-				if (p_dm_bdc_table->bdc_try_counter == 1)
-					p_dm_bdc_table->bdc_try_flag = 0;
-
-				PHYDM_DBG(p_dm, DBG_ANT_DIV, ("Training !!\n"));
-				/* return ; */
-			}
-
-		}
-
-	}
-
-	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("\n[end]\n"));
-
-#endif /* #if(DM_ODM_SUPPORT_TYPE  == ODM_AP) */
-
-
-
-
-
-
-}
-
-#endif
-#endif /* #ifdef BEAMFORMING_SUPPORT */
-
-
 #if (RTL8188E_SUPPORT == 1)
-
 
 void
 odm_rx_hw_ant_div_init_88e(
@@ -2210,24 +1805,6 @@ odm_hw_ant_div(
 	struct phydm_dig_struct	*p_dig_t = &p_dm->dm_dig_table;
 	struct cmn_sta_info	*p_sta;
 
-#if (BEAMFORMING_SUPPORT == 1)
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
-	struct _BF_DIV_COEX_    *p_dm_bdc_table = &p_dm->dm_bdc_table;
-	u32	TH1 = 500000;
-	u32	TH2 = 10000000;
-	u32	ma_rx_temp, degrade_TP_temp, improve_TP_temp;
-	u8	monitor_rssi_threshold = 30;
-
-	p_dm_bdc_table->BF_pass = true;
-	p_dm_bdc_table->DIV_pass = true;
-	p_dm_bdc_table->is_all_div_sta_idle = true;
-	p_dm_bdc_table->is_all_bf_sta_idle = true;
-	p_dm_bdc_table->num_bf_tar = 0 ;
-	p_dm_bdc_table->num_div_tar = 0;
-	p_dm_bdc_table->num_client = 0;
-#endif
-#endif
-
 	if (!p_dm->is_linked) { /* is_linked==False */
 		PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[No Link!!!]\n"));
 
@@ -2265,11 +1842,6 @@ odm_hw_ant_div(
 			}
 
 			/* 2 BDC Init */
-#if (BEAMFORMING_SUPPORT == 1)
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
-			odm_bdc_init(p_dm);
-#endif
-#endif
 
 #ifdef ODM_EVM_ENHANCE_ANTDIV
 			odm_evm_fast_ant_reset(p_dm);
@@ -2294,12 +1866,6 @@ odm_hw_ant_div(
 #endif
 
 	/* 2 BDC mode Arbitration */
-#if (BEAMFORMING_SUPPORT == 1)
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
-	if (p_dm->antdiv_evm_en == 0 || p_dm_fat_table->EVM_method_enable == 0)
-		odm_bf_ant_div_mode_arbitration(p_dm);
-#endif
-#endif
 
 	for (i = 0; i < ODM_ASSOCIATE_ENTRY_NUM; i++) {
 		p_sta = p_dm->p_phydm_sta_info[i];
@@ -2348,106 +1914,19 @@ odm_hw_ant_div(
 
 			/* 2 Select TX Antenna */
 			if (p_dm->ant_div_type != CGCS_RX_HW_ANTDIV) {
-#if (BEAMFORMING_SUPPORT == 1)
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
-				if (p_dm_bdc_table->w_bfee_client[i] == 0)
-#endif
-#endif
 				{
 					odm_update_tx_ant(p_dm, target_ant, i);
 				}
 			}
-
-			/* ------------------------------------------------------------ */
-
-#if (BEAMFORMING_SUPPORT == 1)
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
-
-			p_dm_bdc_table->num_client++;
-
-			if (p_dm_bdc_table->bdc_mode == BDC_MODE_2 || p_dm_bdc_table->bdc_mode == BDC_MODE_3) {
-				/* 2 Byte counter */
-
-				ma_rx_temp = p_sta->rx_moving_average_tp; /* RX  TP   ( bit /sec) */
-
-				if (p_dm_bdc_table->BDC_state == bdc_bfer_train_state)
-					p_dm_bdc_table->MA_rx_TP_DIV[i] =  ma_rx_temp ;
-				else
-					p_dm_bdc_table->MA_rx_TP[i] = ma_rx_temp ;
-
-				if ((ma_rx_temp < TH2)   && (ma_rx_temp > TH1) && (local_max_rssi <= monitor_rssi_threshold)) {
-					if (p_dm_bdc_table->w_bfer_client[i] == 1) { /* Bfer_Target */
-						p_dm_bdc_table->num_bf_tar++;
-
-						if (p_dm_bdc_table->BDC_state == BDC_DECISION_STATE && p_dm_bdc_table->bdc_try_flag == 0) {
-							improve_TP_temp = (p_dm_bdc_table->MA_rx_TP_DIV[i] * 9) >> 3 ; /* * 1.125 */
-							p_dm_bdc_table->BF_pass = (p_dm_bdc_table->MA_rx_TP[i] > improve_TP_temp) ? true : false;
-							PHYDM_DBG(p_dm, DBG_ANT_DIV, ("*** Client[ %d ] :  { MA_rx_TP,improve_TP_temp, MA_rx_TP_DIV,  BF_pass}={ %d,  %d, %d , %d }\n", i, p_dm_bdc_table->MA_rx_TP[i], improve_TP_temp, p_dm_bdc_table->MA_rx_TP_DIV[i], p_dm_bdc_table->BF_pass));
-						}
-					} else { /* DIV_Target */
-						p_dm_bdc_table->num_div_tar++;
-
-						if (p_dm_bdc_table->BDC_state == BDC_DECISION_STATE && p_dm_bdc_table->bdc_try_flag == 0) {
-							degrade_TP_temp = (p_dm_bdc_table->MA_rx_TP_DIV[i] * 5) >> 3; /* * 0.625 */
-							p_dm_bdc_table->DIV_pass = (p_dm_bdc_table->MA_rx_TP[i] > degrade_TP_temp) ? true : false;
-							PHYDM_DBG(p_dm, DBG_ANT_DIV, ("*** Client[ %d ] :  { MA_rx_TP, degrade_TP_temp, MA_rx_TP_DIV,  DIV_pass}=\n{ %d,  %d, %d , %d }\n", i, p_dm_bdc_table->MA_rx_TP[i], degrade_TP_temp, p_dm_bdc_table->MA_rx_TP_DIV[i], p_dm_bdc_table->DIV_pass));
-						}
-					}
-				}
-
-				if (ma_rx_temp > TH1) {
-					if (p_dm_bdc_table->w_bfer_client[i] == 1) /* Bfer_Target */
-						p_dm_bdc_table->is_all_bf_sta_idle = false;
-					else/* DIV_Target */
-						p_dm_bdc_table->is_all_div_sta_idle = false;
-				}
-
-				PHYDM_DBG(p_dm, DBG_ANT_DIV, ("*** Client[ %d ] :  { BFmeeCap, BFmerCap}  = { %d , %d }\n", i, p_dm_bdc_table->w_bfee_client[i], p_dm_bdc_table->w_bfer_client[i]));
-
-				if (p_dm_bdc_table->BDC_state == bdc_bfer_train_state)
-					PHYDM_DBG(p_dm, DBG_ANT_DIV, ("*** Client[ %d ] :    MA_rx_TP_DIV = (( %d ))\n", i, p_dm_bdc_table->MA_rx_TP_DIV[i]));
-
-				else
-					PHYDM_DBG(p_dm, DBG_ANT_DIV, ("*** Client[ %d ] :    MA_rx_TP = (( %d ))\n", i, p_dm_bdc_table->MA_rx_TP[i]));
-
-			}
-#endif
-#endif
-
 		}
 
-#if (BEAMFORMING_SUPPORT == 1)
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
-		if (p_dm_bdc_table->bdc_try_flag == 0)
-#endif
-#endif
-		{
-			phydm_antdiv_reset_statistic(p_dm, i);
-		}
+		phydm_antdiv_reset_statistic(p_dm, i);
 	}
-
-
 
 	/* 2 Set RX Idle Antenna & TX Antenna(Because of HW Bug ) */
 #if (DM_ODM_SUPPORT_TYPE == ODM_AP)
 	PHYDM_DBG(p_dm, DBG_ANT_DIV, ("*** rx_idle_ant = (( %s ))\n", (rx_idle_ant == MAIN_ANT) ? "MAIN_ANT" : "AUX_ANT"));
 
-#if (BEAMFORMING_SUPPORT == 1)
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
-	if (p_dm_bdc_table->bdc_mode == BDC_MODE_1 || p_dm_bdc_table->bdc_mode == BDC_MODE_3) {
-		PHYDM_DBG(p_dm, DBG_ANT_DIV, ("*** bdc_rx_idle_update_counter = (( %d ))\n", p_dm_bdc_table->bdc_rx_idle_update_counter));
-
-		if (p_dm_bdc_table->bdc_rx_idle_update_counter == 1) {
-			PHYDM_DBG(p_dm, DBG_ANT_DIV, ("***Update RxIdle Antenna!!!\n"));
-			p_dm_bdc_table->bdc_rx_idle_update_counter = 30;
-			odm_update_rx_idle_ant(p_dm, rx_idle_ant);
-		} else {
-			p_dm_bdc_table->bdc_rx_idle_update_counter--;
-			PHYDM_DBG(p_dm, DBG_ANT_DIV, ("***NOT update RxIdle Antenna because of BF  ( need to fix TX-ant)\n"));
-		}
-	} else
-#endif
-#endif
 		odm_update_rx_idle_ant(p_dm, rx_idle_ant);
 #else
 
@@ -2455,15 +1934,7 @@ odm_hw_ant_div(
 
 #endif/* #if(DM_ODM_SUPPORT_TYPE  == ODM_AP) */
 
-
-
 	/* 2 BDC Main Algorithm */
-#if (BEAMFORMING_SUPPORT == 1)
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
-	if (p_dm->antdiv_evm_en == 0 || p_dm_fat_table->EVM_method_enable == 0)
-		odm_bd_ccoex_bfee_rx_div_arbitration(p_dm);
-#endif
-#endif
 
 	if (ant_div_max_rssi == 0)
 		p_dig_t->ant_div_rssi_max = p_dm->rssi_min;
@@ -3395,12 +2866,6 @@ odm_ant_div_init(
 	/* 3       -   AP   - */
 #if (DM_ODM_SUPPORT_TYPE == ODM_AP)
 
-#if (BEAMFORMING_SUPPORT == 1)
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
-	odm_bdc_init(p_dm);
-#endif
-#endif
-
 	/* 3     -   WIN   - */
 #elif (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	p_dm_swat_table->ant_5g = MAIN_ANT;
@@ -3687,31 +3152,6 @@ odm_ant_div(
 	if (p_adapter->MgntInfo.AntennaTest)
 		return;
 
-	{
-#if (BEAMFORMING_SUPPORT == 1)
-
-		enum beamforming_cap		beamform_cap = phydm_get_beamform_cap(p_dm);
-
-		PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[ AntDiv Beam Cap ]   cap= ((%d))\n", beamform_cap));
-
-		if (beamform_cap & BEAMFORMEE_CAP) { /* BFmee On  &&   Div On->Div Off */
-			PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[ AntDiv : OFF ]   BFmee ==1; cap= ((%d))\n", beamform_cap));
-			if (p_dm_fat_table->fix_ant_bfee == 0) {
-				odm_ant_div_on_off(p_dm, ANTDIV_OFF);
-				p_dm_fat_table->fix_ant_bfee = 1;
-			}
-			return;
-		} else { /* BFmee Off   &&   Div Off->Div On */
-			if ((p_dm_fat_table->fix_ant_bfee == 1)  &&  p_dm->is_linked) {
-				PHYDM_DBG(p_dm, DBG_ANT_DIV, ("[ AntDiv : ON ]   BFmee ==0; cap=((%d))\n", beamform_cap));
-				if (p_dm->ant_div_type != S0S1_SW_ANTDIV)
-					odm_ant_div_on_off(p_dm, ANTDIV_ON);
-
-				p_dm_fat_table->fix_ant_bfee = 0;
-			}
-		}
-#endif
-	}
 #elif (DM_ODM_SUPPORT_TYPE == ODM_AP)
 	/* ----------just for fool proof */
 

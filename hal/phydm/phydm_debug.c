@@ -2268,35 +2268,9 @@ void phydm_cmd_parser(
 	break;
 
 	case PHYDM_TXBF:
-	{
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
-#if (BEAMFORMING_SUPPORT == 1)
-		struct _RT_BEAMFORMING_INFO	*p_beamforming_info = &p_dm->beamforming_info;
-
-		PHYDM_SSCANF(input[1], DCMD_DECIMAL, &var1[0]);
-		if (var1[0] == 0) {
-			p_beamforming_info->apply_v_matrix = false;
-			p_beamforming_info->snding3ss = true;
-			PHYDM_SNPRINTF((output + used, out_len - used, "\r\n dont apply V matrix and 3SS 789 snding\n"));
-		} else if (var1[0] == 1) {
-			p_beamforming_info->apply_v_matrix = true;
-			p_beamforming_info->snding3ss = true;
-			PHYDM_SNPRINTF((output + used, out_len - used, "\r\n apply V matrix and 3SS 789 snding\n"));
-		} else if (var1[0] == 2) {
-			p_beamforming_info->apply_v_matrix = true;
-			p_beamforming_info->snding3ss = false;
-			PHYDM_SNPRINTF((output + used, out_len - used, "\r\n default txbf setting\n"));
-		} else
-			PHYDM_SNPRINTF((output + used, out_len - used, "\r\n unknown cmd!!\n"));
-#else
-		PHYDM_SNPRINTF((output + used, out_len - used, "\r\n no TxBF !!\n"));
-#endif
-#endif
-	}
 		break;
 
 	case PHYDM_H2C:
-
 		for (i = 0; i < 8; i++) {
 			if (input[i + 1]) {
 				PHYDM_SSCANF(input[i + 1], DCMD_HEX, &var1[i]);

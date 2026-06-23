@@ -1318,9 +1318,6 @@ odm_dm_init(
 	adc_smp_init(p_dm);
 #endif
 
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
-	phydm_beamforming_init(p_dm);
-#endif
 #if (RTL8188E_SUPPORT == 1)
 	odm_ra_info_init_all(p_dm);
 #endif
@@ -1804,10 +1801,6 @@ phydm_watchdog(
 	phydm_adaptive_soml(p_dm);
 #ifdef CONFIG_DYNAMIC_RX_PATH
 	phydm_dynamic_rx_path(p_dm);
-#endif
-
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
-	phydm_beamforming_watchdog(p_dm);
 #endif
 
 	halrf_watchdog(p_dm);
@@ -2479,64 +2472,6 @@ odm_init_all_work_items(struct PHY_DM_STRUCT	*p_dm)
 
 #endif /*#if USE_WORKITEM*/
 
-#if (BEAMFORMING_SUPPORT == 1)
-	odm_initialize_work_item(
-		p_dm,
-		&(p_dm->beamforming_info.txbf_info.txbf_enter_work_item),
-		(RT_WORKITEM_CALL_BACK)hal_com_txbf_enter_work_item_callback,
-		(void *)p_adapter,
-		"txbf_enter_work_item");
-
-	odm_initialize_work_item(
-		p_dm,
-		&(p_dm->beamforming_info.txbf_info.txbf_leave_work_item),
-		(RT_WORKITEM_CALL_BACK)hal_com_txbf_leave_work_item_callback,
-		(void *)p_adapter,
-		"txbf_leave_work_item");
-
-	odm_initialize_work_item(
-		p_dm,
-		&(p_dm->beamforming_info.txbf_info.txbf_fw_ndpa_work_item),
-		(RT_WORKITEM_CALL_BACK)hal_com_txbf_fw_ndpa_work_item_callback,
-		(void *)p_adapter,
-		"txbf_fw_ndpa_work_item");
-
-	odm_initialize_work_item(
-		p_dm,
-		&(p_dm->beamforming_info.txbf_info.txbf_clk_work_item),
-		(RT_WORKITEM_CALL_BACK)hal_com_txbf_clk_work_item_callback,
-		(void *)p_adapter,
-		"txbf_clk_work_item");
-
-	odm_initialize_work_item(
-		p_dm,
-		&(p_dm->beamforming_info.txbf_info.txbf_rate_work_item),
-		(RT_WORKITEM_CALL_BACK)hal_com_txbf_rate_work_item_callback,
-		(void *)p_adapter,
-		"txbf_rate_work_item");
-
-	odm_initialize_work_item(
-		p_dm,
-		&(p_dm->beamforming_info.txbf_info.txbf_status_work_item),
-		(RT_WORKITEM_CALL_BACK)hal_com_txbf_status_work_item_callback,
-		(void *)p_adapter,
-		"txbf_status_work_item");
-
-	odm_initialize_work_item(
-		p_dm,
-		&(p_dm->beamforming_info.txbf_info.txbf_reset_tx_path_work_item),
-		(RT_WORKITEM_CALL_BACK)hal_com_txbf_reset_tx_path_work_item_callback,
-		(void *)p_adapter,
-		"txbf_reset_tx_path_work_item");
-
-	odm_initialize_work_item(
-		p_dm,
-		&(p_dm->beamforming_info.txbf_info.txbf_get_tx_rate_work_item),
-		(RT_WORKITEM_CALL_BACK)hal_com_txbf_get_tx_rate_work_item_callback,
-		(void *)p_adapter,
-		"txbf_get_tx_rate_work_item");
-#endif
-
 	odm_initialize_work_item(
 		p_dm,
 		&(p_dm->adaptivity.phydm_pause_edcca_work_item),
@@ -2601,17 +2536,6 @@ odm_free_all_work_items(struct PHY_DM_STRUCT	*p_dm)
 	/*odm_free_work_item((&p_dm->sbdcnt_workitem));*/
 #endif
 
-#if (BEAMFORMING_SUPPORT == 1)
-	odm_free_work_item((&p_dm->beamforming_info.txbf_info.txbf_enter_work_item));
-	odm_free_work_item((&p_dm->beamforming_info.txbf_info.txbf_leave_work_item));
-	odm_free_work_item((&p_dm->beamforming_info.txbf_info.txbf_fw_ndpa_work_item));
-	odm_free_work_item((&p_dm->beamforming_info.txbf_info.txbf_clk_work_item));
-	odm_free_work_item((&p_dm->beamforming_info.txbf_info.txbf_rate_work_item));
-	odm_free_work_item((&p_dm->beamforming_info.txbf_info.txbf_status_work_item));
-	odm_free_work_item((&p_dm->beamforming_info.txbf_info.txbf_reset_tx_path_work_item));
-	odm_free_work_item((&p_dm->beamforming_info.txbf_info.txbf_get_tx_rate_work_item));
-#endif
-
 	odm_free_work_item((&p_dm->adaptivity.phydm_pause_edcca_work_item));
 	odm_free_work_item((&p_dm->adaptivity.phydm_resume_edcca_work_item));
 
@@ -2649,17 +2573,6 @@ odm_init_all_timers(
 		(void *)odm_cck_tx_path_diversity_callback, NULL, "cck_path_diversity_timer");
 	odm_initialize_timer(p_dm, &p_dm->sbdcnt_timer,
 			     (void *)phydm_sbd_callback, NULL, "SbdTimer");
-#if (BEAMFORMING_SUPPORT == 1)
-	odm_initialize_timer(p_dm, &p_dm->beamforming_info.txbf_info.txbf_fw_ndpa_timer,
-		(void *)hal_com_txbf_fw_ndpa_timer_callback, NULL, "txbf_fw_ndpa_timer");
-#endif
-#endif
-
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
-#if (BEAMFORMING_SUPPORT == 1)
-	odm_initialize_timer(p_dm, &p_dm->beamforming_info.beamforming_timer,
-		(void *)beamforming_sw_timer_callback, NULL, "beamforming_timer");
-#endif
 #endif
 }
 
@@ -2686,28 +2599,10 @@ odm_cancel_all_timers(
 	phydm_lna_sat_chk_timers(p_dm, CANCEL_LNA_SAT_CHK_TIMMER);
 #endif
 
-
 #ifdef CONFIG_DYNAMIC_RX_PATH
 	phydm_dynamic_rx_path_timers(p_dm, CANCEL_DRP_TIMMER);
 #endif
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	odm_cancel_timer(p_dm, &p_dm->path_div_switch_timer);
-	odm_cancel_timer(p_dm, &p_dm->cck_path_diversity_timer);
-	odm_cancel_timer(p_dm, &p_dm->sbdcnt_timer);
-#if (BEAMFORMING_SUPPORT == 1)
-	odm_cancel_timer(p_dm, &p_dm->beamforming_info.txbf_info.txbf_fw_ndpa_timer);
-#endif
-#endif
-
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
-#if (BEAMFORMING_SUPPORT == 1)
-	odm_cancel_timer(p_dm, &p_dm->beamforming_info.beamforming_timer);
-#endif
-#endif
-
 }
-
 
 void
 odm_release_all_timers(
@@ -2726,30 +2621,11 @@ odm_release_all_timers(
 #ifdef CONFIG_DYNAMIC_RX_PATH
 	phydm_dynamic_rx_path_timers(p_dm, RELEASE_DRP_TIMMER);
 #endif
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	odm_release_timer(p_dm, &p_dm->path_div_switch_timer);
-	odm_release_timer(p_dm, &p_dm->cck_path_diversity_timer);
-	odm_release_timer(p_dm, &p_dm->sbdcnt_timer);
-#if (BEAMFORMING_SUPPORT == 1)
-	odm_release_timer(p_dm, &p_dm->beamforming_info.txbf_info.txbf_fw_ndpa_timer);
-#endif
-#endif
-
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
-#if (BEAMFORMING_SUPPORT == 1)
-	odm_release_timer(p_dm, &p_dm->beamforming_info.beamforming_timer);
-#endif
-#endif
 }
-
 
 /* 3============================================================
  * 3 Tx Power Tracking
  * 3============================================================ */
-
-
-
 
 #if (DM_ODM_SUPPORT_TYPE == ODM_AP)
 void

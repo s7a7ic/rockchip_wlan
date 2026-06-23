@@ -33,9 +33,6 @@
 #include "phydm_noisemonitor.h"
 #include "phydm_api.h"
 #include "phydm_pow_train.h"
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN|ODM_CE))
-	#include "phydm_beamforming.h"
-#endif
 
 /*HALRF header*/
 #include "halrf/halrf_iqk.h"
@@ -924,11 +921,6 @@ struct	phydm_iot_center {
 	struct _ANT_DETECTED_INFO			ant_detected_info;	/* Antenna detected information for RSSI tool*/
 #endif
 
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
-#if (BEAMFORMING_SUPPORT == 1)
-	struct _RT_BEAMFORMING_INFO 		beamforming_info;
-#endif
-#endif
 #ifdef PHYDM_AUTO_DEGBUG
 	struct	phydm_auto_dbg_struc			auto_dbg_table;
 #endif

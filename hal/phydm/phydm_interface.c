@@ -1299,55 +1299,7 @@ phydm_get_txbf_en(
 )
 {
 	boolean txbf_en = false;
-
-#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
-#elif (DM_ODM_SUPPORT_TYPE & ODM_CE) && !defined(DM_ODM_CE_MAC80211)
-
-#elif (DM_ODM_SUPPORT_TYPE & ODM_AP)
-
-	#if (BEAMFORMING_SUPPORT == 1)
-	u8 idx = 0xff;
-	boolean act_bfer = false;
-	BEAMFORMING_CAP beamform_cap = BEAMFORMING_CAP_NONE;
-	PRT_BEAMFORMING_ENTRY	p_entry = NULL;
-	struct rtl8192cd_priv *priv			= p_dm->priv;
-	#if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY))
-	struct _BF_DIV_COEX_	*p_dm_bdc_table = &p_dm->dm_bdc_table;
-
-	p_dm_bdc_table->num_txbfee_client = 0;
-	p_dm_bdc_table->num_txbfer_client = 0;
-	#endif
-	#endif
-
-	#if (BEAMFORMING_SUPPORT == 1)
-	beamform_cap = Beamforming_GetEntryBeamCapByMacId(priv, mac_id);
-	p_entry = Beamforming_GetEntryByMacId(priv, mac_id, &idx);
-	if (beamform_cap & (BEAMFORMER_CAP_HT_EXPLICIT | BEAMFORMER_CAP_VHT_SU)) {
-		if (p_entry->Sounding_En)
-			txbf_en = true;
-		else
-			txbf_en = false;
-		act_bfer = true;
-	}
-	#if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY)) /*BDC*/
-	if (act_bfer == true) {
-		p_dm_bdc_table->w_bfee_client[i] = true; /* AP act as BFer */
-		p_dm_bdc_table->num_txbfee_client++;
-	} else
-		p_dm_bdc_table->w_bfee_client[i] = false; /* AP act as BFer */
-	
-	if (beamform_cap & (BEAMFORMEE_CAP_HT_EXPLICIT | BEAMFORMEE_CAP_VHT_SU)) {
-		p_dm_bdc_table->w_bfer_client[i] = true; /* AP act as BFee */
-		p_dm_bdc_table->num_txbfer_client++;
-	} else
-		p_dm_bdc_table->w_bfer_client[i] = false; /* AP act as BFer */
-
-	#endif
-	#endif
-
-#endif
 	return txbf_en;
-
 }
 
 void
