@@ -75,9 +75,7 @@
 
 extern int RTW_STATUS_CODE(int error_code);
 
-#ifndef RTK_DMP_PLATFORM
-	#define CONFIG_USE_VMALLOC
-#endif
+#define CONFIG_USE_VMALLOC
 
 /* flags used for rtw_mstat_update() */
 enum mstat_f {
