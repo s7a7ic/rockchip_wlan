@@ -329,10 +329,6 @@ struct registry_priv {
 	u32	reg_rxgain_offset_5gm;
 	u32	reg_rxgain_offset_5gh;
 
-#ifdef CONFIG_DFS_MASTER
-	u8 dfs_region_domain;
-#endif
-
 #ifdef CONFIG_RTW_NAPI
 	u8 en_napi;
 #ifdef CONFIG_RTW_NAPI_DYNAMIC
@@ -759,25 +755,6 @@ struct rf_ctl_t {
 	u8 txpwr_lmt_5g_cck_ofdm_state;
 	u8 txpwr_lmt_5g_20_40_ref;
 	#endif
-#endif
-
-#ifdef CONFIG_DFS_MASTER
-	bool radar_detect_by_others;
-	u8 dfs_master_enabled;
-	bool radar_detected;
-
-	u8 radar_detect_ch;
-	u8 radar_detect_bw;
-	u8 radar_detect_offset;
-
-	systime cac_start_time;
-	systime cac_end_time;
-
-	u8 dfs_ch_sel_d_flags;
-
-	u8 dbg_dfs_master_fake_radar_detect_cnt;
-	u8 dbg_dfs_master_radar_detect_trigger_non;
-	u8 dbg_dfs_master_choose_dfs_ch_first;
 #endif
 };
 

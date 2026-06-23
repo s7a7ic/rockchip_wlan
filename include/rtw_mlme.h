@@ -608,13 +608,6 @@ struct mlme_priv {
 
 #endif
 
-#ifdef CONFIG_DFS
-	u8	handle_dfs;
-#endif
-#ifdef CONFIG_DFS_MASTER
-	/* TODO: move to rfctl */
-	_timer dfs_master_timer;
-#endif
 #ifdef CONFIG_RTW_80211R
 	ft_priv ftpriv;
 #endif

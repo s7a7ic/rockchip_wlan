@@ -605,19 +605,6 @@ void set_channel_bwmode(_adapter *padapter, unsigned char channel, unsigned char
 	}
 	_enter_critical_mutex(&(adapter_to_dvobj(padapter)->setch_mutex), NULL);
 
-#ifdef CONFIG_DFS_MASTER
-	{
-		struct rf_ctl_t *rfctl = adapter_to_rfctl(padapter);
-		bool ori_overlap_radar_detect_ch = rtw_rfctl_overlap_radar_detect_ch(rfctl);
-		bool new_overlap_radar_detect_ch = _rtw_rfctl_overlap_radar_detect_ch(rfctl, channel, bwmode, channel_offset);
-
-		if (new_overlap_radar_detect_ch && IS_CH_WAITING(rfctl)) {
-			u8 pause = 0xFF;
-
-			rtw_hal_set_hwreg(padapter, HW_VAR_TXPAUSE, &pause);
-		}
-#endif /* CONFIG_DFS_MASTER */
-
 		/* set Channel */
 		/* saved channel/bw info */
 		rtw_set_oper_ch(padapter, channel);
@@ -642,18 +629,6 @@ void set_channel_bwmode(_adapter *padapter, unsigned char channel, unsigned char
 		if (iqk_info_backup == true)
 			rtw_hal_ch_sw_iqk_info_backup(padapter);
 #endif
-
-#ifdef CONFIG_DFS_MASTER
-		if (new_overlap_radar_detect_ch)
-			rtw_odm_radar_detect_enable(padapter);
-		else if (ori_overlap_radar_detect_ch) {
-			u8 pause = 0x00;
-
-			rtw_odm_radar_detect_disable(padapter);
-			rtw_hal_set_hwreg(padapter, HW_VAR_TXPAUSE, &pause);
-		}
-	}
-#endif /* CONFIG_DFS_MASTER */
 
 	_exit_critical_mutex(&(adapter_to_dvobj(padapter)->setch_mutex), NULL);
 }
@@ -2517,37 +2492,6 @@ void update_beacon_info(_adapter *padapter, u8 *pframe, uint pkt_len, struct sta
 		i += (pIE->Length + 2);
 	}
 }
-
-#ifdef CONFIG_DFS
-void process_csa_ie(_adapter *padapter, u8 *pframe, uint pkt_len)
-{
-	unsigned int i;
-	unsigned int len;
-	PNDIS_802_11_VARIABLE_IEs	pIE;
-	u8 new_ch_no = 0;
-
-	if (padapter->mlmepriv.handle_dfs == true)
-		return;
-
-	len = pkt_len - (_BEACON_IE_OFFSET_ + WLAN_HDR_A3_LEN);
-
-	for (i = 0; i < len;) {
-		pIE = (PNDIS_802_11_VARIABLE_IEs)(pframe + (_BEACON_IE_OFFSET_ + WLAN_HDR_A3_LEN) + i);
-
-		switch (pIE->ElementID) {
-		case _CH_SWTICH_ANNOUNCE_:
-			padapter->mlmepriv.handle_dfs = true;
-			_rtw_memcpy(&new_ch_no, pIE->data + 1, 1);
-			rtw_set_csa_cmd(padapter, new_ch_no);
-			break;
-		default:
-			break;
-		}
-
-		i += (pIE->Length + 2);
-	}
-}
-#endif /* CONFIG_DFS */
 
 unsigned int is_ap_in_tkip(_adapter *padapter)
 {

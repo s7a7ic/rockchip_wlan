@@ -1398,21 +1398,11 @@ sint sta2ap_data_frame(
 
 		*psta = rtw_get_stainfo(pstapriv, pattrib->src);
 		if (*psta == NULL) {
-			#ifdef CONFIG_DFS_MASTER
-			struct rf_ctl_t *rfctl = adapter_to_rfctl(adapter);
-
-			/* prevent RX tasklet blocks cmd_thread */
-			if (rfctl->radar_detected == 1)
-				goto bypass_deauth7;
-			#endif
 
 			RTW_INFO("issue_deauth to sta=" MAC_FMT " for the reason(7)\n", MAC_ARG(pattrib->src));
 
 			issue_deauth(adapter, pattrib->src, WLAN_REASON_CLASS3_FRAME_FROM_NONASSOC_STA);
 
-#ifdef CONFIG_DFS_MASTER
-bypass_deauth7:
-#endif
 			ret = RTW_RX_HANDLED;
 			goto exit;
 		}

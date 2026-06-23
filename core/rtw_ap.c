@@ -1447,9 +1447,6 @@ chbw_decision:
 
 	rtw_start_bss_hdl_after_chbw_decided(padapter);
 
-#if defined(CONFIG_DFS_MASTER)
-	rtw_dfs_master_status_apply(padapter, self_action);
-#endif
 	rtw_hal_rcr_set_chk_bssid(padapter, self_action);
 
 	doiqk = true;
@@ -3546,10 +3543,6 @@ void stop_ap_mode(_adapter *padapter)
 	padapter->securitypriv.ndisauthtype = Ndis802_11AuthModeOpen;
 	padapter->securitypriv.ndisencryptstatus = Ndis802_11WEPDisabled;
 
-#ifdef CONFIG_DFS_MASTER
-	rtw_dfs_master_status_apply(padapter, self_action);
-#endif
-
 	/* free scan queue */
 	rtw_free_network_queue(padapter, true);
 
@@ -3790,22 +3783,6 @@ choose_chbw:
 		if (req_bw < 0)
 			req_bw = cur_ie_bw;
 
-#if defined(CONFIG_DFS_MASTER)
-		if (!rtw_odm_dfs_domain_unknown(adapter)) {
-			/* choose 5G DFS channel for debug */
-			if (adapter_to_rfctl(adapter)->dbg_dfs_master_choose_dfs_ch_first
-				&& rtw_choose_shortest_waiting_ch(adapter, req_bw, &dec_ch, &dec_bw, &dec_offset, RTW_CHF_2G | RTW_CHF_NON_DFS) == true)
-				RTW_INFO(FUNC_ADPT_FMT" choose 5G DFS channel for debug\n", FUNC_ADPT_ARG(adapter));
-			else if (adapter_to_rfctl(adapter)->dfs_ch_sel_d_flags
-				&& rtw_choose_shortest_waiting_ch(adapter, req_bw, &dec_ch, &dec_bw, &dec_offset, adapter_to_rfctl(adapter)->dfs_ch_sel_d_flags) == true)
-				RTW_INFO(FUNC_ADPT_FMT" choose with dfs_ch_sel_d_flags:0x%02x for debug\n", FUNC_ADPT_ARG(adapter), adapter_to_rfctl(adapter)->dfs_ch_sel_d_flags);
-			else if (rtw_choose_shortest_waiting_ch(adapter, req_bw, &dec_ch, &dec_bw, &dec_offset, 0) == false) {
-				RTW_WARN(FUNC_ADPT_FMT" no available channel\n", FUNC_ADPT_ARG(adapter));
-				*chbw_allow = false;
-				goto exit;
-			}
-		} else
-#endif /* defined(CONFIG_DFS_MASTER) */
 		if (rtw_choose_shortest_waiting_ch(adapter, req_bw, &dec_ch, &dec_bw, &dec_offset, RTW_CHF_DFS) == false) {
 			RTW_WARN(FUNC_ADPT_FMT" no available channel\n", FUNC_ADPT_ARG(adapter));
 			*chbw_allow = false;
@@ -4019,11 +3996,7 @@ void tx_beacon_handlder(struct dvobj_priv *pdvobj)
 		RTW_INFO("padapter=%p, PORT=%d\n", padapter, padapter->hw_port);
 #endif
 		/* bypass TX BCN queue if op ch is switching/waiting */
-		if (!check_fwstate(&padapter->mlmepriv, WIFI_OP_CH_SWITCHING)
-			#ifdef CONFIG_DFS_MASTER
-			&& !IS_CH_WAITING(adapter_to_rfctl(padapter))
-			#endif
-		) {
+		if (!check_fwstate(&padapter->mlmepriv, WIFI_OP_CH_SWITCHING)) {
 			/*update_beacon(padapter, _TIM_IE_, NULL, false);*/
 			/*issue_beacon(padapter, 0);*/
 			send_beacon(padapter);

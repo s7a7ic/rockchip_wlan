@@ -54,11 +54,6 @@
 	#define CONFIG_USB_VENDOR_REQ_MUTEX
 #endif
 
-#if !defined(CONFIG_AP_MODE) && defined(CONFIG_DFS_MASTER)
-	#warning "undef CONFIG_DFS_MASTER because CONFIG_AP_MODE is not defined"
-	#undef CONFIG_DFS_MASTER
-#endif
-
 #define RTW_SCAN_SPARSE_MIRACAST 1
 #define RTW_SCAN_SPARSE_BG 0
 #define RTW_SCAN_SPARSE_ROAMING_ACTIVE 1

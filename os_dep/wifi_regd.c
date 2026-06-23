@@ -260,38 +260,6 @@ static void _rtw_reg_apply_radar_flags(struct wiphy *wiphy)
 		ch = &sband->channels[i];
 		if (!rtw_is_dfs_ch(ch->hw_value))
 			continue;
-#ifdef CONFIG_DFS
-		if (!(ch->flags & IEEE80211_CHAN_DISABLED)
-			#if defined(CONFIG_DFS_MASTER)
-			&& rtw_odm_dfs_domain_unknown(wiphy_to_adapter(wiphy))
-			#endif
-		) {
-			ch->flags |= IEEE80211_CHAN_RADAR;
-			#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 14, 0))
-			ch->flags |= (IEEE80211_CHAN_NO_IBSS | IEEE80211_CHAN_PASSIVE_SCAN);
-			#else
-			ch->flags |= IEEE80211_CHAN_NO_IR;
-			#endif
-		}
-#endif /* CONFIG_DFS */
-
-#if 0
-		/*
-		 * We always enable radar detection/DFS on this
-		 * frequency range. Additionally we also apply on
-		 * this frequency range:
-		 * - If STA mode does not yet have DFS supports disable
-		 *  active scanning
-		 * - If adhoc mode does not support DFS yet then disable
-		 *  adhoc in the frequency.
-		 * - If AP mode does not yet support radar detection/DFS
-		 *  do not allow AP mode
-		 */
-		if (!(ch->flags & IEEE80211_CHAN_DISABLED))
-			ch->flags |= IEEE80211_CHAN_RADAR |
-				     IEEE80211_CHAN_NO_IBSS |
-				     IEEE80211_CHAN_PASSIVE_SCAN;
-#endif
 	}
 }
 
@@ -332,9 +300,6 @@ static void _rtw_reg_apply_flags(struct wiphy *wiphy)
 		ch = ieee80211_get_channel(wiphy, freq);
 		if (ch) {
 			if (channel_set[i].ScanType == SCAN_PASSIVE
-				#if defined(CONFIG_DFS_MASTER)
-				&& rtw_odm_dfs_domain_unknown(wiphy_to_adapter(wiphy))
-				#endif
 			) {
 				#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 14, 0))
 				ch->flags = (IEEE80211_CHAN_NO_IBSS | IEEE80211_CHAN_PASSIVE_SCAN);
