@@ -7,7 +7,7 @@
 #ifndef _RTW_XMIT_H_
 #define _RTW_XMIT_H_
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	#ifdef CONFIG_TX_AGGREGATION
 		#define MAX_XMITBUF_SZ	(20480)	/* 20k */
 		/* #define SDIO_TX_AGG_MAX	5 */
@@ -16,19 +16,10 @@
 		#define SDIO_TX_AGG_MAX	1
 	#endif
 
-	#if defined CONFIG_SDIO_HCI
-		#define NR_XMITBUFF	(16)
-	#endif
-	#if defined(CONFIG_GSPI_HCI)
-		#define NR_XMITBUFF	(128)
-	#endif
+	#define NR_XMITBUFF	(16)
 #endif
 
-#ifdef USB_XMITBUF_ALIGN_SZ
-	#define XMITBUF_ALIGN_SZ (USB_XMITBUF_ALIGN_SZ)
-#else
-	#define XMITBUF_ALIGN_SZ 512
-#endif
+#define XMITBUF_ALIGN_SZ 512
 
 /* xmit extension buff defination */
 #define MAX_XMIT_EXTBUF_SZ	(1536)
@@ -120,7 +111,7 @@
 	#define EARLY_MODE_INFO_SIZE	8
 #endif
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	#define TXDESC_OFFSET TXDESC_SIZE
 #endif
 
@@ -388,7 +379,7 @@ struct xmit_buf {
 
 	struct submit_ctx *sctx;
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	u8 *phead;
 	u8 *pdata;
 	u8 *ptail;
@@ -412,7 +403,7 @@ struct xmit_frame {
 	u8	*buf_addr;
 	struct xmit_buf *pxmitbuf;
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	u8	pg_num;
 	u8	agg_num;
 #endif
@@ -529,7 +520,7 @@ struct	xmit_priv	{
 
 	u8	wmm_para_seq[4];/* sequence for wmm ac parameter strength from large to small. it's value is 0->vo, 1->vi, 2->be, 3->bk. */
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 #ifdef CONFIG_SDIO_TX_TASKLET
 	struct tasklet_struct xmit_tasklet;
 #else

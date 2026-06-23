@@ -17,9 +17,6 @@
 #ifdef CONFIG_SDIO_HCI
 	#include <hal_sdio.h>
 #endif
-#ifdef CONFIG_GSPI_HCI
-	#include <hal_gspi.h>
-#endif
 
 #if defined(CONFIG_RTW_ACS) || defined(CONFIG_BACKGROUND_NOISE_MONITOR)
 #include "../hal/hal_dm_acs.h"
@@ -554,7 +551,7 @@ typedef struct hal_com_data {
 	u8 rxagg_dma_timeout;
 #endif /* RTW_RX_AGGREGATION */
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	/*  */
 	/* For SDIO Interface HAL related */
 	/*  */

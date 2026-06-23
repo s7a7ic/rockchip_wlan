@@ -923,7 +923,7 @@ u8 rtw_mi_buddy_check_pending_xmitbuf(_adapter *padapter)
 }
 #endif
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 static u8 _rtw_mi_dequeue_writeport(_adapter *padapter , bool exclude_self)
 {
 	int i;
@@ -1077,7 +1077,7 @@ static u8 _rtw_mi_tx_beacon_hdl(_adapter *adapter, void *data)
 	) {
 		adapter->mlmepriv.update_bcn = true;
 #ifndef CONFIG_INTERRUPT_BASED_TXBCN
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 		tx_beacon_hdl(adapter, NULL);
 #endif
 #endif

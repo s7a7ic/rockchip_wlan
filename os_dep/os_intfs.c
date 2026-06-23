@@ -3586,7 +3586,7 @@ int rtw_suspend_wow(_adapter *padapter)
 			rtw_netif_stop_queue(pnetdev);
 		rtw_mi_buddy_netif_stop_queue(padapter, true);
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 		/* 2.only for SDIO disable interrupt */
 		rtw_intf_stop(padapter);
 

@@ -6467,7 +6467,7 @@ unsigned int send_beacon(_adapter *padapter)
 	int	issue = 0;
 	int poll = 0;
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	systime start = rtw_get_current_time();
 
 	/* bypass TX BCN queue because op ch is switching/waiting */

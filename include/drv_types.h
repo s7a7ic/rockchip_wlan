@@ -404,9 +404,6 @@ typedef struct rtw_if_operations {
 	#include <drv_types_sdio.h>
 	#define INTF_DATA	SDIO_DATA
 	#define INTF_OPS	PRTW_IF_OPS
-#elif defined(CONFIG_GSPI_HCI)
-	#include <drv_types_gspi.h>
-	#define INTF_DATA GSPI_DATA
 #endif
 
 #ifdef CONFIG_CONCURRENT_MODE

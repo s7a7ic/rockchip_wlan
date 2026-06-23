@@ -11,7 +11,7 @@
 #define RECV_BLK_CNT 16
 #define RECV_BLK_TH RECV_BLK_CNT
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	#define MAX_RECVBUF_SZ  (RX_DMA_SIZE_8723B - RX_DMA_RESERVED_SIZE_8723B)
 #endif
 
@@ -25,7 +25,7 @@
 	#endif /* !CONFIG_SDIO_RX_COPY */
 #endif /* CONFIG_SDIO_HCI */
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	s32 rtl8723bs_init_recv_priv(PADAPTER padapter);
 	void rtl8723bs_free_recv_priv(PADAPTER padapter);
 #endif

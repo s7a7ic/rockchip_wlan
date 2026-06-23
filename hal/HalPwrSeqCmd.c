@@ -77,10 +77,6 @@ u8 HalPwrSeqCmdParsing(
 				} else
 #endif
 				{
-#ifdef CONFIG_GSPI_HCI
-					if (GET_PWR_CFG_BASE(PwrCfgCmd) == PWR_BASEADDR_SDIO)
-						offset = SPI_LOCAL_OFFSET | offset;
-#endif
 					/* Read the value from system register */
 					value = rtw_read8(padapter, offset);
 
@@ -104,10 +100,6 @@ u8 HalPwrSeqCmdParsing(
 				} else
 					maxPollingCnt = 5000;
 
-#ifdef CONFIG_GSPI_HCI
-				if (GET_PWR_CFG_BASE(PwrCfgCmd) == PWR_BASEADDR_SDIO)
-					offset = SPI_LOCAL_OFFSET | offset;
-#endif
 				do {
 #ifdef CONFIG_SDIO_HCI
 					if (GET_PWR_CFG_BASE(PwrCfgCmd) == PWR_BASEADDR_SDIO)
