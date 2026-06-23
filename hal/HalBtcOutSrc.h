@@ -105,7 +105,7 @@ enum {
 #define		BTC_TMP_BUF_SHORT		20
 
 extern u1Byte	gl_btc_trace_buf[];
-#define		BTC_SPRINTF			rsprintf
+#define		BTC_SPRINTF			snprintf
 #define		BTC_TRACE(_MSG_)\
 do {\
 	if (GLBtcDbgType[COMP_COEX] & BIT(DBG_LOUD)) {\
@@ -197,7 +197,7 @@ typedef enum _BTC_CHIP_TYPE {
 #define		WIFI_P2P_GC_CONNECTED			BIT4
 
 /* following is for command line utility */
-#define	CL_SPRINTF	rsprintf
+#define	CL_SPRINTF	snprintf
 #define	CL_PRINTF	DCMD_Printf
 
 struct btc_board_info {
