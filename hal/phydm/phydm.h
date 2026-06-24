@@ -33,12 +33,8 @@
 #include "halrf/halrf_iqk.h"
 #include "halrf/halrf.h"
 #include "halrf/halrf_powertracking.h"
-#if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-	#include "halrf/halphyrf_ap.h"
-#elif(DM_ODM_SUPPORT_TYPE & (ODM_CE))
+#if (DM_ODM_SUPPORT_TYPE & (ODM_CE))
 	#include "halrf/halphyrf_ce.h"
-#elif (DM_ODM_SUPPORT_TYPE & (ODM_WIN))
-	#include "halrf/halphyrf_win.h"
 #endif
 
 extern const u16 phy_rate_table[28];
@@ -58,11 +54,7 @@ extern const u16 phy_rate_table[28];
 #define MAX_2(_x_, _y_)	(((_x_)>(_y_))? (_x_) : (_y_))
 #define MIN_2(_x_, _y_)	(((_x_)<(_y_))? (_x_) : (_y_))
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
-	#define PHYDM_WATCH_DOG_PERIOD	1 /*second*/
-#else
-	#define PHYDM_WATCH_DOG_PERIOD	2 /*second*/
-#endif
+#define PHYDM_WATCH_DOG_PERIOD	2 /*second*/
 
 /*============================================================*/
 /*structure and define*/
@@ -768,10 +760,6 @@ struct	phydm_iot_center {
 	u32			n_iqk_cnt;
 	u32			n_iqk_ok_cnt;
 	u32			n_iqk_fail_cnt;
-
-#if (DM_ODM_SUPPORT_TYPE & ODM_AP)
-	boolean		config_bbrf;
-#endif
 	boolean		is_disable_power_training;
 	u8			dynamic_tx_high_power_lvl;
 	u8			last_dtp_lvl;
@@ -835,10 +823,6 @@ struct	phydm_iot_center {
 #endif
 
 #if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY))
-	#if (DM_ODM_SUPPORT_TYPE & (ODM_AP))
-	struct _BF_DIV_COEX_					dm_bdc_table;
-	#endif
-
 	#if (defined(CONFIG_HL_SMART_ANTENNA))
 	struct smt_ant_honbo					dm_sat_table;
 	#endif
@@ -1098,18 +1082,6 @@ phydm_cmn_info_query(
 	struct PHY_DM_STRUCT	*p_dm,
 	enum phydm_info_query_e	info_type
 );
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
-void
-odm_init_all_threads(
-	struct PHY_DM_STRUCT	*p_dm
-);
-
-void
-odm_stop_all_threads(
-	struct PHY_DM_STRUCT	*p_dm
-);
-#endif
 
 void
 odm_init_all_timers(

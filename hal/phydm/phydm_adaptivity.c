@@ -6,12 +6,6 @@
  ******************************************************************************/
 #include "phydm_precomp.h"
 
-#if (DM_ODM_SUPPORT_TYPE & ODM_WIN)
-	#if WPP_SOFTWARE_TRACE
-		#include "PhyDM_Adaptivity.tmh"
-	#endif
-#endif
-
 void
 phydm_dig_up_bound_lmt_en(
 	void			*p_dm_void
@@ -57,81 +51,9 @@ phydm_check_adaptivity(
 		p_dm->adaptivity_enable = false;
 		return;
 	}
-	
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	if (p_dm->ap_total_num > adaptivity->ap_num_th) {
-		p_dm->adaptivity_enable = false;
-		PHYDM_DBG(p_dm, DBG_ADPTVTY, ("AP total num > %d!!, disable adaptivity\n", adaptivity->ap_num_th));
-		return;
-	}
-#elif (DM_ODM_SUPPORT_TYPE == ODM_AP)
-	if (adaptivity->dynamic_link_adaptivity) {
-		if (p_dm->is_linked && adaptivity->is_check == false) {
-			phydm_check_environment(p_dm);
-		} else if (!p_dm->is_linked)
-			adaptivity->is_check = false;
 
-		return;
-	}
-#endif
-	
 	p_dm->adaptivity_enable = true;
 }
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-boolean
-phydm_check_channel_plan(
-	void			*p_dm_void
-)
-{
-	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-	struct _ADAPTER		*p_adapter	= p_dm->adapter;
-	PMGNT_INFO		p_mgnt_info = &(p_adapter->MgntInfo);
-
-	if (p_mgnt_info->RegEnableAdaptivity == 2) {
-		if (p_dm->carrier_sense_enable == false) {		/*check domain Code for adaptivity or CarrierSense*/
-			if ((*p_dm->p_band_type == ODM_BAND_5G) &&
-				!(p_dm->odm_regulation_5g == REGULATION_ETSI || p_dm->odm_regulation_5g == REGULATION_WW)) {
-				PHYDM_DBG(p_dm, DBG_ADPTVTY, ("adaptivity skip 5G domain code : %d\n", p_dm->odm_regulation_5g));
-				p_dm->adaptivity_enable = false;
-				return true;
-			} else if ((*p_dm->p_band_type == ODM_BAND_2_4G) &&
-				!(p_dm->odm_regulation_2_4g == REGULATION_ETSI || p_dm->odm_regulation_2_4g == REGULATION_WW)) {
-				PHYDM_DBG(p_dm, DBG_ADPTVTY, ("adaptivity skip 2.4G domain code : %d\n", p_dm->odm_regulation_2_4g));
-				p_dm->adaptivity_enable = false;
-				return true;
-
-			} else if ((*p_dm->p_band_type != ODM_BAND_2_4G) && (*p_dm->p_band_type != ODM_BAND_5G)) {
-				PHYDM_DBG(p_dm, DBG_ADPTVTY, ("adaptivity neither 2G nor 5G band, return\n"));
-				p_dm->adaptivity_enable = false;
-				return true;
-			}
-		} else {
-			if ((*p_dm->p_band_type == ODM_BAND_5G) &&
-				!(p_dm->odm_regulation_5g == REGULATION_MKK || p_dm->odm_regulation_5g == REGULATION_WW)) {
-				PHYDM_DBG(p_dm, DBG_ADPTVTY, ("CarrierSense skip 5G domain code : %d\n", p_dm->odm_regulation_5g));
-				p_dm->adaptivity_enable = false;
-				return true;
-			}
-
-			else if ((*p_dm->p_band_type == ODM_BAND_2_4G) &&
-				!(p_dm->odm_regulation_2_4g == REGULATION_MKK  || p_dm->odm_regulation_2_4g == REGULATION_WW)) {
-				PHYDM_DBG(p_dm, DBG_ADPTVTY, ("CarrierSense skip 2.4G domain code : %d\n", p_dm->odm_regulation_2_4g));
-				p_dm->adaptivity_enable = false;
-				return true;
-
-			} else if ((*p_dm->p_band_type != ODM_BAND_2_4G) && (*p_dm->p_band_type != ODM_BAND_5G)) {
-				PHYDM_DBG(p_dm, DBG_ADPTVTY, ("CarrierSense neither 2G nor 5G band, return\n"));
-				p_dm->adaptivity_enable = false;
-				return true;
-			}
-		}
-	}
-
-	return false;
-
-}
-#endif
 
 void
 phydm_set_edcca_threshold(
@@ -492,7 +414,7 @@ phydm_adaptivity_init(
 	s8	igi_target = 0x32;
 	/*struct phydm_dig_struct* p_dig_t = &p_dm->dm_dig_table;*/
 
-#if (DM_ODM_SUPPORT_TYPE & (ODM_CE | ODM_WIN))
+#if (DM_ODM_SUPPORT_TYPE & (ODM_CE))
 
 	if (p_dm->carrier_sense_enable == false) {
 		if (p_dm->th_l2h_ini == 0)
@@ -510,23 +432,6 @@ phydm_adaptivity_init(
 		p_dm->edcca_enable = false;		/*even no adaptivity, we still enable EDCCA, AP side use mib control*/
 	else
 		p_dm->edcca_enable = true;
-
-#elif (DM_ODM_SUPPORT_TYPE & ODM_AP)
-	struct rtl8192cd_priv	*priv = p_dm->priv;
-
-	if (p_dm->carrier_sense_enable) {
-		p_dm->th_l2h_ini = 0xa;
-		p_dm->th_edcca_hl_diff = 7;
-	} else {
-		p_dm->th_l2h_ini = p_dm->TH_L2H_default;	/*set by mib*/
-		p_dm->th_edcca_hl_diff = p_dm->th_edcca_hl_diff_default;
-	}
-
-	if (priv->pshare->rf_ft_var.adaptivity_enable == 2)
-		adaptivity->dynamic_link_adaptivity = true;
-	else
-		adaptivity->dynamic_link_adaptivity = false;
-
 #endif
 
 	adaptivity->adapt_igi_up = 0;
@@ -586,22 +491,13 @@ phydm_adaptivity_init(
 	/*phydm_set_edcca_threshold_api(p_dm, p_dig_t->cur_ig_value);*/
 
 	p_dm->adaptivity_flag = (p_dm->support_ic_type & ODM_IC_GAIN_IDX_EDCCA) ? false : true;
-	
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
-	adaptivity->igi_up_bound_lmt_val = 180;
-#else
+
 	adaptivity->igi_up_bound_lmt_val = 90;
-#endif
 	adaptivity->igi_up_bound_lmt_cnt = 0;
 	adaptivity->igi_lmt_en = false;
-
 }
 
-
-void
-phydm_adaptivity(
-	void			*p_dm_void
-)
+void phydm_adaptivity(void *p_dm_void)
 {
 	struct PHY_DM_STRUCT		*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct phydm_dig_struct			*p_dig_t = &p_dm->dm_dig_table;
@@ -609,17 +505,6 @@ phydm_adaptivity(
 	s8			th_l2h_dmc, th_h2l_dmc;
 	s8			diff = 0, igi_target = 0x32;
 	struct phydm_adaptivity_struct	*adaptivity = (struct phydm_adaptivity_struct *)phydm_get_structure(p_dm, PHYDM_ADAPTIVITY);
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*p_adapter	= p_dm->adapter;
-	u32			is_fw_current_in_ps_mode = false;
-	u8			disable_ap_adapt_setting;
-
-	p_adapter->HalFunc.GetHwRegHandler(p_adapter, HW_VAR_FW_PSMODE_STATUS, (u8 *)(&is_fw_current_in_ps_mode));
-
-	/*Disable EDCCA mode while under LPS mode, added by Roger, 2012.09.14.*/
-	if (is_fw_current_in_ps_mode)
-		return;
-#endif
 
 	if ((p_dm->edcca_enable == false) || (adaptivity->is_stop_edcca == true)) {
 		PHYDM_DBG(p_dm, DBG_ADPTVTY, ("Disable EDCCA!!!\n"));
@@ -634,23 +519,6 @@ phydm_adaptivity(
 		p_dm->th_l2h_ini = p_dm->th_l2h_ini_mode2;
 		p_dm->th_edcca_hl_diff = p_dm->th_edcca_hl_diff_mode2;
 	}
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	else if (adaptivity->debug_mode == false) {
-		disable_ap_adapt_setting = false;
-		if (p_dm->p_soft_ap_mode != NULL) {
-			if (*(p_dm->p_soft_ap_mode) != 0 && (p_dm->soft_ap_special_setting & BIT(0)))
-				disable_ap_adapt_setting = true;
-			PHYDM_DBG(p_dm, DBG_ADPTVTY, ("p_dm->soft_ap_special_setting = %x, *(p_dm->p_soft_ap_mode) = %d, disable_ap_adapt_setting = %d\n", p_dm->soft_ap_special_setting, *(p_dm->p_soft_ap_mode), disable_ap_adapt_setting));
-		}
-		if (phydm_check_channel_plan(p_dm) || (p_dm->ap_total_num > adaptivity->ap_num_th) || disable_ap_adapt_setting) {
-			p_dm->th_l2h_ini = p_dm->th_l2h_ini_mode2;
-			p_dm->th_edcca_hl_diff = p_dm->th_edcca_hl_diff_mode2;
-		} else {
-			p_dm->th_l2h_ini = adaptivity->th_l2h_ini_backup;
-			p_dm->th_edcca_hl_diff = adaptivity->th_edcca_hl_diff_backup;
-		}
-	}
-#endif
 	else if (adaptivity->debug_mode == true) {
 		p_dm->th_l2h_ini = adaptivity->th_l2h_ini_debug;
 		p_dm->th_edcca_hl_diff = 7;
@@ -761,45 +629,20 @@ phydm_pause_edcca(
 		PHYDM_DBG(p_dm, DBG_ADPTVTY, ("pauseEDCCA : L2Hbak = 0x%x, H2Lbak = 0x%x, IGI = 0x%x\n", adaptivity->backup_l2h, adaptivity->backup_h2l, IGI));
 
 		/*Disable EDCCA*/
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-		if (odm_is_work_item_scheduled(&(adaptivity->phydm_pause_edcca_work_item)) == false)
-			odm_schedule_work_item(&(adaptivity->phydm_pause_edcca_work_item));
-#else
 		phydm_pause_edcca_work_item_callback(p_dm);
-#endif
 
 	} else {
 
 		adaptivity->is_stop_edcca = false;
 		PHYDM_DBG(p_dm, DBG_ADPTVTY, ("resumeEDCCA : L2Hbak = 0x%x, H2Lbak = 0x%x, IGI = 0x%x\n", adaptivity->backup_l2h, adaptivity->backup_h2l, IGI));
 		/*Resume EDCCA*/
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-		if (odm_is_work_item_scheduled(&(adaptivity->phydm_resume_edcca_work_item)) == false)
-			odm_schedule_work_item(&(adaptivity->phydm_resume_edcca_work_item));
-#else
 		phydm_resume_edcca_work_item_callback(p_dm);
-#endif
-
 	}
-
 }
 
-
-void
-phydm_pause_edcca_work_item_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter
-#else
-	void			*p_dm_void
-#endif
-)
+void phydm_pause_edcca_work_item_callback(void *p_dm_void)
 {
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	PHAL_DATA_TYPE	p_hal_data = GET_HAL_DATA(adapter);
-	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->DM_OutSrc;
-#else
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-#endif
 
 	if (p_dm->support_ic_type & ODM_IC_11N_SERIES)
 		odm_set_bb_reg(p_dm, REG_OFDM_0_ECCA_THRESHOLD, MASKBYTE2 | MASKBYTE0, (u32)(0x7f | 0x7f << 16));
@@ -807,38 +650,18 @@ phydm_pause_edcca_work_item_callback(
 	else if (p_dm->support_ic_type & ODM_IC_11AC_SERIES)
 		odm_set_bb_reg(p_dm, REG_FPGA0_XB_LSSI_READ_BACK, MASKLWORD, (u16)(0x7f | 0x7f << 8));
 #endif
-
 }
 
-void
-phydm_resume_edcca_work_item_callback(
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	struct _ADAPTER		*adapter
-#else
-	void			*p_dm_void
-#endif
-)
+void phydm_resume_edcca_work_item_callback(void *p_dm_void)
 {
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	PHAL_DATA_TYPE	p_hal_data = GET_HAL_DATA(adapter);
-	struct PHY_DM_STRUCT		*p_dm = &p_hal_data->DM_OutSrc;
-#else
 	struct PHY_DM_STRUCT	*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
-#endif
 	struct phydm_adaptivity_struct	*adaptivity = (struct phydm_adaptivity_struct *)phydm_get_structure(p_dm, PHYDM_ADAPTIVITY);
 
 	if (p_dm->support_ic_type & ODM_IC_11N_SERIES)
 		odm_set_bb_reg(p_dm, REG_OFDM_0_ECCA_THRESHOLD, MASKBYTE2 | MASKBYTE0, (u32)((u8)adaptivity->backup_l2h | (u8)adaptivity->backup_h2l << 16));
-#if (RTL8195A_SUPPORT == 0)
-	else if (p_dm->support_ic_type & ODM_IC_11AC_SERIES)
-		odm_set_bb_reg(p_dm, REG_FPGA0_XB_LSSI_READ_BACK, MASKLWORD, (u16)((u8)adaptivity->backup_l2h | (u8)adaptivity->backup_h2l << 8));
-#endif
-
 }
 
-
-void
-phydm_set_edcca_threshold_api(
+void phydm_set_edcca_threshold_api(
 	void	*p_dm_void,
 	u8	IGI
 )
@@ -856,22 +679,7 @@ phydm_set_edcca_threshold_api(
 			th_l2h_dmc = p_dm->th_l2h_ini - diff + igi_target;
 			th_h2l_dmc = th_l2h_dmc - p_dm->th_edcca_hl_diff;
 		}
-#if (RTL8195A_SUPPORT == 0)
-		else	{
-			diff = igi_target - (s8)IGI;
-			th_l2h_dmc = p_dm->th_l2h_ini + diff;
-			if (th_l2h_dmc > 10)
-				th_l2h_dmc = 10;
 
-			th_h2l_dmc = th_l2h_dmc - p_dm->th_edcca_hl_diff;
-
-			/*replace lower bound to prevent EDCCA always equal 1*/
-			if (th_h2l_dmc < adaptivity->h2l_lb)
-				th_h2l_dmc = adaptivity->h2l_lb;
-			if (th_l2h_dmc < adaptivity->l2h_lb)
-				th_l2h_dmc = adaptivity->l2h_lb;
-		}
-#endif
 		PHYDM_DBG(p_dm, DBG_ADPTVTY, ("API :IGI=0x%x, th_l2h_dmc = %d, th_h2l_dmc = %d\n", IGI, th_l2h_dmc, th_h2l_dmc));
 		PHYDM_DBG(p_dm, DBG_ADPTVTY, ("API :adapt_igi_up=0x%x, h2l_lb = 0x%x, l2h_lb = 0x%x\n", adaptivity->adapt_igi_up, adaptivity->h2l_lb, adaptivity->l2h_lb));
 

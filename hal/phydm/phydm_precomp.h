@@ -9,7 +9,6 @@
 
 #include "phydm_types.h"
 #include "phydm_features.h"
-#include "halrf/halrf_features.h"
 
 #if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
 	#include "Precomp.h"		/* We need to include mp_precomp.h due to batch file setting. */
