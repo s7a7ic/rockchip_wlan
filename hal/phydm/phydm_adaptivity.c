@@ -179,8 +179,6 @@ phydm_set_lna(
 	}
 }
 
-
-
 void
 phydm_set_trx_mux(
 	void				*p_dm_void,
@@ -198,17 +196,6 @@ phydm_set_trx_mux(
 			odm_set_bb_reg(p_dm, ODM_REG_CCK_RPT_FORMAT_11N_B, BIT(22) | BIT(21) | BIT(20), rx_mode);	/*set RXmod to standby mode to remove outside noise affect*/
 		}
 	}
-#if (RTL8195A_SUPPORT == 0)
-	else if (p_dm->support_ic_type & ODM_IC_11AC_SERIES) {
-		odm_set_bb_reg(p_dm, ODM_REG_TRMUX_11AC, BIT(11) | BIT(10) | BIT(9) | BIT(8), tx_mode);				/*set TXmod to standby mode to remove outside noise affect*/
-		odm_set_bb_reg(p_dm, ODM_REG_TRMUX_11AC, BIT(7) | BIT(6) | BIT(5) | BIT(4), rx_mode);				/*set RXmod to standby mode to remove outside noise affect*/
-		if (p_dm->rf_type > RF_1T1R) {
-			odm_set_bb_reg(p_dm, ODM_REG_TRMUX_11AC_B, BIT(11) | BIT(10) | BIT(9) | BIT(8), tx_mode);		/*set TXmod to standby mode to remove outside noise affect*/
-			odm_set_bb_reg(p_dm, ODM_REG_TRMUX_11AC_B, BIT(7) | BIT(6) | BIT(5) | BIT(4), rx_mode);			/*set RXmod to standby mode to remove outside noise affect*/
-		}
-	}
-#endif
-
 }
 
 void
@@ -226,7 +213,6 @@ phydm_mac_edcca_state(
 		/*		odm_set_mac_reg(p_dm, REG_RD_CTRL, BIT(11), 1);			*/ /*reg524[11]=1	*/
 	}
 	PHYDM_DBG(p_dm, DBG_ADPTVTY, ("EDCCA enable state = %d\n", state));
-
 }
 
 void
@@ -253,7 +239,6 @@ phydm_check_environment(
 	}
 
 	adaptivity->is_check = true;
-
 }
 
 void
@@ -326,7 +311,6 @@ phydm_search_pwdb_lower_bound(
 
 		} else
 			is_adjust = false;
-
 	}
 
 	adaptivity->adapt_igi_up = IGI - p_dm->dc_backoff;
@@ -465,19 +449,7 @@ phydm_adaptivity_init(
 		} else
 			odm_set_bb_reg(p_dm, ODM_REG_EDCCA_DCNF_11N, BIT(21) | BIT(20), 0x1);		/*0:rx_dfir, 1: dcnf_out, 2 :rx_iq, 3: rx_nbi_nf_out*/
 	}
-#if (RTL8195A_SUPPORT == 0)
-	if (p_dm->support_ic_type & ODM_IC_11AC_GAIN_IDX_EDCCA) {		/*8814a no need to find pwdB lower bound, maybe*/
-		/*odm_set_bb_reg(p_dm, ODM_REG_EDCCA_DOWN_OPT, BIT(30) | BIT(29) | BIT(28), 0x7);*/		/*interfernce need > 2^x us, and then EDCCA will be 1*/
-		odm_set_bb_reg(p_dm, ODM_REG_ACBB_EDCCA_ENHANCE, BIT(29) | BIT(28), 0x1);		/*0:rx_dfir, 1: dcnf_out, 2 :rx_iq, 3: rx_nbi_nf_out*/
-	}
 
-	if (!(p_dm->support_ic_type & (ODM_IC_11AC_GAIN_IDX_EDCCA | ODM_IC_11N_GAIN_IDX_EDCCA))) {
-		phydm_search_pwdb_lower_bound(p_dm);
-		if (phydm_re_search_condition(p_dm))
-			phydm_search_pwdb_lower_bound(p_dm);
-	} else
-		phydm_set_edcca_threshold(p_dm, 0x7f, 0x7f);				/*resume to no link state*/
-#endif
 	/*forgetting factor setting*/
 	phydm_set_forgetting_factor(p_dm);
 

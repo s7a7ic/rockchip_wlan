@@ -818,10 +818,6 @@ struct	phydm_iot_center {
 
 	struct _odm_phy_dbg_info_				phy_dbg_info;
 
-#ifdef CONFIG_ADAPTIVE_SOML
-	struct adaptive_soml					dm_soml_table;
-#endif
-
 #if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY))
 	#if (defined(CONFIG_HL_SMART_ANTENNA))
 	struct smt_ant_honbo					dm_sat_table;
