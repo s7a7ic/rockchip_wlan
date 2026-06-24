@@ -642,10 +642,6 @@ struct mlme_ext_priv {
 #ifdef CONFIG_RTW_REPEATER_SON
 	_timer		rson_scan_timer;
 #endif
-#ifdef CONFIG_RTW_80211R
-	_timer		ft_link_timer;
-	_timer		ft_roam_timer;
-#endif
 
 	systime last_scan_time;
 	u8	scan_abort;
@@ -1009,14 +1005,6 @@ unsigned int OnAction_wmm(_adapter *padapter, union recv_frame *precv_frame);
 unsigned int OnAction_vht(_adapter *padapter, union recv_frame *precv_frame);
 unsigned int OnAction_p2p(_adapter *padapter, union recv_frame *precv_frame);
 
-#ifdef CONFIG_RTW_80211R
-void start_clnt_ft_action(_adapter *padapter, u8 *pTargetAddr);
-void issue_action_ft_request(_adapter *padapter, u8 *pTargetAddr);
-void report_ft_event(_adapter *padapter);
-void report_ft_reassoc_event(_adapter *padapter, u8 *pMacAddr);
-void ft_link_timer_hdl(void *ctx);
-void ft_roam_timer_hdl(void *ctx);
-#endif
 void mlmeext_joinbss_event_callback(_adapter *padapter, int join_res);
 void mlmeext_sta_del_event_callback(_adapter *padapter);
 void mlmeext_sta_add_event_callback(_adapter *padapter, struct sta_info *psta);
@@ -1247,9 +1235,6 @@ enum rtw_c2h_event {
 #ifdef CONFIG_IEEE80211W
 	GEN_EVT_CODE(_TimeoutSTA),
 #endif /* CONFIG_IEEE80211W */
-#ifdef CONFIG_RTW_80211R
-	GEN_EVT_CODE(_FT_REASSOC),
-#endif
 	MAX_C2HEVT
 };
 
@@ -1287,9 +1272,6 @@ static struct fwevent wlanevents[] = {
 #ifdef CONFIG_IEEE80211W
 	{sizeof(struct stadel_event), &rtw_sta_timeout_event_callback},
 #endif /* CONFIG_IEEE80211W */
-#ifdef CONFIG_RTW_80211R
-	{sizeof(struct stassoc_event), &rtw_ft_reassoc_event_callback},
-#endif
 };
 
 #endif/* _RTW_MLME_EXT_C_ */

@@ -470,65 +470,6 @@ struct beacon_keys {
 	int group_cipher;
 	int is_8021x;
 };
-#ifdef CONFIG_RTW_80211R
-#define FT_ACTION_REQ_LIMIT	4
-
-typedef enum _RTW_WIFI_FT_STA_STATUS {
-	RTW_FT_UNASSOCIATED_STA = 0,
-	RTW_FT_AUTHENTICATING_STA,
-	RTW_FT_AUTHENTICATED_STA,
-	RTW_FT_ASSOCIATING_STA,
-	RTW_FT_ASSOCIATED_STA,
-	RTW_FT_REQUESTING_STA,
-	RTW_FT_REQUESTED_STA,
-	RTW_FT_CONFIRMED_STA,
-	RTW_FT_UNSPECIFIED_STA
-} RTW_WIFI_FT_STA_STATUS;
-
-#define rtw_chk_ft_status(adapter, status) ((adapter)->mlmepriv.ftpriv.ft_status == status)
-#define rtw_set_ft_status(adapter, status) \
-	do { \
-		((adapter)->mlmepriv.ftpriv.ft_status = status); \
-	} while (0)
-
-#define rtw_reset_ft_status(adapter) \
-	do { \
-		((adapter)->mlmepriv.ftpriv.ft_status = RTW_FT_UNASSOCIATED_STA); \
-	} while (0)
-
-typedef enum _RTW_WIFI_FT_CAPABILITY {
-	RTW_FT_STA_SUPPORTED = BIT0,
-	RTW_FT_STA_OVER_DS_SUPPORTED = BIT1,
-	RTW_FT_SUPPORTED = BIT2,
-	RTW_FT_OVER_DS_SUPPORTED = BIT3,
-} RTW_WIFI_FT_CAPABILITY;
-
-#define rtw_chk_ft_flags(adapter, flags) ((adapter)->mlmepriv.ftpriv.ft_flags & (flags))
-#define rtw_set_ft_flags(adapter, flags) \
-	do { \
-		((adapter)->mlmepriv.ftpriv.ft_flags |= (flags)); \
-	} while (0)
-
-#define rtw_clr_ft_flags(adapter, flags) \
-	do { \
-		((adapter)->mlmepriv.ftpriv.ft_flags &= ~(flags)); \
-	} while (0)
-
-#define RTW_MAX_FTIE_SZ	256
-typedef struct _ft_priv {
-	u16	mdid;
-	u8	ft_cap;	/*b0: FT over DS, b1: Resource Req Protocol Cap, b2~b7: Reserved*/
-	u8	updated_ft_ies[RTW_MAX_FTIE_SZ];
-	u16	updated_ft_ies_len;
-	u8	ft_action[RTW_MAX_FTIE_SZ];
-	u16	ft_action_len;
-	struct cfg80211_ft_event_params ft_event;
-	u8	ft_roam_on_expired;
-	u8	ft_flags;
-	u32 ft_status;
-	u32 ft_req_retry_cnt;
-} ft_priv;
-#endif
 
 struct mlme_priv {
 
@@ -608,10 +549,6 @@ struct mlme_priv {
 
 #endif
 
-#ifdef CONFIG_RTW_80211R
-	ft_priv ftpriv;
-#endif
-
 	RT_LINK_DETECT_T	LinkDetectInfo;
 
 	u8	acm_mask; /* for wmm acm mask */
@@ -658,10 +595,6 @@ struct mlme_priv {
 	u8 sw_to_20mhz; /*switch to 20Mhz BW*/
 #endif /* CONFIG_80211N_HT */
 
-#ifdef CONFIG_RTW_80211R
-	u8 *auth_rsp;
-	u32 auth_rsp_len;
-#endif
 	u8 *assoc_req;
 	u32 assoc_req_len;
 
@@ -817,10 +750,6 @@ extern void rtw_wmm_event_callback(PADAPTER padapter, u8 *pbuf);
 #ifdef CONFIG_IEEE80211W
 void rtw_sta_timeout_event_callback(_adapter *adapter, u8 *pbuf);
 #endif /* CONFIG_IEEE80211W */
-#ifdef CONFIG_RTW_80211R
-void rtw_update_ft_stainfo(_adapter *padapter, WLAN_BSSID_EX *pnetwork);
-void rtw_ft_reassoc_event_callback(_adapter *padapter, u8 *pbuf);
-#endif
 
 thread_return event_thread(thread_context context);
 

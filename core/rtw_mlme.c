@@ -109,13 +109,6 @@ sint	_rtw_init_mlme_priv(_adapter *padapter)
 	pmlmepriv->roam_rssi_threshold = RTW_ROAM_RSSI_THRESHOLD;
 #endif /* CONFIG_LAYER2_ROAMING */
 
-#ifdef CONFIG_RTW_80211R
-	memset(&pmlmepriv->ftpriv, 0, sizeof(ft_priv));
-	pmlmepriv->ftpriv.ft_flags = 0
-		| RTW_FT_STA_SUPPORTED
-		| RTW_FT_STA_OVER_DS_SUPPORTED
-		;
-#endif
 	rtw_init_mlme_timer(padapter);
 
 exit:
@@ -164,10 +157,6 @@ void rtw_free_mlme_priv_ie_data(struct mlme_priv *pmlmepriv)
 	rtw_free_mlme_ie_data(&pmlmepriv->wfd_go_probe_resp_ie, &pmlmepriv->wfd_go_probe_resp_ie_len);
 	rtw_free_mlme_ie_data(&pmlmepriv->wfd_assoc_req_ie, &pmlmepriv->wfd_assoc_req_ie_len);
 	rtw_free_mlme_ie_data(&pmlmepriv->wfd_assoc_resp_ie, &pmlmepriv->wfd_assoc_resp_ie_len);
-#endif
-
-#ifdef CONFIG_RTW_80211R
-	rtw_free_mlme_ie_data(&pmlmepriv->auth_rsp, &pmlmepriv->auth_rsp_len);
 #endif
 }
 
@@ -1190,14 +1179,10 @@ void rtw_surveydone_event_callback(_adapter	*adapter, u8 *pbuf)
 {
 	_irqL  irqL;
 	struct	mlme_priv	*pmlmepriv = &(adapter->mlmepriv);
-#ifdef CONFIG_RTW_80211R
-	struct mlme_ext_priv	*pmlmeext = &adapter->mlmeextpriv;
-#endif
 
 #ifdef CONFIG_MLME_EXT
 	mlmeext_surveydone_event_callback(adapter);
 #endif
-
 
 	_enter_critical_bh(&pmlmepriv->lock, &irqL);
 	if (pmlmepriv->wps_probe_req_ie) {
@@ -1206,7 +1191,6 @@ void rtw_surveydone_event_callback(_adapter	*adapter, u8 *pbuf)
 		rtw_mfree(pmlmepriv->wps_probe_req_ie, free_len);
 		pmlmepriv->wps_probe_req_ie = NULL;
 	}
-
 
 	if (check_fwstate(pmlmepriv, _FW_UNDER_SURVEY) == false) {
 		RTW_INFO(FUNC_ADPT_FMT" fw_state:0x%x\n", FUNC_ADPT_ARG(adapter), get_fwstate(pmlmepriv));
@@ -1293,17 +1277,8 @@ void rtw_surveydone_event_callback(_adapter	*adapter, u8 *pbuf)
 			if (check_fwstate(pmlmepriv, WIFI_STATION_STATE)
 			    && check_fwstate(pmlmepriv, _FW_LINKED)) {
 				if (rtw_select_roaming_candidate(pmlmepriv) == _SUCCESS) {
-#ifdef CONFIG_RTW_80211R
-					if (rtw_chk_ft_flags(adapter, RTW_FT_OVER_DS_SUPPORTED)) {
-						start_clnt_ft_action(adapter, (u8 *)pmlmepriv->roam_network->network.MacAddress);
-					} else {
-						/*wait a little time to retrieve packets buffered in the current ap while scan*/
-						_set_timer(&pmlmeext->ft_roam_timer, 30);
-					}
-#else
 					receive_disconnect(adapter, pmlmepriv->cur_network.network.MacAddress
 						, WLAN_REASON_ACTIVE_ROAM, false);
-#endif
 				}
 			}
 		}
@@ -1705,11 +1680,7 @@ static struct sta_info *rtw_joinbss_update_stainfo(_adapter *padapter, struct wl
 		rtw_hal_set_odm_var(padapter, HAL_ODM_STA_INFO, psta, true);
 
 		/* security related */
-#ifdef CONFIG_RTW_80211R
-		if ((padapter->securitypriv.dot11AuthAlgrthm == dot11AuthAlgrthm_8021X) && (psta->ft_pairwise_key_installed == false)) {
-#else
 		if (padapter->securitypriv.dot11AuthAlgrthm == dot11AuthAlgrthm_8021X) {
-#endif
 			padapter->securitypriv.binstallGrpkey = false;
 			padapter->securitypriv.busetkipkey = false;
 			padapter->securitypriv.bgrpkey_handshake = false;
@@ -2285,87 +2256,8 @@ void rtw_sta_timeout_event_callback(_adapter *adapter, u8 *pbuf)
 
 		associated_clients_update(adapter, updated, STA_INFO_UPDATE_ALL);
 	}
-
-
-
 }
 #endif /* CONFIG_IEEE80211W */
-
-#ifdef CONFIG_RTW_80211R
-void rtw_update_ft_stainfo(_adapter *padapter, WLAN_BSSID_EX *pnetwork)
-{
-	struct sta_priv		*pstapriv = &padapter->stapriv;
-	struct sta_info		*psta = NULL;
-
-	psta = rtw_get_stainfo(pstapriv, pnetwork->MacAddress);
-	if (psta == NULL)
-		psta = rtw_alloc_stainfo(pstapriv, pnetwork->MacAddress);
-
-	if (padapter->securitypriv.dot11AuthAlgrthm == dot11AuthAlgrthm_8021X) {
-
-		padapter->securitypriv.binstallGrpkey = false;
-		padapter->securitypriv.busetkipkey = false;
-		padapter->securitypriv.bgrpkey_handshake = false;
-
-		psta->ieee8021x_blocked = true;
-		psta->dot118021XPrivacy = padapter->securitypriv.dot11PrivacyAlgrthm;
-		psta->dot11txpn.val = psta->dot11txpn.val + 1;
-
-		_rtw_memset((u8 *)&psta->dot118021x_UncstKey, 0, sizeof(union Keytype));
-		_rtw_memset((u8 *)&psta->dot11tkiprxmickey, 0, sizeof(union Keytype));
-		_rtw_memset((u8 *)&psta->dot11tkiptxmickey, 0, sizeof(union Keytype));
-		_rtw_memset((u8 *)&psta->dot11txpn, 0, sizeof(union pn48));
-#ifdef CONFIG_IEEE80211W
-		_rtw_memset((u8 *)&psta->dot11wtxpn, 0, sizeof(union pn48));
-#endif
-		_rtw_memset((u8 *)&psta->dot11rxpn, 0, sizeof(union pn48));
-	}
-
-}
-
-void rtw_ft_reassoc_event_callback(_adapter *padapter, u8 *pbuf)
-{
-	struct mlme_priv		*pmlmepriv = &(padapter->mlmepriv);
-	struct stassoc_event	*pstassoc = (struct stassoc_event *)pbuf;
-	ft_priv	*pftpriv = &pmlmepriv->ftpriv;
-	struct mlme_ext_priv	*pmlmeext = &padapter->mlmeextpriv;
-	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
-	WLAN_BSSID_EX		*pnetwork = (WLAN_BSSID_EX *)(&(pmlmeinfo->network));
-	struct cfg80211_ft_event_params ft_evt_parms;
-	_irqL irqL;
-
-	_rtw_memset(&ft_evt_parms, 0, sizeof(ft_evt_parms));
-	rtw_update_ft_stainfo(padapter, pnetwork);
-	ft_evt_parms.ies_len = pftpriv->ft_event.ies_len;
-	ft_evt_parms.ies =  rtw_zmalloc(ft_evt_parms.ies_len);
-	if (ft_evt_parms.ies)
-		_rtw_memcpy((void *)ft_evt_parms.ies, pftpriv->ft_event.ies, ft_evt_parms.ies_len);
-	 else
-		goto err_2;
-
-	ft_evt_parms.target_ap = rtw_zmalloc(ETH_ALEN);
-	if (ft_evt_parms.target_ap)
-		_rtw_memcpy((void *)ft_evt_parms.target_ap, pstassoc->macaddr, ETH_ALEN);
-	else
-		goto err_1;
-
-	ft_evt_parms.ric_ies = pftpriv->ft_event.ric_ies;
-	ft_evt_parms.ric_ies_len = pftpriv->ft_event.ric_ies_len;
-
-	_enter_critical_bh(&pmlmepriv->lock, &irqL);
-	rtw_set_ft_status(padapter, RTW_FT_AUTHENTICATED_STA);
-	_exit_critical_bh(&pmlmepriv->lock, &irqL);
-
-	rtw_cfg80211_ft_event(padapter, &ft_evt_parms);
-	RTW_INFO("%s: to "MAC_FMT"\n", __func__, MAC_ARG(ft_evt_parms.target_ap));
-
-	rtw_mfree((u8 *)pftpriv->ft_event.target_ap, ETH_ALEN);
-err_1:
-	rtw_mfree((u8 *)ft_evt_parms.ies, ft_evt_parms.ies_len);
-err_2:
-	return;
-}
-#endif
 
 void rtw_sta_mstatus_disc_rpt(_adapter *adapter, u8 mac_id)
 {
@@ -2456,12 +2348,6 @@ void rtw_stadel_event_callback(_adapter *adapter, u8 *pbuf)
 		struct wlan_network *roam_target = NULL;
 
 #ifdef CONFIG_LAYER2_ROAMING
-#ifdef CONFIG_RTW_80211R
-		if (reason == WLAN_REASON_EXPIRATION_CHK && rtw_chk_roam_flags(adapter, RTW_ROAM_ON_EXPIRED))
-			pmlmepriv->ftpriv.ft_roam_on_expired = true;
-		else
-			pmlmepriv->ftpriv.ft_roam_on_expired = false;
-#endif
 		if (adapter->registrypriv.wifi_spec == 1)
 			roam = false;
 		else if (reason == WLAN_REASON_EXPIRATION_CHK && rtw_chk_roam_flags(adapter, RTW_ROAM_ON_EXPIRED))
@@ -2629,15 +2515,10 @@ void rtw_join_timeout_handler(void *ctx)
 				}
 #endif /* CONFIG_INTEL_WIDI */
 				RTW_INFO("%s We've try roaming but fail\n", __FUNCTION__);
-#ifdef CONFIG_RTW_80211R
-				rtw_clr_ft_flags(adapter, RTW_FT_SUPPORTED|RTW_FT_OVER_DS_SUPPORTED);
-				rtw_reset_ft_status(adapter);
-#endif
 				rtw_indicate_disconnect(adapter, 0, false);
 				break;
 			}
 		}
-
 	} else
 #endif
 	{
@@ -3012,11 +2893,6 @@ static int rtw_check_roaming_candidate(struct mlme_priv *mlme
 {
 	int updated = false;
 	_adapter *adapter = container_of(mlme, _adapter, mlmepriv);
-#ifdef CONFIG_RTW_80211R
-	ft_priv *pftpriv = &mlme->ftpriv;
-	u32 mdie_len = 0;
-	u8 *ptmp = NULL;
-#endif
 
 #if defined(CONFIG_RTW_REPEATER_SON) &&  (!defined(CONFIG_RTW_REPEATER_SON_ROOT))
 	if (rtw_rson_isupdate_roamcan(mlme, candidate, competitor))
@@ -3033,27 +2909,6 @@ static int rtw_check_roaming_candidate(struct mlme_priv *mlme
 #ifdef CONFIG_LAYER2_ROAMING
 	if (mlme->need_to_roam == false)
 		goto exit;
-#endif
-
-#ifdef CONFIG_RTW_80211R
-	if (rtw_chk_ft_flags(adapter, RTW_FT_SUPPORTED)) {
-		ptmp = rtw_get_ie(&competitor->network.IEs[12], _MDIE_, &mdie_len, competitor->network.IELength-12);
-		if (ptmp) {
-			if (!_rtw_memcmp(&pftpriv->mdid, ptmp+2, 2))
-				goto exit;
-
-			/*The candidate don't support over-the-DS*/
-			if (rtw_chk_ft_flags(adapter, RTW_FT_STA_OVER_DS_SUPPORTED)) {
-				if ((rtw_chk_ft_flags(adapter, RTW_FT_OVER_DS_SUPPORTED) && !(*(ptmp+4) & 0x01)) ||
-					(!rtw_chk_ft_flags(adapter, RTW_FT_OVER_DS_SUPPORTED) && (*(ptmp+4) & 0x01))) {
-					RTW_INFO("FT: ignore the candidate(" MAC_FMT ") for over-the-DS\n", MAC_ARG(competitor->network.MacAddress));
-					rtw_clr_ft_flags(adapter, RTW_FT_OVER_DS_SUPPORTED);
-					goto exit;
-				}
-			}
-		} else
-			goto exit;
-	}
 #endif
 
 	RTW_INFO("roam candidate:%s %s("MAC_FMT", ch%3u) rssi:%d, age:%5d\n",
@@ -4590,10 +4445,6 @@ void _rtw_roaming(_adapter *padapter, struct wlan_network *tgt_network)
 					continue;
 				else {
 					RTW_INFO("%s(%d) -to roaming fail, indicate_disconnect\n", __FUNCTION__, __LINE__);
-#ifdef CONFIG_RTW_80211R
-					rtw_clr_ft_flags(padapter, RTW_FT_SUPPORTED|RTW_FT_OVER_DS_SUPPORTED);
-					rtw_reset_ft_status(padapter);
-#endif
 					rtw_indicate_disconnect(padapter, 0, false);
 					break;
 				}

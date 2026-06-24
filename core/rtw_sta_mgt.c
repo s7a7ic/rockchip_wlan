@@ -163,10 +163,6 @@ void _rtw_init_stainfo(struct sta_info *psta)
 	_rtw_init_listhead(&psta->asoc_list);
 	_rtw_init_listhead(&psta->auth_list);
 	psta->bpairwise_key_installed = false;
-
-#ifdef CONFIG_RTW_80211R
-	psta->ft_pairwise_key_installed = false;
-#endif
 #endif /* CONFIG_AP_MODE	 */
 
 	rtw_st_ctl_init(&psta->st_ctl);

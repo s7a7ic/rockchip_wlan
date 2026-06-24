@@ -338,28 +338,6 @@ int rtw_rson_isupdate_roamcan(struct mlme_priv *mlme
 	if (cand_score < comp_score)
 		return true;
 
-#if 0		/*	Handle 11R protocol	*/
-#ifdef CONFIG_RTW_80211R
-	if (rtw_chk_ft_flags(adapter, RTW_FT_SUPPORTED)) {
-		ptmp = rtw_get_ie(&competitor->network.IEs[12], _MDIE_, &mdie_len, competitor->network.IELength-12);
-		if (ptmp) {
-			if (!_rtw_memcmp(&pftpriv->mdid, ptmp+2, 2))
-				goto exit;
-
-			/*The candidate don't support over-the-DS*/
-			if (rtw_chk_ft_flags(adapter, RTW_FT_STA_OVER_DS_SUPPORTED)) {
-				if ((rtw_chk_ft_flags(adapter, RTW_FT_OVER_DS_SUPPORTED) && !(*(ptmp+4) & 0x01)) ||
-					(!rtw_chk_ft_flags(adapter, RTW_FT_OVER_DS_SUPPORTED) && (*(ptmp+4) & 0x01))) {
-					RTW_INFO("FT: ignore the candidate(" MAC_FMT ") for over-the-DS\n", MAC_ARG(competitor->network.MacAddress));
-					rtw_clr_ft_flags(adapter, RTW_FT_OVER_DS_SUPPORTED);
-					goto exit;
-				}
-			}
-		} else
-			goto exit;
-	}
-#endif
-#endif
 	return false;
 }
 
@@ -552,17 +530,8 @@ void rtw_rson_scan_cmd_hdl(_adapter *padapter, int op)
 				if (check_fwstate(pmlmepriv, WIFI_STATION_STATE)
 				    && check_fwstate(pmlmepriv, _FW_LINKED)) {
 					if (rtw_select_roaming_candidate(pmlmepriv) == _SUCCESS) {
-#ifdef CONFIG_RTW_80211R
-						if (rtw_chk_ft_flags(padapter, RTW_FT_OVER_DS_SUPPORTED)) {
-							start_clnt_ft_action(adapter, (u8 *)pmlmepriv->roam_network->network.MacAddress);
-						} else {
-							/*wait a little time to retrieve packets buffered in the current ap while scan*/
-							_set_timer(&pmlmeext->ft_roam_timer, 30);
-						}
-#else
 						receive_disconnect(padapter, pmlmepriv->cur_network.network.MacAddress
 							, WLAN_REASON_ACTIVE_ROAM, false);
-#endif
 					}
 				}
 			}

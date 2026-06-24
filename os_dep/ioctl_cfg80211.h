@@ -315,14 +315,6 @@ void rtw_cfg80211_deinit_rfkill(struct wiphy *wiphy);
 #define rtw_cfg80211_disconnected(wdev, reason, ie, ie_len, locally_generated, gfp) cfg80211_disconnected(wdev_to_ndev(wdev), reason, ie, ie_len, locally_generated, gfp)
 #endif
 
-#ifdef CONFIG_RTW_80211R
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0))
-#define rtw_cfg80211_ft_event(adapter, parm)  cfg80211_ft_event((adapter)->pnetdev, parm)
-#else
-	#error "Cannot support FT for KERNEL_VERSION < 3.10\n"
-#endif
-#endif
-
 #if (KERNEL_VERSION(4, 7, 0) >= LINUX_VERSION_CODE)
 #define NUM_NL80211_BANDS IEEE80211_NUM_BANDS
 #endif

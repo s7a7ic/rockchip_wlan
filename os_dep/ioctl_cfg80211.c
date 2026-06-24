@@ -697,10 +697,6 @@ check_bss:
 
 		RTW_INFO(FUNC_ADPT_FMT" call cfg80211_roamed\n", FUNC_ADPT_ARG(padapter));
 
-#ifdef CONFIG_RTW_80211R
-		if ((rtw_to_roam(padapter) > 0) && rtw_chk_ft_flags(padapter, RTW_FT_SUPPORTED))
-			rtw_set_ft_status(padapter, RTW_FT_ASSOCIATED_STA);
-#endif
 	} else {
 		#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 11, 0) || defined(COMPAT_KERNEL_RELEASE)
 		RTW_INFO("pwdev->sme_state(b)=%d\n", pwdev->sme_state);
@@ -1123,11 +1119,6 @@ static int rtw_cfg80211_set_encryption(struct net_device *dev, struct ieee_param
 		/* RTW_INFO("%s, : dot11AuthAlgrthm == dot11AuthAlgrthm_8021X\n", __func__); */
 
 		if (check_fwstate(pmlmepriv, WIFI_STATION_STATE | WIFI_MP_STATE) == true) { /* sta mode */
-#ifdef CONFIG_RTW_80211R
-			if ((rtw_to_roam(padapter) > 0) && rtw_chk_ft_flags(padapter, RTW_FT_SUPPORTED))
-				psta = rtw_get_stainfo(pstapriv, pmlmepriv->assoc_bssid);
-			else
-#endif
 				psta = rtw_get_stainfo(pstapriv, get_bssid(pmlmepriv));
 			if (psta == NULL) {
 				/* DEBUG_ERR( ("Set wpa_set_encryption: Obtain Sta_info fail\n")); */
@@ -1156,9 +1147,7 @@ static int rtw_cfg80211_set_encryption(struct net_device *dev, struct ieee_param
 						padapter->securitypriv.busetkipkey = false;
 					}
 					psta->bpairwise_key_installed = true;
-#ifdef CONFIG_RTW_80211R
-					psta->ft_pairwise_key_installed = true;
-#endif
+
 					/* DEBUG_ERR((" param->u.crypt.key_len=%d\n",param->u.crypt.key_len)); */
 					RTW_INFO(" ~~~~set sta key:unicastkey\n");
 
@@ -2404,15 +2393,6 @@ static int rtw_cfg80211_set_key_mgt(struct security_priv *psecuritypriv, u32 key
 		psecuritypriv->dot11AuthAlgrthm = dot11AuthAlgrthm_8021X;
 		psecuritypriv->rsn_akm_suite_type = 2;
 	}
-#ifdef CONFIG_RTW_80211R
-	else if (key_mgt == WLAN_AKM_SUITE_FT_8021X) {
-		psecuritypriv->dot11AuthAlgrthm = dot11AuthAlgrthm_8021X;
-		psecuritypriv->rsn_akm_suite_type = 3;
-	} else if (key_mgt == WLAN_AKM_SUITE_FT_PSK) {
-		psecuritypriv->dot11AuthAlgrthm = dot11AuthAlgrthm_8021X;
-		psecuritypriv->rsn_akm_suite_type = 4;
-	}
-#endif
 	else {
 		RTW_INFO("Invalid key mgt: 0x%x\n", key_mgt);
 		/* return -EINVAL; */
@@ -5775,10 +5755,6 @@ static struct cfg80211_ops rtw_cfg80211_ops = {
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 6, 0))
 	.set_monitor_channel = cfg80211_rtw_set_monitor_channel,
-#endif
-
-#ifdef CONFIG_RTW_80211R
-	.update_ft_ies = cfg80211_rtw_update_ft_ies,
 #endif
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) || defined(COMPAT_KERNEL_RELEASE)

@@ -185,4 +185,3 @@
 /* #define CONFIG_FW_C2H_DEBUG */
 #define	DBG_RX_DFRAME_RAW_DATA
 /* #define CONFIG_GPIO_API */
-/*#define CONFIG_RTW_80211R*/

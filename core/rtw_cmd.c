@@ -1282,9 +1282,6 @@ u8 rtw_joinbss_cmd(_adapter  *padapter, struct wlan_network *pnetwork)
 	struct rf_ctl_t *rfctl = adapter_to_rfctl(padapter);
 	u32 tmp_len;
 	u8 *ptmp = NULL;
-#ifdef CONFIG_RTW_80211R
-	struct _ft_priv			*pftpriv = &pmlmepriv->ftpriv;
-#endif
 
 	pcmd = (struct cmd_obj *)rtw_zmalloc(sizeof(struct cmd_obj));
 	if (pcmd == NULL) {
@@ -1400,34 +1397,6 @@ u8 rtw_joinbss_cmd(_adapter  *padapter, struct wlan_network *pnetwork)
 	rtw_append_exented_cap(padapter, &psecnetwork->IEs[0], &psecnetwork->IELength);
 
 #endif /* CONFIG_80211N_HT */
-
-#ifdef CONFIG_RTW_80211R
-	/*IEEE802.11-2012 Std. Table 8-101�XAKM suite selectors*/
-	if ((rtw_chk_ft_flags(padapter, RTW_FT_STA_SUPPORTED)) &&
-		((psecuritypriv->rsn_akm_suite_type == 3) || (psecuritypriv->rsn_akm_suite_type == 4))
-		) {
-		ptmp = rtw_get_ie(&pnetwork->network.IEs[12], _MDIE_, &tmp_len, pnetwork->network.IELength-12);
-		if (ptmp) {
-			_rtw_memcpy(&pftpriv->mdid, ptmp+2, 2);
-			pftpriv->ft_cap = *(ptmp+4);
-
-			RTW_INFO("FT: Target AP "MAC_FMT" MDID=(0x%2x), capacity=(0x%2x)\n", MAC_ARG(pnetwork->network.MacAddress), pftpriv->mdid, pftpriv->ft_cap);
-			rtw_set_ft_flags(padapter, RTW_FT_SUPPORTED);
-			if ((rtw_chk_ft_flags(padapter, RTW_FT_STA_OVER_DS_SUPPORTED)) && (pftpriv->ft_roam_on_expired == false) && (pftpriv->ft_cap & 0x01))
-				rtw_set_ft_flags(padapter, RTW_FT_OVER_DS_SUPPORTED);
-		} else {
-				/*Don't use FT roaming if Target AP cannot support FT*/
-				RTW_INFO("FT: Target AP "MAC_FMT" could not support FT\n", MAC_ARG(pnetwork->network.MacAddress));
-				rtw_clr_ft_flags(padapter, RTW_FT_SUPPORTED|RTW_FT_OVER_DS_SUPPORTED);
-				rtw_reset_ft_status(padapter);
-		}
-	} else {
-		/*It could be a non-FT connection*/
-		RTW_INFO("FT: non-FT rtw_joinbss_cmd\n");
-		rtw_clr_ft_flags(padapter, RTW_FT_SUPPORTED|RTW_FT_OVER_DS_SUPPORTED);
-		rtw_reset_ft_status(padapter);
-	}
-#endif
 
 #if 0
 	psecuritypriv->supplicant_ie[0] = (u8)psecnetwork->IELength;

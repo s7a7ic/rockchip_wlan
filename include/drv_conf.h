@@ -26,10 +26,6 @@
 	#undef CONFIG_POWER_SAVING
 #endif
 
-#if defined(CONFIG_RTW_80211R) && !defined(CONFIG_LAYER2_ROAMING)
-	#error "Enable CONFIG_LAYER2_ROAMING before enable CONFIG_RTW_80211R\n"
-#endif
-
 /*
 #if defined(CONFIG_HAS_EARLYSUSPEND) && defined(CONFIG_RESUME_IN_WORKQUEUE)
 	#warning "You have CONFIG_HAS_EARLYSUSPEND enabled in your system, we disable CONFIG_RESUME_IN_WORKQUEUE automatically"
