@@ -48,12 +48,10 @@ static int rtw_sdio_resume(struct device *dev);
 static int rtw_sdio_suspend(struct device *dev);
 extern void rtw_dev_unload(PADAPTER padapter);
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 29))
 static const struct dev_pm_ops rtw_sdio_pm_ops = {
 	.suspend	= rtw_sdio_suspend,
 	.resume	= rtw_sdio_resume,
 };
-#endif
 
 struct sdio_drv_priv {
 	struct sdio_driver r871xs_drv;
@@ -65,11 +63,9 @@ static struct sdio_drv_priv sdio_drvpriv = {
 	.r871xs_drv.remove = rtw_dev_remove,
 	.r871xs_drv.name = (char *)DRV_NAME,
 	.r871xs_drv.id_table = sdio_ids,
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 29))
 	.r871xs_drv.drv = {
 		.pm = &rtw_sdio_pm_ops,
 	}
-#endif
 };
 
 static struct rtw_if_operations sdio_ops = {
@@ -166,9 +162,7 @@ static u8 gpio_hostwakeup_alloc_irq(PADAPTER padapter)
 
 	RTW_INFO("%s : oob_irq = %d\n", __func__, oob_irq);
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 32))
 	status = IRQF_NO_SUSPEND;
-#endif
 
 	if (HIGH_ACTIVE)
 		status |= IRQF_TRIGGER_RISING;
@@ -211,31 +205,29 @@ void dump_sdio_card_info(void *sel, struct dvobj_priv *dvobj)
 	case MMC_TIMING_LEGACY:
 		_RTW_PRINT_SEL(sel, "legacy");
 		break;
+
 	case MMC_TIMING_MMC_HS:
 		_RTW_PRINT_SEL(sel, "mmc high-speed");
 		break;
+
 	case MMC_TIMING_SD_HS:
 		_RTW_PRINT_SEL(sel, "sd high-speed");
 		break;
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 0, 0)
-	#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0)
+
 	case MMC_TIMING_UHS_SDR12:
 		_RTW_PRINT_SEL(sel, "sd uhs SDR12");
 		break;
 	case MMC_TIMING_UHS_SDR25:
 		_RTW_PRINT_SEL(sel, "sd uhs SDR25");
 		break;
-	#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0) */
 
 	case MMC_TIMING_UHS_SDR50:
 		_RTW_PRINT_SEL(sel, "sd uhs SDR50");
 		break;
 
-	#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 16, 0)
 	case MMC_TIMING_MMC_DDR52:
 		_RTW_PRINT_SEL(sel, "mmc DDR52");
 		break;
-	#endif
 
 	case MMC_TIMING_UHS_SDR104:
 		_RTW_PRINT_SEL(sel, "sd uhs SDR104");
@@ -244,18 +236,14 @@ void dump_sdio_card_info(void *sel, struct dvobj_priv *dvobj)
 		_RTW_PRINT_SEL(sel, "sd uhs DDR50");
 		break;
 
-	#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 3, 0)
 	case MMC_TIMING_MMC_HS200:
 		_RTW_PRINT_SEL(sel, "mmc HS200");
 		break;
-	#endif
 
-	#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 16, 0)
 	case MMC_TIMING_MMC_HS400:
 		_RTW_PRINT_SEL(sel, "mmc HS400");
 		break;
-	#endif
-#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(3, 0, 0) */
+
 	default:
 		_RTW_PRINT_SEL(sel, "unknown(%d)", psdio_data->timing);
 		break;
@@ -300,16 +288,12 @@ static u32 sdio_init(struct dvobj_priv *dvobj)
 	psdio_data->clock = func->card->host->ios.clock;
 
 	psdio_data->sd3_bus_mode = false;
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 0, 0)
+
 	if (psdio_data->timing <= MMC_TIMING_UHS_DDR50
-		#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0)
 		&& psdio_data->timing >= MMC_TIMING_UHS_SDR12
-		#else
-		&& psdio_data->timing >= MMC_TIMING_UHS_SDR50
-		#endif
 	)
 		psdio_data->sd3_bus_mode = true;
-#endif
+
 	SDIO_CARD_INFO_DUMP(dvobj);
 
 release:
@@ -776,7 +760,6 @@ static int rtw_sdio_suspend(struct device *dev)
 
 exit:
 #ifdef CONFIG_RTW_SDIO_PM_KEEP_POWER
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 34))
 	/* Android 4.0 don't support WIFI close power */
 	/* or power down or clock will close after wifi resume, */
 	/* this is sprd's bug in Android 4.0, but sprd don't */
@@ -796,7 +779,6 @@ exit:
 			sdio_set_host_pm_flags(func, MMC_PM_KEEP_POWER);
 		}
 	}
-#endif
 #endif
 	return ret;
 }

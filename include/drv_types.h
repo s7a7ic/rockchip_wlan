@@ -1128,10 +1128,6 @@ struct _ADAPTER {
 	/*	The driver will show up the desired channel number when this flag is 1. */
 	u8 bNotifyChannelChange;
 	u8 bsta_tp_dump;
-#ifdef CONFIG_AUTOSUSPEND
-	u8	bDisableAutosuspend;
-#endif
-
 	u8 isprimary; /* is primary adapter or not */
 	/* notes:
 	**	if isprimary is true, the adapter_type value is 0, iface_id is IFACE_ID0 for PRIMARY_ADAPTER

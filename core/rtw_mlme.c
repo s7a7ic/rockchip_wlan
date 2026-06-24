@@ -2328,15 +2328,8 @@ void rtw_stadel_event_callback(_adapter *adapter, u8 *pbuf)
 	if (psta)
 		rtw_wfd_st_switch(psta, 0);
 
-	if (MLME_IS_AP(adapter)) {
-#ifdef COMPAT_KERNEL_RELEASE
-
-#elif (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 37)) || defined(CONFIG_CFG80211_FORCE_COMPATIBLE_2_6_37_UNDER)
-		rtw_cfg80211_indicate_sta_disassoc(adapter, pstadel->macaddr, *(u16 *)pstadel->rsvd);
-#endif /* (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 37)) || defined(CONFIG_CFG80211_FORCE_COMPATIBLE_2_6_37_UNDER) */
-
+	if (MLME_IS_AP(adapter))
 		return;
-	}
 
 	mlmeext_sta_del_event_callback(adapter);
 
