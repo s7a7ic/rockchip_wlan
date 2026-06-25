@@ -148,12 +148,6 @@ odm_write_dig(
 
 	if (p_dig_t->cur_ig_value != current_igi) {
 
-		#if (ODM_PHY_STATUS_NEW_TYPE_SUPPORT == 1)
-		/* Set IGI value of CCK for new CCK AGC */
-		if (p_dm->cck_new_agc && (p_dm->support_ic_type & ODM_IC_PHY_STATUE_NEW_TYPE))
-			odm_set_bb_reg(p_dm, 0xa0c, 0x3f00, (current_igi >> 1));
-		#endif
-
 		/*Add by YuChen for USB IO too slow issue*/
 		if ((p_dm->support_ability & ODM_BB_ADAPTIVITY) && (current_igi > p_dig_t->cur_ig_value)) {
 			p_dig_t->cur_ig_value = current_igi;
@@ -844,10 +838,7 @@ phydm_dig_by_rssi_lps(
 /* 3============================================================
  * 3 FASLE ALARM CHECK
  * 3============================================================ */
-void
-phydm_false_alarm_counter_reg_reset(
-	void					*p_dm_void
-)
+void phydm_false_alarm_counter_reg_reset(void *p_dm_void)
 {
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct phydm_dig_struct	*p_dig_t = &p_dm->dm_dig_table;
@@ -897,38 +888,9 @@ phydm_false_alarm_counter_reg_reset(
 		odm_set_bb_reg(p_dm, 0xF14, BIT(16), 0);
 	}
 #endif	/* #if (ODM_IC_11N_SERIES_SUPPORT == 1) */
-
-#if (ODM_IC_11AC_SERIES_SUPPORT == 1)
-		if (p_dm->support_ic_type & ODM_IC_11AC_SERIES) {
-	#if (RTL8881A_SUPPORT == 1)
-			/* Reset FA counter by enable/disable OFDM */
-			if (false_alm_cnt->cnt_ofdm_fail_pre >= 0x7fff) {
-				/* reset OFDM */
-				odm_set_bb_reg(p_dm, 0x808, BIT(29), 0);
-				odm_set_bb_reg(p_dm, 0x808, BIT(29), 1);
-				false_alm_cnt->cnt_ofdm_fail_pre = 0;
-				PHYDM_DBG(p_dm, DBG_FA_CNT, ("Reset FA_cnt\n"));
-			}
-	#endif	/* #if (RTL8881A_SUPPORT == 1) */
-			/* reset OFDM FA countner */
-			odm_set_bb_reg(p_dm, 0x9A4, BIT(17), 1);
-			odm_set_bb_reg(p_dm, 0x9A4, BIT(17), 0);
-
-			/* reset CCK FA counter */
-			odm_set_bb_reg(p_dm, 0xA2C, BIT(15), 0);
-			odm_set_bb_reg(p_dm, 0xA2C, BIT(15), 1);
-
-			/* reset CCA counter */
-			odm_set_bb_reg(p_dm, 0xB58, BIT(0), 1);
-			odm_set_bb_reg(p_dm, 0xB58, BIT(0), 0);
-		}
-#endif	/* #if (ODM_IC_11AC_SERIES_SUPPORT == 1) */
 }
 
-void
-phydm_false_alarm_counter_reg_hold(
-	void					*p_dm_void
-)
+void phydm_false_alarm_counter_reg_hold(void *p_dm_void)
 {
 	struct PHY_DM_STRUCT *p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 
@@ -945,10 +907,7 @@ phydm_false_alarm_counter_reg_hold(
 	}
 }
 
-void
-odm_false_alarm_counter_statistics(
-	void		*p_dm_void
-)
+void odm_false_alarm_counter_statistics(void *p_dm_void)
 {
 	struct PHY_DM_STRUCT					*p_dm = (struct PHY_DM_STRUCT *)p_dm_void;
 	struct phydm_fa_struct	*false_alm_cnt = (struct phydm_fa_struct *)phydm_get_structure(p_dm, PHYDM_FALSEALMCNT);
@@ -1003,23 +962,6 @@ odm_false_alarm_counter_statistics(
 		/* read VHT CRC32 counter */
 		false_alm_cnt->cnt_vht_crc32_error = 0;
 		false_alm_cnt->cnt_vht_crc32_ok = 0;
-		
-#if (RTL8723D_SUPPORT == 1)
-		if (p_dm->support_ic_type == ODM_RTL8723D) {
-			/* read HT CRC32 agg counter */
-			ret_value = odm_get_bb_reg(p_dm, ODM_REG_HT_CRC32_CNT_11N_AGG, MASKDWORD);
-			false_alm_cnt->cnt_ht_crc32_error_agg = (ret_value & 0xffff0000) >> 16;
-			false_alm_cnt->cnt_ht_crc32_ok_agg= ret_value & 0xffff;
-		}
-#endif
-		
-#if (RTL8188E_SUPPORT == 1)
-		if (p_dm->support_ic_type == ODM_RTL8188E) {
-			ret_value = odm_get_bb_reg(p_dm, ODM_REG_SC_CNT_11N, MASKDWORD);
-			false_alm_cnt->cnt_bw_lsc = (ret_value & 0xffff);
-			false_alm_cnt->cnt_bw_usc = ((ret_value & 0xffff0000) >> 16);
-		}
-#endif
 
 		{
 			ret_value = odm_get_bb_reg(p_dm, ODM_REG_CCK_FA_LSB_11N, MASKBYTE0);
@@ -1048,84 +990,6 @@ odm_false_alarm_counter_statistics(
 			("[OFDM FA Detail] Parity_Fail = (( %d )), Rate_Illegal = (( %d )), CRC8_fail = (( %d )), Mcs_fail = (( %d )), Fast_Fsync = (( %d )), SB_Search_fail = (( %d ))\n",
 			false_alm_cnt->cnt_parity_fail, false_alm_cnt->cnt_rate_illegal, false_alm_cnt->cnt_crc8_fail, false_alm_cnt->cnt_mcs_fail, false_alm_cnt->cnt_fast_fsync, false_alm_cnt->cnt_sb_search_fail));
 		
-	}
-#endif
-
-#if (ODM_IC_11AC_SERIES_SUPPORT == 1)
-	if (p_dm->support_ic_type & ODM_IC_11AC_SERIES) {
-		u32 cck_enable;
-
-		/* read OFDM FA counter */
-		false_alm_cnt->cnt_ofdm_fail = odm_get_bb_reg(p_dm, ODM_REG_OFDM_FA_11AC, MASKLWORD);
-
-		/* Read CCK FA counter */
-		false_alm_cnt->cnt_cck_fail = odm_get_bb_reg(p_dm, ODM_REG_CCK_FA_11AC, MASKLWORD);
-
-		/* read CCK/OFDM CCA counter */
-		ret_value = odm_get_bb_reg(p_dm, ODM_REG_CCK_CCA_CNT_11AC, MASKDWORD);
-		false_alm_cnt->cnt_ofdm_cca = (ret_value & 0xffff0000) >> 16;
-		false_alm_cnt->cnt_cck_cca = ret_value & 0xffff;
-
-		/* read CCK CRC32 counter */
-		ret_value = odm_get_bb_reg(p_dm, ODM_REG_CCK_CRC32_CNT_11AC, MASKDWORD);
-		false_alm_cnt->cnt_cck_crc32_error = (ret_value & 0xffff0000) >> 16;
-		false_alm_cnt->cnt_cck_crc32_ok = ret_value & 0xffff;
-
-		/* read OFDM CRC32 counter */
-		ret_value = odm_get_bb_reg(p_dm, ODM_REG_OFDM_CRC32_CNT_11AC, MASKDWORD);
-		false_alm_cnt->cnt_ofdm_crc32_error = (ret_value & 0xffff0000) >> 16;
-		false_alm_cnt->cnt_ofdm_crc32_ok = ret_value & 0xffff;
-
-		/* read HT CRC32 counter */
-		ret_value = odm_get_bb_reg(p_dm, ODM_REG_HT_CRC32_CNT_11AC, MASKDWORD);
-		false_alm_cnt->cnt_ht_crc32_error = (ret_value & 0xffff0000) >> 16;
-		false_alm_cnt->cnt_ht_crc32_ok = ret_value & 0xffff;
-
-		/* read VHT CRC32 counter */
-		ret_value = odm_get_bb_reg(p_dm, ODM_REG_VHT_CRC32_CNT_11AC, MASKDWORD);
-		false_alm_cnt->cnt_vht_crc32_error = (ret_value & 0xffff0000) >> 16;
-		false_alm_cnt->cnt_vht_crc32_ok = ret_value & 0xffff;
-
-#if (RTL8881A_SUPPORT == 1)
-		/* For 8881A */
-		if (p_dm->support_ic_type == ODM_RTL8881A) {
-			u32 cnt_ofdm_fail_temp = 0;
-
-			if (false_alm_cnt->cnt_ofdm_fail >= false_alm_cnt->cnt_ofdm_fail_pre) {
-				cnt_ofdm_fail_temp = false_alm_cnt->cnt_ofdm_fail_pre;
-				false_alm_cnt->cnt_ofdm_fail_pre = false_alm_cnt->cnt_ofdm_fail;
-				false_alm_cnt->cnt_ofdm_fail = false_alm_cnt->cnt_ofdm_fail - cnt_ofdm_fail_temp;
-			} else
-				false_alm_cnt->cnt_ofdm_fail_pre = false_alm_cnt->cnt_ofdm_fail;
-			PHYDM_DBG(p_dm, DBG_FA_CNT, ("odm_false_alarm_counter_statistics(): cnt_ofdm_fail=%d\n",	false_alm_cnt->cnt_ofdm_fail_pre));
-			PHYDM_DBG(p_dm, DBG_FA_CNT, ("odm_false_alarm_counter_statistics(): cnt_ofdm_fail_pre=%d\n",	cnt_ofdm_fail_temp));
-		}
-#endif
-		cck_enable =  odm_get_bb_reg(p_dm, ODM_REG_BB_RX_PATH_11AC, BIT(28));
-		if (cck_enable) { /* if(*p_dm->p_band_type == ODM_BAND_2_4G) */
-			false_alm_cnt->cnt_all = false_alm_cnt->cnt_ofdm_fail + false_alm_cnt->cnt_cck_fail;
-			false_alm_cnt->cnt_cca_all = false_alm_cnt->cnt_cck_cca + false_alm_cnt->cnt_ofdm_cca;
-		} else {
-			false_alm_cnt->cnt_all = false_alm_cnt->cnt_ofdm_fail;
-			false_alm_cnt->cnt_cca_all = false_alm_cnt->cnt_ofdm_cca;
-		}
-	}
-#endif
-
-#if (RTL8723D_SUPPORT == 1)
-	if (p_dm->support_ic_type != ODM_RTL8723D) {
-		if (phydm_set_bb_dbg_port(p_dm, BB_DBGPORT_PRIORITY_1, 0x0)) {/*set debug port to 0x0*/
-			false_alm_cnt->dbg_port0 = phydm_get_bb_dbg_port_value(p_dm);
-			phydm_release_bb_dbg_port(p_dm);
-		}
-
-		if (phydm_set_bb_dbg_port(p_dm, BB_DBGPORT_PRIORITY_1, adaptivity->adaptivity_dbg_port)) {
-			if (p_dm->support_ic_type & (ODM_RTL8723B | ODM_RTL8188E))
-				false_alm_cnt->edcca_flag = (boolean)((phydm_get_bb_dbg_port_value(p_dm) & BIT(30)) >> 30);
-			else
-				false_alm_cnt->edcca_flag = (boolean)((phydm_get_bb_dbg_port_value(p_dm) & BIT(29)) >> 29);
-			phydm_release_bb_dbg_port(p_dm);
-		}
 	}
 #endif
 

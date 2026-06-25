@@ -4,12 +4,8 @@
  * Copyright(c) 2007 - 2017 Realtek Corporation. All rights reserved.
  *
  ******************************************************************************/
-#ifndef	__PHYDMPREDEFINE_H__
-#define    __PHYDMPREDEFINE_H__
-
-/* 1 ============================================================
- * 1  Definition
- * 1 ============================================================ */
+#ifndef __PHYDMPREDEFINE_H__
+#define __PHYDMPREDEFINE_H__
 
 #define PHYDM_CODE_BASE		"PHYDM_V021"
 #define PHYDM_RELEASE_DATE		"20170801"
@@ -49,21 +45,10 @@
 
 /* number of entry */
 #if (DM_ODM_SUPPORT_TYPE & (ODM_CE))
-	#ifdef DM_ODM_CE_MAC80211
-		/* defined in wifi.h (32+1) */
-	#else
-		#define	ASSOCIATE_ENTRY_NUM					MACID_NUM_SW_LIMIT  /* Max size of asoc_entry[].*/
-	#endif
+	#define	ASSOCIATE_ENTRY_NUM					MACID_NUM_SW_LIMIT  /* Max size of asoc_entry[].*/
 	#define	ODM_ASSOCIATE_ENTRY_NUM				ASSOCIATE_ENTRY_NUM
-#elif(DM_ODM_SUPPORT_TYPE & (ODM_AP))
-	#define ASSOCIATE_ENTRY_NUM					NUM_STAT
-	#define	ODM_ASSOCIATE_ENTRY_NUM				(ASSOCIATE_ENTRY_NUM+1)
 #else
 	#define ODM_ASSOCIATE_ENTRY_NUM				((ASSOCIATE_ENTRY_NUM*3)+1)
-#endif
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_CE) && defined(DM_ODM_CE_MAC80211)
-	#define RX_SMOOTH_FACTOR	20
 #endif
 
 /* -----MGN rate--------------------------------- */
@@ -303,7 +288,6 @@ enum odm_interface_e {
 	ODM_ITRF_ALL	=	0x7,
 };
 
-
 enum phydm_ic_e {
 	ODM_RTL8188E	=	BIT(0),
 	ODM_RTL8812	=	BIT(1),
@@ -371,44 +355,15 @@ enum phydm_ic_e {
 #define PHYDM_IC_SUPPORT_MU_BFEE	(ODM_RTL8822B | ODM_RTL8821C | ODM_RTL8814B)
 #define PHYDM_IC_SUPPORT_MU_BFER	(ODM_RTL8822B | ODM_RTL8814B)
 
-
 /*========[Compile time IC flag] ===============================================================================]*/
 /*========[AC/N Support] ===========================*/
-#if (DM_ODM_SUPPORT_TYPE == ODM_AP)
-
-	#ifdef RTK_AC_SUPPORT
-	#define ODM_IC_11AC_SERIES_SUPPORT		1
-	#else
-	#define ODM_IC_11AC_SERIES_SUPPORT		0
-	#endif
-
-	#define ODM_IC_11N_SERIES_SUPPORT			1
-
-#elif (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-
-	#define ODM_IC_11AC_SERIES_SUPPORT		1
-	#define ODM_IC_11N_SERIES_SUPPORT			1
-
-#elif (DM_ODM_SUPPORT_TYPE == ODM_CE) && defined(DM_ODM_CE_MAC80211)
-
-	#define ODM_IC_11AC_SERIES_SUPPORT		1
-	#define ODM_IC_11N_SERIES_SUPPORT			1
-
-#else /*ODM_CE*/
-
-	#define ODM_IC_11N_SERIES_SUPPORT			1
-	#define ODM_IC_11AC_SERIES_SUPPORT		0
-
-#endif
+#define ODM_IC_11N_SERIES_SUPPORT			1
 
 /*===IC SS Compile Flag, prepare for code size reduction==============*/
 	#define PHYDM_COMPILE_IC_1SS
 
 /*==[ABOVE N-SS COMPILE FLAG]=============================*/
 	#define PHYDM_COMPILE_ABOVE_1SS
-
-/*========[New Phy-Status Support] =========================================================================]*/
-	#define ODM_PHY_STATUS_NEW_TYPE_SUPPORT			0
 
 /* ODM_CMNINFO_CUT_VER */
 enum odm_cut_version_e {
@@ -470,7 +425,6 @@ enum odm_wireless_mode_e {
 	ODM_WM_AC_24G	= BIT(7),/* 0x80*/
 	ODM_WM_AC_ONLY	= BIT(8),/* 0x100*/
 	ODM_WM_MAX		= BIT(11)/* 0x800*/
-
 };
 #endif
 
@@ -487,10 +441,8 @@ enum odm_band_type_e {
 #endif
 };
 
-
 /* ODM_CMNINFO_SEC_CHNL_OFFSET */
 enum phydm_sec_chnl_offset_e {
-
 	PHYDM_DONT_CARE	= 0,
 	PHYDM_BELOW		= 1,
 	PHYDM_ABOVE		= 2
@@ -507,8 +459,6 @@ enum odm_security_e {
 	ODM_WEP_WPA_MIXED    = 6, /* WEP + WPA */
 	ODM_SEC_SMS4			= 7,
 };
-
-/* ODM_CMNINFO_CHNL */
 
 /* ODM_CMNINFO_BOARD_TYPE */
 enum odm_board_type_e {
@@ -615,7 +565,6 @@ enum odm_parameter_init_e {
 	ODM_INIT_FW_SETTING
 };
 
-
 enum phydm_pause_type {
 	PHYDM_PAUSE = 1,			/*Pause & Set new value*/
 	PHYDM_PAUSE_NO_SET = 2,	/*Pause & Stay in current value*/
@@ -631,5 +580,4 @@ enum phydm_pause_level {
 	PHYDM_PAUSE_MAX_NUM = 4
 };
 
-
-#endif
+#endif /* __PHYDMPREDEFINE_H__ */

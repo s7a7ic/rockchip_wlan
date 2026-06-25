@@ -12,10 +12,7 @@
 
 /* 2 Config Flags and Structs - defined by each ODM type */
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_CE)
-	#define __PACK
-	#define __WLAN_ATTRIB_PACK__
-#endif
+#define __PACK
 
 /* 2 OutSrc Header Files */
 
@@ -30,8 +27,7 @@
 
 #if (DM_ODM_SUPPORT_TYPE & ODM_CE) && !defined(DM_ODM_CE_MAC80211)
 
-void
-phy_set_tx_power_limit(
+void phy_set_tx_power_limit(
 	struct PHY_DM_STRUCT	*p_dm,
 	u8	*regulation,
 	u8	*band,
@@ -42,15 +38,13 @@ phy_set_tx_power_limit(
 	u8	*power_limit
 );
 
-enum hal_status
-rtw_phydm_fw_iqk(
+enum hal_status rtw_phydm_fw_iqk(
 	struct PHY_DM_STRUCT	*p_dm,
 	u8 clear,
 	u8 segment
 );
 
-enum hal_status
-rtw_phydm_cfg_phy_para(
+enum hal_status rtw_phydm_cfg_phy_para(
 	struct PHY_DM_STRUCT	*p_dm,
 	enum phydm_halmac_param config_type,
 	u32 offset,

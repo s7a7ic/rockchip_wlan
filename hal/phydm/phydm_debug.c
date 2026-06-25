@@ -827,11 +827,6 @@ void phydm_reset_rx_rate_distribution(struct PHY_DM_STRUCT *p_dm_odm)
 	odm_memory_set(p_dm_odm, &(p_dbg->num_qry_legacy_pkt[0]), 0, (LEGACY_RATE_NUM * 2));
 	odm_memory_set(p_dm_odm, &(p_dbg->num_qry_ht_pkt[0]), 0, (HT_RATE_NUM * 2));
 	p_dbg->ht_pkt_not_zero = false;
-	
-#if	ODM_IC_11AC_SERIES_SUPPORT
-	odm_memory_set(p_dm_odm, &(p_dbg->num_qry_vht_pkt[0]), 0, (VHT_RATE_NUM * 2));
-	p_dbg->vht_pkt_not_zero = false;
-#endif
 }
 
 void phydm_rx_rate_distribution(void *p_dm_void)
@@ -879,29 +874,8 @@ void phydm_rx_rate_distribution(void *p_dm_void)
 				p_dbg->num_qry_ht_pkt[rate_ss_shift + 2], p_dbg->num_qry_ht_pkt[rate_ss_shift + 3],
 				p_dbg->num_qry_ht_pkt[rate_ss_shift + 4], p_dbg->num_qry_ht_pkt[rate_ss_shift + 5],
 				p_dbg->num_qry_ht_pkt[rate_ss_shift + 6], p_dbg->num_qry_ht_pkt[rate_ss_shift + 7]));
-
 		}
 	}
-	
-#if	ODM_IC_11AC_SERIES_SUPPORT
-	/*======VHT=============================================================*/
-	if (p_dbg->vht_pkt_not_zero){
-		
-		for (i = 0; i < rate_num; i++) {
-			
-			rate_ss_shift = 10 * i;
-			
-			PHYDM_DBG(p_dm, ODM_COMP_COMMON, ("* VHT-%d ss MCS[0:9] = {%d, %d, %d, %d, %d, %d, %d, %d, %d, %d}\n",
-				(i + 1),
-				p_dbg->num_qry_vht_pkt[rate_ss_shift + 0], p_dbg->num_qry_vht_pkt[rate_ss_shift + 1],
-				p_dbg->num_qry_vht_pkt[rate_ss_shift + 2], p_dbg->num_qry_vht_pkt[rate_ss_shift + 3],
-				p_dbg->num_qry_vht_pkt[rate_ss_shift + 4], p_dbg->num_qry_vht_pkt[rate_ss_shift + 5],
-				p_dbg->num_qry_vht_pkt[rate_ss_shift + 6], p_dbg->num_qry_vht_pkt[rate_ss_shift + 7],
-				p_dbg->num_qry_vht_pkt[rate_ss_shift + 8], p_dbg->num_qry_vht_pkt[rate_ss_shift + 9]));
-
-		}
-	}
-#endif
 }
 
 void phydm_get_avg_phystatus_val(void		*p_dm_void)
@@ -1110,11 +1084,6 @@ phydm_basic_dbg_message
 		}
 	#endif
 
-	#if (ODM_PHY_STATUS_NEW_TYPE_SUPPORT == 1)
-		/*STBC or LDPC pkt*/
-		if (p_dm->support_ic_type & ODM_IC_PHY_STATUE_NEW_TYPE)
-			PHYDM_DBG(p_dm, ODM_COMP_COMMON, ("Coding: LDPC=((%s)), STBC=((%s))\n", (p_dm->phy_dbg_info.is_ldpc_pkt) ? "Y" : "N", (p_dm->phy_dbg_info.is_stbc_pkt) ? "Y" : "N"));
-	#endif
 	} else
 		PHYDM_DBG(p_dm, ODM_COMP_COMMON, ("No Link !!!\n"));
 
@@ -1679,7 +1648,6 @@ enum PHYDM_CMD_ID {
 	PHYDM_H2C,
 	PHYDM_ANT_SWITCH,
 	PHYDM_DYNAMIC_RA_PATH,
-	PHYDM_ADAPTIVE_SOML,
 	PHYDM_PSD,
 	PHYDM_DEBUG_PORT,
 	PHYDM_DIS_HTSTF_CONTROL,
@@ -1728,7 +1696,6 @@ struct _PHYDM_COMMAND phy_dm_ary[] = {
 	{"h2c", PHYDM_H2C},
 	{"ant_switch", PHYDM_ANT_SWITCH},
 	{"drp", PHYDM_DYNAMIC_RA_PATH},
-	{"soml", PHYDM_ADAPTIVE_SOML},
 	{"psd", PHYDM_PSD},
 	{"dbgport", PHYDM_DEBUG_PORT},
 	{"dis_htstf", PHYDM_DIS_HTSTF_CONTROL},
@@ -2021,13 +1988,7 @@ void phydm_cmd_parser(
 		break;
 
 	case PHYDM_LA_MODE:
-
-		#if (PHYDM_LA_MODE_SUPPORT == 1)
-		phydm_lamode_trigger_setting(p_dm, &input[0], &used, output, &out_len, input_num);
-		#else
 		PHYDM_SNPRINTF((output + used, out_len - used, "This IC doesn't support LA mode\n"));
-		#endif
-
 		break;
 
 	case PHYDM_DUMP_REG:
@@ -2050,12 +2011,6 @@ void phydm_cmd_parser(
 	{
 		break;
 	}
-
-	case PHYDM_AUTO_DBG:
-		#ifdef PHYDM_AUTO_DEGBUG
-		phydm_auto_dbg_console(p_dm, &input[0], &used, output, &out_len, input_num);
-		#endif
-		break;
 
 	case PHYDM_SHOW_RXRATE:
 		break;
@@ -2322,12 +2277,7 @@ void phydm_cmd_parser(
 
 		break;
 
-	case PHYDM_ADAPTIVE_SOML:
-		PHYDM_SNPRINTF((output + used, out_len - used, "Not Support IC"));
-		break;
-
 	case PHYDM_PSD:
-
 		#ifdef CONFIG_PSD_TOOL
 		phydm_psd_debug(p_dm, &input[0], &used, output, &out_len, input_num);
 		#endif

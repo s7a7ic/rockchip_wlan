@@ -19,19 +19,13 @@
 #define	ODM_ENDIAN_BIG	0
 #define	ODM_ENDIAN_LITTLE	1
 
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	#define GET_PDM_ODM(__padapter)	((struct PHY_DM_STRUCT*)(&((GET_HAL_DATA(__padapter))->DM_OutSrc)))
-#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
+#if (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	#define GET_PDM_ODM(__padapter)	((struct PHY_DM_STRUCT*)(&((GET_HAL_DATA(__padapter))->odmpriv)))
-#elif (DM_ODM_SUPPORT_TYPE == ODM_AP)
-	#define GET_PDM_ODM(__padapter)	((struct PHY_DM_STRUCT*)(&(__padapter->pshare->_dmODM)))
 #endif
 
-#if (DM_ODM_SUPPORT_TYPE != ODM_WIN)
-	#define	RT_PCI_INTERFACE				1
-	#define	RT_USB_INTERFACE				2
-	#define	RT_SDIO_INTERFACE				3
-#endif
+#define	RT_PCI_INTERFACE				1
+#define	RT_USB_INTERFACE				2
+#define	RT_SDIO_INTERFACE				3
 
 enum hal_status {
 	HAL_STATUS_SUCCESS,
@@ -43,10 +37,6 @@ enum hal_status {
 	RT_STATUS_NOT_SUPPORT,
 	RT_STATUS_OS_API_FAILED,*/
 };
-
-#if (DM_ODM_SUPPORT_TYPE != ODM_WIN)
-
-#define		VISTA_USB_RX_REVISE			0
 
 /*
  * Declare for ODM spin lock defintion temporarily fro compile pass.
@@ -63,10 +53,6 @@ enum rt_spinlock_type {
 	RT_RF_OPERATE_SPINLOCK = 10,
 	RT_INITIAL_SPINLOCK = 11,
 	RT_RF_STATE_SPINLOCK = 12, /* For RF state. Added by Bruce, 2007-10-30. */
-#if VISTA_USB_RX_REVISE
-	RT_USBRX_CONTEXT_SPINLOCK = 13,
-	RT_USBRX_POSTPROC_SPINLOCK = 14, /* protect data of adapter->IndicateW/ IndicateR */
-#endif
 	/* Shall we define Ndis 6.2 SpinLock Here ? */
 	RT_PORT_SPINLOCK = 16,
 	RT_VNIC_SPINLOCK = 17,
@@ -95,86 +81,7 @@ enum rt_spinlock_type {
 	RT_LAST_SPINLOCK,
 };
 
-#endif
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_WIN)
-	#define sta_info 	_RT_WLAN_STA
-	#define	__func__		__FUNCTION__
-	#define	PHYDM_TESTCHIP_SUPPORT	TESTCHIP_SUPPORT
-	#define MASKH3BYTES			0xffffff00
-	#define SUCCESS	0
-	#define FAIL	(-1)
-
-	#define	u8 		u1Byte
-	#define	s8 		s1Byte
-
-	#define	u16		u2Byte
-	#define	s16		s2Byte
-
-	#define	u32 	u4Byte
-	#define	s32 		s4Byte
-
-	#define	u64		u8Byte
-	#define	s64		s8Byte
-
-	#define	timer_list	_RT_TIMER
-	
-
-#elif (DM_ODM_SUPPORT_TYPE == ODM_AP)
-	#include "../typedef.h"
-
-	#if (defined(TESTCHIP_SUPPORT))
-		#define	PHYDM_TESTCHIP_SUPPORT 1
-	#else
-		#define	PHYDM_TESTCHIP_SUPPORT 0
-	#endif
-
-	#define	sta_info stat_info
-	#define	boolean	bool
-
-#elif (DM_ODM_SUPPORT_TYPE == ODM_CE) && defined(DM_ODM_CE_MAC80211)
-
-	#include <asm/byteorder.h>
-
-	#define DEV_BUS_TYPE	RT_PCI_INTERFACE
-
-	#if defined(__LITTLE_ENDIAN)
-		#define	ODM_ENDIAN_TYPE			ODM_ENDIAN_LITTLE
-	#elif defined(__BIG_ENDIAN)
-		#define	ODM_ENDIAN_TYPE			ODM_ENDIAN_BIG
-	#else
-		#error
-	#endif
-
-	/* define useless flag to avoid compile warning */
-	#define	USE_WORKITEM 0
-	#define	FOR_BRAZIL_PRETEST 0
-	#define	FPGA_TWO_MAC_VERIFICATION	0
-	#define	RTL8881A_SUPPORT	0
-	#define	PHYDM_TESTCHIP_SUPPORT 0
-
-	/* support list */
-	#define RTL8188E_SUPPORT				0
-	#define RTL8812A_SUPPORT				0
-	#define RTL8821A_SUPPORT				0
-	#define RTL8723B_SUPPORT				0
-	#define RTL8723D_SUPPORT				0
-	#define RTL8192E_SUPPORT				0
-	#define RTL8814A_SUPPORT				0
-	#define RTL8195A_SUPPORT				0
-	#define RTL8197F_SUPPORT				0
-	#define RTL8703B_SUPPORT				0
-	#define RTL8188F_SUPPORT				0
-	#define RTL8822B_SUPPORT				1
-	#define RTL8821B_SUPPORT				0
-	#define RTL8821C_SUPPORT				0
-
-	#define POWER_TRAINING_ACTIVE			0
-
-	#define sta_info	rtl_sta_info
-	#define	boolean		bool
-
-#elif (DM_ODM_SUPPORT_TYPE == ODM_CE)
+#if (DM_ODM_SUPPORT_TYPE == ODM_CE)
 	#include <drv_types.h>
 
 	#if defined(CONFIG_SDIO_HCI)
