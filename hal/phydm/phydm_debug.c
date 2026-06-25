@@ -1910,30 +1910,12 @@ void phydm_cmd_parser(
 		break;
 		
 	case PHYDM_SMART_ANT:
-
 		for (i = 0; i < 5; i++) {
 			if (input[i + 1]) {
 				PHYDM_SSCANF(input[i + 1], DCMD_HEX, &var1[i]);
 				input_idx++;
 			}
 		}
-
-		if (input_idx >= 1) {
-	#if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY))
-
-		#ifdef CONFIG_HL_SMART_ANTENNA_TYPE2
-		phydm_hl_smart_ant_debug_type2(p_dm, &input[0], &used, output, &out_len, input_num);
-		#elif (defined(CONFIG_HL_SMART_ANTENNA_TYPE1))
-		phydm_hl_smart_ant_debug(p_dm, &input[0], &used, output, &out_len, input_num);
-		#endif
-	
-	#endif
-
-	#if (defined(CONFIG_CUMITEK_SMART_ANTENNA))
-		phydm_cumitek_smt_ant_debug(p_dm, &input[0], &used, output, &out_len, input_num);
-	#endif
-		}
-
 		break;
 
 	case PHYDM_API:

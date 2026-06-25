@@ -4,8 +4,8 @@
  * Copyright(c) 2007 - 2017 Realtek Corporation. All rights reserved.
  *
  ******************************************************************************/
-#ifndef	__PHYDMANTDIV_H__
-#define    __PHYDMANTDIV_H__
+#ifndef __PHYDMANTDIV_H__
+#define __PHYDMANTDIV_H__
 
 /*#define ANTDIV_VERSION	"2.0"  //2014.11.04*/
 /*#define ANTDIV_VERSION	"2.1"  //2015.01.13  Dino*/
@@ -21,10 +21,6 @@
 /*#define ANTDIV_VERSION	"3.8"  2015.12.21  Dino, Add SmartAnt dynamic training packet num */
 /*#define ANTDIV_VERSION	"3.9"  2016.01.05  Dino, Add SmartAnt cmd for converting single & two smtant, and add cmd for adjust truth table */
 #define ANTDIV_VERSION	"4.0"  /*2017.05.25  Mark, Add SW antenna diversity for 8821c because HW transient issue */
-
-/* 1 ============================================================
- * 1  Definition
- * 1 ============================================================ */
 
 #define	ANTDIV_INIT		0xff
 #define	MAIN_ANT	1		/*ant A or ant Main   or S1*/
@@ -57,8 +53,6 @@
 
 #define ODM_ANTDIV_2G_SUPPORT_IC			(ODM_RTL8188E | ODM_RTL8192E | ODM_RTL8723B | ODM_RTL8881A | ODM_RTL8188F | ODM_RTL8723D)
 #define ODM_ANTDIV_5G_SUPPORT_IC			(ODM_RTL8821 | ODM_RTL8881A | ODM_RTL8812 | ODM_RTL8821C)
-
-#define ODM_EVM_ENHANCE_ANTDIV_SUPPORT_IC	(ODM_RTL8192E)
 
 #define ODM_ANTDIV_2G	BIT(0)
 #define ODM_ANTDIV_5G	BIT(1)
@@ -122,11 +116,6 @@
 /*Hong Lin Smart antenna*/
 #define HL_SMTANT_2WIRE_DATA_LEN 24
 
-/* 1 ============================================================
- * 1  structure
- * 1 ============================================================ */
-
-
 struct _sw_antenna_switch_ {
 	u8		double_chk_flag;	/*If current antenna RSSI > "RSSI_CHECK_THRESHOLD", than check this antenna again*/
 	u8		try_flag;
@@ -188,43 +177,6 @@ struct phydm_fat_struct {
 	u8	idx_ant_div_counter_5g;
 	u8	ant_div_2g_5g;
 
-#ifdef ODM_EVM_ENHANCE_ANTDIV
-	/*For 1SS RX phy rate*/
-	u32	main_ant_evm_sum[ODM_ASSOCIATE_ENTRY_NUM];
-	u32	aux_ant_evm_sum[ODM_ASSOCIATE_ENTRY_NUM];
-	u32	main_ant_evm_cnt[ODM_ASSOCIATE_ENTRY_NUM];
-	u32	aux_ant_evm_cnt[ODM_ASSOCIATE_ENTRY_NUM];
-
-	/*For 2SS RX phy rate*/
-	u32	main_ant_evm_2ss_sum[ODM_ASSOCIATE_ENTRY_NUM][2];	/*2SS with A1+B*/
-	u32	aux_ant_evm_2ss_sum[ODM_ASSOCIATE_ENTRY_NUM][2];	/*2SS with A2+B*/
-	u32	main_ant_evm_2ss_cnt[ODM_ASSOCIATE_ENTRY_NUM];
-	u32	aux_ant_evm_2ss_cnt[ODM_ASSOCIATE_ENTRY_NUM];
-
-	boolean	EVM_method_enable;
-	u8	target_ant_evm;
-	u8	target_ant_crc32;
-	u8	target_ant_tp;
-	u8	target_ant_enhance;
-	u8	pre_target_ant_enhance;
-	u16	main_mpdu_ok_cnt;
-	u16	aux_mpdu_ok_cnt;
-
-	u32	crc32_ok_cnt;
-	u32	crc32_fail_cnt;
-	u32	main_crc32_ok_cnt;
-	u32	aux_crc32_ok_cnt;
-	u32	main_crc32_fail_cnt;
-	u32	aux_crc32_fail_cnt;
-
-	u32	antdiv_tp_main;
-	u32	antdiv_tp_aux;
-	u32	antdiv_tp_main_cnt;
-	u32	antdiv_tp_aux_cnt;
-
-	u8	pre_antdiv_rssi;
-	u8	pre_antdiv_tp;
-#endif
 #if (DM_ODM_SUPPORT_TYPE & (ODM_CE))
 	u32    cck_ctrl_frame_cnt_main;
 	u32    cck_ctrl_frame_cnt_aux;
@@ -245,11 +197,6 @@ struct phydm_fat_struct {
 	u8    *p_default_s0_s1;
 	u8    default_s0_s1;
 };
-
-
-/* 1 ============================================================
- * 1  enumeration
- * 1 ============================================================ */
 
 enum fat_state_e /*Fast antenna training*/
 {
@@ -272,275 +219,6 @@ enum ant_div_type_e {
 	HL_SW_SMART_ANT_TYPE2	= 0x11 /*Hong-Bo Smart antenna use for 8822B which is a 2 ant. entitys*/
 };
 
+void odm_ant_div_reset(void *p_dm_void);
 
-/* 1 ============================================================
- * 1  function prototype
- * 1 ============================================================ */
-
-void
-odm_stop_antenna_switch_dm(
-	void	*p_dm_void
-);
-
-void
-phydm_enable_antenna_diversity(
-	void			*p_dm_void
-);
-
-void
-odm_set_ant_config(
-	void	*p_dm_void,
-	u8		ant_setting	/* 0=A, 1=B, 2=C, .... */
-);
-
-
-#define sw_ant_div_rest_after_link	odm_sw_ant_div_rest_after_link
-
-void odm_sw_ant_div_rest_after_link(
-	void	*p_dm_void
-);
-
-void
-odm_ant_div_on_off(
-	void		*p_dm_void,
-	u8		swch
-);
-
-void
-odm_tx_by_tx_desc_or_reg(
-	void		*p_dm_void,
-	u8		swch
-);
-
-#if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY))
-
-void
-phydm_antdiv_reset_statistic(
-	void	*p_dm_void,
-	u32	macid
-);
-
-void
-odm_update_rx_idle_ant(
-	void		*p_dm_void,
-	u8		ant
-);
-
-void
-phydm_set_antdiv_val(
-	void			*p_dm_void,
-	u32			*val_buf,
-	u8			val_len
-);
-
-#if (RTL8723B_SUPPORT == 1)
-void
-odm_update_rx_idle_ant_8723b(
-	void			*p_dm_void,
-	u8			ant,
-	u32			default_ant,
-	u32			optional_ant
-);
-#endif
-
-#if (RTL8188F_SUPPORT == 1)
-void
-phydm_update_rx_idle_antenna_8188F(
-	void	*p_dm_void,
-	u32	default_ant
-);
-#endif
-
-#if (RTL8723D_SUPPORT == 1)
-
-void
-phydm_set_tx_ant_pwr_8723d(
-	void			*p_dm_void,
-	u8			ant
-);
-
-void
-odm_update_rx_idle_ant_8723d(
-	void			*p_dm_void,
-	u8			ant,
-	u32			default_ant,
-	u32			optional_ant
-);
-
-#endif
-
-#ifdef CONFIG_S0S1_SW_ANTENNA_DIVERSITY
-
-void
-odm_sw_antdiv_workitem_callback(
-	void	*p_context
-);
-
-#if (DM_ODM_SUPPORT_TYPE == ODM_CE)
-
-void
-odm_sw_antdiv_workitem_callback(
-	void	*p_context
-);
-
-void
-odm_sw_antdiv_callback(
-	void		*function_context
-);
-
-#endif
-
-void
-odm_s0s1_sw_ant_div_by_ctrl_frame(
-	void			*p_dm_void,
-	u8			step
-);
-
-void
-odm_antsel_statistics_of_ctrl_frame(
-	void			*p_dm_void,
-	u8			antsel_tr_mux,
-	u32			rx_pwdb_all
-);
-
-void
-odm_s0s1_sw_ant_div_by_ctrl_frame_process_rssi(
-	void				*p_dm_void,
-	void		*p_phy_info_void,
-	void		*p_pkt_info_void
-);
-
-#endif
-
-#ifdef ODM_EVM_ENHANCE_ANTDIV
-VOID
-phydm_evm_sw_antdiv_init(
-	void		*p_dm_void
-);
-
-void
-odm_evm_fast_ant_training_callback(
-	void		*p_dm_void
-);
-#endif
-
-void
-odm_hw_ant_div(
-	void		*p_dm_void
-);
-
-#if (defined(CONFIG_5G_CG_SMART_ANT_DIVERSITY)) || (defined(CONFIG_2G_CG_SMART_ANT_DIVERSITY))
-void
-odm_fast_ant_training(
-	void		*p_dm_void
-);
-
-void
-odm_fast_ant_training_callback(
-	void		*p_dm_void
-);
-
-void
-odm_fast_ant_training_work_item_callback(
-	void		*p_dm_void
-);
-#endif
-
-void
-odm_ant_div_init(
-	void		*p_dm_void
-);
-
-void
-odm_ant_div(
-	void		*p_dm_void
-);
-
-void
-odm_antsel_statistics(
-	void			*p_dm_void,
-	void			*p_phy_info_void,
-	u8			antsel_tr_mux,
-	u32			mac_id,
-	u32			utility,
-	u8			method,
-	u8			is_cck_rate
-);
-
-void
-odm_process_rssi_for_ant_div(
-	void		*p_dm_void,
-	void		*p_phy_info_void,
-	void		*p_pkt_info_void
-);
-
-
-
-#if (DM_ODM_SUPPORT_TYPE & (ODM_WIN | ODM_CE))
-void
-odm_set_tx_ant_by_tx_info(
-	void			*p_dm_void,
-	u8			*p_desc,
-	u8			mac_id
-);
-
-#elif (DM_ODM_SUPPORT_TYPE == ODM_AP)
-
-struct tx_desc; /*declared tx_desc here or compile error happened when enabled 8822B*/
-
-void
-odm_set_tx_ant_by_tx_info(
-	struct	rtl8192cd_priv		*priv,
-	struct	tx_desc			*pdesc,
-	unsigned short			aid
-);
-
-#if 1/*def def CONFIG_WLAN_HAL*/
-void
-odm_set_tx_ant_by_tx_info_hal(
-	struct	rtl8192cd_priv		*priv,
-	void	*pdesc_data,
-	u16		aid
-);
-#endif	/*#ifdef CONFIG_WLAN_HAL*/
-#endif
-
-
-void
-odm_ant_div_config(
-	void		*p_dm_void
-);
-
-void
-odm_ant_div_timers(
-	void		*p_dm_void,
-	u8		state
-);
-
-void
-phydm_antdiv_debug(
-	void		*p_dm_void,
-	u32		*const dm_value,
-	u32		*_used,
-	char			*output,
-	u32		*_out_len
-);
-
-#endif /*#if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY))*/
-
-void
-odm_ant_div_reset(
-	void		*p_dm_void
-);
-
-void
-odm_antenna_diversity_init(
-	void		*p_dm_void
-);
-
-void
-odm_antenna_diversity(
-	void		*p_dm_void
-);
-
-#endif /*#ifndef	__ODMANTDIV_H__*/
+#endif /* __ODMANTDIV_H__ */

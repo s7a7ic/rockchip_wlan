@@ -733,9 +733,6 @@ struct	phydm_iot_center {
 	struct timer_list	path_div_switch_timer;
 	struct timer_list	cck_path_diversity_timer;	/*2011.09.27 add for path Diversity*/
 	struct timer_list	fast_ant_training_timer;
-#ifdef ODM_EVM_ENHANCE_ANTDIV
-	struct timer_list	evm_fast_ant_training_timer;
-#endif
 	struct timer_list	sbdcnt_timer;
 
 /*=== PHYDM Structure ======================================== (start)*/
@@ -746,39 +743,30 @@ struct	phydm_iot_center {
 	struct	phydm_bt_info				bt_info_table;
 #endif
 
-	struct	pkt_process_info				pkt_proc_struct;
+	struct	pkt_process_info						pkt_proc_struct;
 	struct phydm_adaptivity_struct			adaptivity;
-
-	struct _ODM_NOISE_MONITOR_			noise_level;
-
-	struct _odm_phy_dbg_info_				phy_dbg_info;
-
-#if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY))
-	#if (defined(CONFIG_HL_SMART_ANTENNA))
-	struct smt_ant_honbo					dm_sat_table;
-	#endif
-#endif
-
-	struct phydm_fat_struct				dm_fat_table;
-	struct phydm_dig_struct				dm_dig_table;
-	struct phydm_lna_sat_info_struct	dm_lna_sat_info;
+	struct _ODM_NOISE_MONITOR_					noise_level;
+	struct _odm_phy_dbg_info_						phy_dbg_info;
+	struct phydm_fat_struct							dm_fat_table;
+	struct phydm_dig_struct							dm_dig_table;
+	struct phydm_lna_sat_info_struct		dm_lna_sat_info;
 
 #ifdef PHYDM_SUPPORT_CCKPD
 	struct phydm_cckpd_struct				dm_cckpd_table;
 #endif
 
 	struct _rate_adaptive_table_			dm_ra_table;
-	struct phydm_fa_struct					false_alm_cnt;
+	struct phydm_fa_struct						false_alm_cnt;
 #ifdef PHYDM_TDMA_DIG_SUPPORT
 	struct phydm_fa_acc_struct				false_alm_cnt_acc;
 #endif
-	struct _sw_antenna_switch_				dm_swat_table;
-	struct phydm_cfo_track_struct			dm_cfo_track;
-	struct _ACS_							dm_acs;
-	struct _CCX_INFO						dm_ccx_info;
-	struct _hal_rf_						rf_table; 		/*for HALRF function*/
+	struct _sw_antenna_switch_						dm_swat_table;
+	struct phydm_cfo_track_struct					dm_cfo_track;
+	struct _ACS_													dm_acs;
+	struct _CCX_INFO											dm_ccx_info;
+	struct _hal_rf_												rf_table; 		/*for HALRF function*/
 	struct odm_rf_calibration_structure		rf_calibrate_info;
-	struct odm_power_trim_data			power_trim_data;	
+	struct odm_power_trim_data						power_trim_data;
 
 #ifdef CONFIG_PSD_TOOL
 	struct _PHYDM_PSD_					dm_psd_table;

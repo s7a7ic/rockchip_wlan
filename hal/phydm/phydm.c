@@ -325,7 +325,6 @@ void odm_dm_init(struct PHY_DM_STRUCT *p_dm)
 	phydm_txcurrentcalibration(p_dm);
 	phydm_get_pa_bias_offset(p_dm);
 #endif
-	odm_antenna_diversity_init(p_dm);
 #ifdef CONFIG_DYNAMIC_RX_PATH
 	phydm_dynamic_rx_path_init(p_dm);
 #endif
@@ -437,9 +436,6 @@ void phydm_watchdog_lps(struct PHY_DM_STRUCT *p_dm)
 	phydm_dig_by_rssi_lps(p_dm);
 	phydm_cck_pd_th(p_dm);
 	phydm_adaptivity(p_dm);
-	#if (DM_ODM_SUPPORT_TYPE & (ODM_CE))
-	odm_antenna_diversity(p_dm); /*enable AntDiv in PS mode, request from SD4 Jeff*/
-	#endif
 	phydm_common_info_self_reset(p_dm);
 #endif
 }
@@ -513,24 +509,6 @@ u8 phydm_pause_func(
 		p_dm->phydm_func_handler.pause_phydm_handler = phydm_set_cckpd_val; /*function pointer hook*/
 		
 	} else 
-#endif
-
-#ifdef CONFIG_PHYDM_ANTENNA_DIVERSITY
-	if (pause_func == F06_ANT_DIV) {
-
-		PHYDM_DBG(p_dm, ODM_COMP_API, ("[AntDiv]\n"));
-
-		if (val_lehgth != 1) {
-			PHYDM_DBG(p_dm, ODM_COMP_API, ("[WARNING] val_length != 1\n"));
-			return PAUSE_FAIL;
-		}
-		
-		ori_val[0] = (u32)(p_dm->dm_fat_table.rx_idle_ant); /*default antenna*/
-		pause_lv_pre = &(p_dm->pause_lv_table.lv_antdiv);
-		bkp_val = (u32*)(&(p_dm->dm_fat_table.rvrt_val));
-		p_dm->phydm_func_handler.pause_phydm_handler = phydm_set_antdiv_val; /*function pointer hook*/
-	
-	} else
 #endif
 
 	if (pause_func == F13_ADPTVTY) {
@@ -724,9 +702,6 @@ void phydm_watchdog(struct PHY_DM_STRUCT *p_dm)
 		phydm_dig_by_rssi_lps(p_dm);
 		phydm_adaptivity(p_dm);
 
-		#if (DM_ODM_SUPPORT_TYPE & (ODM_CE))
-		odm_antenna_diversity(p_dm); /*enable AntDiv in PS mode, request from SD4 Jeff*/
-		#endif
 		return;
 	}
 	#endif
@@ -746,7 +721,6 @@ void phydm_watchdog(struct PHY_DM_STRUCT *p_dm)
 	phydm_adaptivity(p_dm);
 	phydm_ra_info_watchdog(p_dm);
 	odm_cfo_tracking(p_dm);
-	odm_antenna_diversity(p_dm);
 #ifdef CONFIG_DYNAMIC_RX_PATH
 	phydm_dynamic_rx_path(p_dm);
 #endif
@@ -1275,10 +1249,6 @@ u32 phydm_cmn_info_query(struct PHY_DM_STRUCT *p_dm, enum phydm_info_query_e inf
 
 void odm_init_all_timers(struct PHY_DM_STRUCT *p_dm)
 {
-#if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY))
-	odm_ant_div_timers(p_dm, INIT_ANTDIV_TIMMER);
-#endif
-
 #ifdef PHYDM_LNA_SAT_CHK_SUPPORT
 	phydm_lna_sat_chk_timers(p_dm, INIT_LNA_SAT_CHK_TIMMER);
 #endif
@@ -1286,10 +1256,6 @@ void odm_init_all_timers(struct PHY_DM_STRUCT *p_dm)
 
 void odm_cancel_all_timers(struct PHY_DM_STRUCT *p_dm)
 {
-#if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY))
-	odm_ant_div_timers(p_dm, CANCEL_ANTDIV_TIMMER);
-#endif
-
 #ifdef PHYDM_LNA_SAT_CHK_SUPPORT
 	phydm_lna_sat_chk_timers(p_dm, CANCEL_LNA_SAT_CHK_TIMMER);
 #endif

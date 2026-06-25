@@ -154,10 +154,7 @@ u8 phydm_get_signal_quality(
 	return result;
 }
 
-u8
-phydm_query_rx_pwr_percentage(
-	s8		ant_power
-)
+u8 phydm_query_rx_pwr_percentage(s8 ant_power)
 {
 	if ((ant_power <= -100) || (ant_power >= 20))
 		return	0;
@@ -167,12 +164,7 @@ phydm_query_rx_pwr_percentage(
 		return 100 + ant_power;
 }
 
-
-s32
-phydm_signal_scale_mapping_92c_series(
-	struct PHY_DM_STRUCT *p_dm,
-	s32 curr_sig
-)
+s32 phydm_signal_scale_mapping_92c_series(struct PHY_DM_STRUCT *p_dm, s32 curr_sig)
 {
 	s32 ret_sig = 0;
 #if (DEV_BUS_TYPE == RT_PCI_INTERFACE)
@@ -220,23 +212,17 @@ phydm_signal_scale_mapping_92c_series(
 		else
 			ret_sig = curr_sig;
 	}
-
 #endif
 	return ret_sig;
 }
 
-s32
-phydm_signal_scale_mapping(
-	struct PHY_DM_STRUCT *p_dm,
-	s32 curr_sig
-)
+s32 phydm_signal_scale_mapping(struct PHY_DM_STRUCT *p_dm, s32 curr_sig)
 {
 #ifdef CONFIG_SIGNAL_SCALE_MAPPING
 		return phydm_signal_scale_mapping_92c_series(p_dm, curr_sig);
 #else
 		return curr_sig;
 #endif
-
 }
 
 static u8 phydm_evm_db_to_percentage(s8 value)
@@ -251,16 +237,6 @@ static u8 phydm_evm_db_to_percentage(s8 value)
 
 	/*dbg_print("value=%d\n", value);*/
 	/*ODM_RT_DISP(FRX, RX_PHY_SQ, ("EVMdbToPercentage92C value=%d / %x\n", ret_val, ret_val));*/
-#ifdef ODM_EVM_ENHANCE_ANTDIV
-	if (ret_val >= 0)
-		ret_val = 0;
-
-	if (ret_val <= -40)
-		ret_val = -40;
-
-	ret_val = 0 - ret_val;
-	ret_val *= 3;
-#else
 	if (ret_val >= 0)
 		ret_val = 0;
 
@@ -272,15 +248,11 @@ static u8 phydm_evm_db_to_percentage(s8 value)
 
 	if (ret_val == 99)
 		ret_val = 100;
-#endif
 
 	return (u8)ret_val;
 }
 
-static u8
-phydm_evm_dbm_jaguar_series(
-	s8 value
-)
+static u8 phydm_evm_dbm_jaguar_series(s8 value)
 {
 	s8 ret_val = value;
 
@@ -294,10 +266,7 @@ phydm_evm_dbm_jaguar_series(
 	return (u8)ret_val;
 }
 
-static s16
-phydm_cfo(
-	s8 value
-)
+static s16 phydm_cfo(s8 value)
 {
 	s16  ret_val;
 
@@ -578,14 +547,6 @@ void phydm_rx_phy_status92c_series_parsing(
 	/* dbg_print("is_cck_rate = %d, p_phy_info->rx_pwdb_all = %d, p_phy_sta_rpt->cck_agc_rpt_ofdm_cfosho_a = 0x%x\n", */
 	/* is_cck_rate, p_phy_info->rx_pwdb_all, p_phy_sta_rpt->cck_agc_rpt_ofdm_cfosho_a); */
 
-	/* For 92C/92D HW (Hybrid) Antenna Diversity */
-#if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY))
-	/* For 88E HW Antenna Diversity */
-	p_dm->dm_fat_table.antsel_rx_keep_0 = p_phy_sta_rpt->ant_sel;
-	p_dm->dm_fat_table.antsel_rx_keep_1 = p_phy_sta_rpt->ant_sel_b;
-	p_dm->dm_fat_table.antsel_rx_keep_2 = p_phy_sta_rpt->antsel_rx_keep_2;
-#endif
-
 	if (p_pktinfo->is_packet_match_bssid) {
 		phydm_avg_phystatus_index(p_dm, p_phy_info, p_pktinfo);
 		phydm_rx_statistic_cal(p_dm, p_phy_status, p_pktinfo);
@@ -633,10 +594,6 @@ void phydm_process_rssi_for_dm(
 	if (p_pktinfo->station_id >= ODM_ASSOCIATE_ENTRY_NUM)
 		return;
 
-#ifdef CONFIG_S0S1_SW_ANTENNA_DIVERSITY
-	odm_s0s1_sw_ant_div_by_ctrl_frame_process_rssi(p_dm, p_phy_info, p_pktinfo);
-#endif
-
 	p_sta = p_dm->p_phydm_sta_info[p_pktinfo->station_id];
 
 	if (!is_sta_active(p_sta)) {
@@ -653,12 +610,6 @@ void phydm_process_rssi_for_dm(
 	is_cck_rate = (p_pktinfo->data_rate <= ODM_RATE11M) ? true : false;
 	p_dm->rx_rate = p_pktinfo->data_rate;
 
-	/* --------------Statistic for antenna/path diversity------------------ */
-	if (p_dm->support_ability & ODM_BB_ANT_DIV) {
-#if (defined(CONFIG_PHYDM_ANTENNA_DIVERSITY))
-		odm_process_rssi_for_ant_div(p_dm, p_phy_info, p_pktinfo);
-#endif
-	}
 	/* -----------------Smart Antenna Debug Message------------------ */
 
 	undecorated_smoothed_cck =  p_sta->rssi_stat.rssi_cck;
