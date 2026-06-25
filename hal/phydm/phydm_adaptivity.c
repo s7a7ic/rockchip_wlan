@@ -66,11 +66,8 @@ phydm_set_edcca_threshold(
 
 	if (p_dm->support_ic_type & ODM_IC_11N_SERIES)
 		odm_set_bb_reg(p_dm, REG_OFDM_0_ECCA_THRESHOLD, MASKBYTE2 | MASKBYTE0, (u32)((u8)L2H | (u8)H2L << 16));
-#if (RTL8195A_SUPPORT == 0)
 	else if (p_dm->support_ic_type & ODM_IC_11AC_SERIES)
 		odm_set_bb_reg(p_dm, REG_FPGA0_XB_LSSI_READ_BACK, MASKLWORD, (u16)((u8)L2H | (u8)H2L << 8));
-#endif
-
 }
 
 void
@@ -499,13 +496,11 @@ void phydm_adaptivity(void *p_dm_void)
 	PHYDM_DBG(p_dm, DBG_ADPTVTY, ("odm_Adaptivity() =====>\n"));
 	PHYDM_DBG(p_dm, DBG_ADPTVTY, ("igi_base=0x%x, th_l2h_ini = %d, th_edcca_hl_diff = %d\n",
 		adaptivity->igi_base, p_dm->th_l2h_ini, p_dm->th_edcca_hl_diff));
-#if (RTL8195A_SUPPORT == 0)
 	if (p_dm->support_ic_type & ODM_IC_11AC_SERIES) {
 		/*fix AC series when enable EDCCA hang issue*/
 		odm_set_bb_reg(p_dm, 0x800, BIT(10), 1);	/*ADC_mask disable*/
 		odm_set_bb_reg(p_dm, 0x800, BIT(10), 0);	/*ADC_mask enable*/
 	}
-#endif
 
 	igi_target = adaptivity->igi_base;
 	adaptivity->igi_target = (u8) igi_target;
@@ -530,7 +525,6 @@ void phydm_adaptivity(void *p_dm_void)
 		th_l2h_dmc = p_dm->th_l2h_ini - diff + igi_target;
 		th_h2l_dmc = th_l2h_dmc - p_dm->th_edcca_hl_diff;
 	}
-#if (RTL8195A_SUPPORT == 0)
 	else	{
 		diff = igi_target - (s8)igi;
 		th_l2h_dmc = p_dm->th_l2h_ini + diff;
@@ -545,7 +539,6 @@ void phydm_adaptivity(void *p_dm_void)
 		if (th_l2h_dmc < adaptivity->l2h_lb)
 			th_l2h_dmc = adaptivity->l2h_lb;
 	}
-#endif
 	adaptivity->th_l2h = th_l2h_dmc;
 	adaptivity->th_h2l = th_h2l_dmc;
 	PHYDM_DBG(p_dm, DBG_ADPTVTY, ("IGI=0x%x, th_l2h_dmc = %d, th_h2l_dmc = %d\n", igi, th_l2h_dmc, th_h2l_dmc));
@@ -582,7 +575,6 @@ phydm_pause_edcca(
 			adaptivity->backup_l2h = p_dm->th_l2h_ini - diff + adaptivity->igi_target;
 			adaptivity->backup_h2l = adaptivity->backup_l2h - p_dm->th_edcca_hl_diff;
 		}
-#if (RTL8195A_SUPPORT == 0)
 		else {
 			diff = adaptivity->igi_target - (s8)IGI;
 			adaptivity->backup_l2h = p_dm->th_l2h_ini + diff;
@@ -597,7 +589,6 @@ phydm_pause_edcca(
 			if (adaptivity->backup_l2h < adaptivity->l2h_lb)
 				adaptivity->backup_l2h = adaptivity->l2h_lb;
 		}
-#endif
 		PHYDM_DBG(p_dm, DBG_ADPTVTY, ("pauseEDCCA : L2Hbak = 0x%x, H2Lbak = 0x%x, IGI = 0x%x\n", adaptivity->backup_l2h, adaptivity->backup_h2l, IGI));
 
 		/*Disable EDCCA*/
@@ -618,10 +609,8 @@ void phydm_pause_edcca_work_item_callback(void *p_dm_void)
 
 	if (p_dm->support_ic_type & ODM_IC_11N_SERIES)
 		odm_set_bb_reg(p_dm, REG_OFDM_0_ECCA_THRESHOLD, MASKBYTE2 | MASKBYTE0, (u32)(0x7f | 0x7f << 16));
-#if (RTL8195A_SUPPORT == 0)
 	else if (p_dm->support_ic_type & ODM_IC_11AC_SERIES)
 		odm_set_bb_reg(p_dm, REG_FPGA0_XB_LSSI_READ_BACK, MASKLWORD, (u16)(0x7f | 0x7f << 8));
-#endif
 }
 
 void phydm_resume_edcca_work_item_callback(void *p_dm_void)
@@ -695,12 +684,10 @@ phydm_adaptivity_debug(
 			reg_value32 = odm_get_bb_reg(p_dm, 0xc4c, MASKDWORD);
 			h2l_diff = (s8)(0x000000ff & reg_value32) - (s8)((0x00ff0000 & reg_value32)>>16);
 		}
-#if (RTL8195A_SUPPORT == 0)
 		else if (p_dm->support_ic_type & ODM_IC_11AC_SERIES) {
 			reg_value32 = odm_get_bb_reg(p_dm, 0x8a4, MASKDWORD);
 			h2l_diff = (s8)(0x000000ff & reg_value32) - (s8)((0x0000ff00 & reg_value32)>>8);
 		}
-#endif
 		if (h2l_diff == 7)
 			PHYDM_SNPRINTF((output + used, out_len - used, "adaptivity is enabled\n"));
 		else
