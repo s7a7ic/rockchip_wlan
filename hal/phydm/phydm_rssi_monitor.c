@@ -55,14 +55,7 @@ phydm_rssi_monitor_h2c(
 	PHYDM_DBG(p_dm, DBG_RSSI_MNTR, ("PHYDM h2c[0x42]=0x%x %x %x %x %x %x %x\n",
 		h2c_val[6], h2c_val[5], h2c_val[4], h2c_val[3], h2c_val[2], h2c_val[1], h2c_val[0]));
 
-	#if (RTL8188E_SUPPORT == 1)
-	if (p_dm->support_ic_type == ODM_RTL8188E)
-		odm_ra_set_rssi_8188e(p_dm, (u8)(p_sta->mac_id & 0xFF), p_sta->rssi_stat.rssi & 0x7F);
-	else
-	#endif 
-	{
-		odm_fill_h2c_cmd(p_dm, ODM_H2C_RSSI_REPORT, H2C_MAX_LENGTH, h2c_val);
-	}
+	odm_fill_h2c_cmd(p_dm, ODM_H2C_RSSI_REPORT, H2C_MAX_LENGTH, h2c_val);
 }
 
 void
