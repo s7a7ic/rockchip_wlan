@@ -476,12 +476,9 @@ next:
 		if (padapter->registrypriv.wifi_spec)
 			rtw_msleep_os(1);
 		else
-#ifdef CONFIG_REDUCE_TX_CPU_LOADING
-			rtw_msleep_os(1);
-#else
 			yield();
 			/* rtw_usleep_os(50); */
-#endif
+
 		goto next;
 	}
 
@@ -489,9 +486,6 @@ next:
 	ret = rtw_txframes_pending(padapter);
 	_exit_critical_bh(&pxmitpriv->lock, &irql);
 	if (ret == 1) {
-#ifdef CONFIG_REDUCE_TX_CPU_LOADING
-		rtw_msleep_os(1);
-#endif
 		goto next;
 	}
 
