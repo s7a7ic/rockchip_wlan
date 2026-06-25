@@ -216,10 +216,6 @@
 #define MACID_NUM_SW_LIMIT 32
 #define SEC_CAM_ENT_NUM_SW_LIMIT 32
 
-#if defined(CONFIG_RTL8812A) || defined(CONFIG_RTL8821A) || defined(CONFIG_RTL8814A)
-	#define CONFIG_IEEE80211_BAND_5GHZ
-#endif
-
 #if defined(CONFIG_WOWLAN) && (defined(CONFIG_RTL8822B) || defined(CONFIG_RTL8821C))
 	#define CONFIG_WOW_PATTERN_HW_CAM
 #endif

@@ -1201,11 +1201,6 @@ void dump_txpwr_lmt(void *sel, _adapter *adapter)
 	}
 
 	RTW_PRINT_SEL(sel, "txpwr_lmt_2g_cck_ofdm_state:0x%02x\n", rfctl->txpwr_lmt_2g_cck_ofdm_state);
-	#ifdef CONFIG_IEEE80211_BAND_5GHZ
-	if (IS_HARDWARE_TYPE_JAGUAR_AND_JAGUAR2(adapter))
-		RTW_PRINT_SEL(sel, "txpwr_lmt_5g_cck_ofdm_state:0x%02x\n", rfctl->txpwr_lmt_5g_cck_ofdm_state);
-		RTW_PRINT_SEL(sel, "txpwr_lmt_5g_20_40_ref:0x%02x\n", rfctl->txpwr_lmt_5g_20_40_ref);
-	#endif
 	RTW_PRINT_SEL(sel, "\n");
 
 	for (band = BAND_ON_2_4G; band <= BAND_ON_5G; band++) {
@@ -1263,25 +1258,7 @@ void dump_txpwr_lmt(void *sel, _adapter *adapter)
 						if (band == BAND_ON_2_4G
 							&& !(rfctl->txpwr_lmt_2g_cck_ofdm_state & (TXPWR_LMT_HAS_OFDM_1T << ntx_idx)))
 							continue;
-						#ifdef CONFIG_IEEE80211_BAND_5GHZ
-						if (band == BAND_ON_5G
-							&& !(rfctl->txpwr_lmt_5g_cck_ofdm_state & (TXPWR_LMT_HAS_OFDM_1T << ntx_idx)))
-							continue;
-						#endif
 					}
-
-					/* bypass 5G 20M, 40M pure reference */
-					#ifdef CONFIG_IEEE80211_BAND_5GHZ
-					if (band == BAND_ON_5G && (bw == CHANNEL_WIDTH_20 || bw == CHANNEL_WIDTH_40)) {
-						if (rfctl->txpwr_lmt_5g_20_40_ref == TXPWR_LMT_REF_HT_FROM_VHT) {
-							if (tlrs == TXPWR_LMT_RS_HT)
-								continue;
-						} else if (rfctl->txpwr_lmt_5g_20_40_ref == TXPWR_LMT_REF_VHT_FROM_HT) {
-							if (tlrs == TXPWR_LMT_RS_VHT && bw <= CHANNEL_WIDTH_40)
-								continue;
-						}
-					}
-					#endif
 
 					/* choose n-SS mapping rate section to get lmt diff value */
 					if (tlrs == TXPWR_LMT_RS_CCK)
@@ -1499,13 +1476,6 @@ void rtw_txpwr_lmt_add_with_nlen(struct rf_ctl_t *rfctl, const char *regd_name, 
 				for (m = 0; m < CENTER_CH_2G_NUM; ++m)
 					for (l = 0; l < MAX_TX_COUNT; ++l)
 						ent->lmt_2g[j][k][m][l] = MAX_POWER_INDEX;
-		#ifdef CONFIG_IEEE80211_BAND_5GHZ
-		for (j = 0; j < MAX_5G_BANDWIDTH_NUM; ++j)
-			for (k = 0; k < TXPWR_LMT_RS_NUM_5G; ++k)
-				for (m = 0; m < CENTER_CH_5G_ALL_NUM; ++m)
-					for (l = 0; l < MAX_TX_COUNT; ++l)
-						ent->lmt_5g[j][k][m][l] = MAX_POWER_INDEX;
-		#endif
 	}
 
 	rtw_list_insert_tail(&ent->list, &rfctl->txpwr_lmt_list);
@@ -1514,10 +1484,6 @@ void rtw_txpwr_lmt_add_with_nlen(struct rf_ctl_t *rfctl, const char *regd_name, 
 chk_lmt_val:
 	if (band == BAND_ON_2_4G)
 		pre_lmt = ent->lmt_2g[bw][tlrs][ch_idx][ntx_idx];
-	#ifdef CONFIG_IEEE80211_BAND_5GHZ
-	else if (band == BAND_ON_5G)
-		pre_lmt = ent->lmt_5g[bw][tlrs - 1][ch_idx][ntx_idx];
-	#endif
 	else
 		goto release_lock;
 
@@ -1529,10 +1495,6 @@ chk_lmt_val:
 	lmt = rtw_min(pre_lmt, lmt);
 	if (band == BAND_ON_2_4G)
 		ent->lmt_2g[bw][tlrs][ch_idx][ntx_idx] = lmt;
-	#ifdef CONFIG_IEEE80211_BAND_5GHZ
-	else if (band == BAND_ON_5G)
-		ent->lmt_5g[bw][tlrs - 1][ch_idx][ntx_idx] = lmt;
-	#endif
 
 	if (0)
 		RTW_PRINT("%s, %4s, %6s, %7s, %uT, ch%3d = %d\n"
