@@ -15,7 +15,6 @@
 #include <drv_conf.h>
 #include <basic_types.h>
 #include <osdep_service.h>
-#include <rtw_byteorder.h>
 #include <wlan_bssdef.h>
 #include <wifi.h>
 #include <ieee80211.h>
@@ -38,6 +37,12 @@ typedef struct _ADAPTER _adapter, ADAPTER, *PADAPTER;
 #include <rtw_debug.h>
 #include <rtw_sta_info.h>
 #include <rtw_rf.h>
+
+#if defined(__LITTLE_ENDIAN)
+	#include <linux/byteorder/little_endian.h>
+#else
+	#include <linux/byteorder/big_endian.h>
+#endif
 
 #ifdef CONFIG_80211N_HT
 	#include <rtw_ht.h>
