@@ -187,18 +187,6 @@ odm_txpowertracking_callback_thermal_meter(
 
 	thermal_value = (u8)odm_get_rf_reg(p_dm, RF_PATH_A, c.thermal_reg_addr, 0xfc00);	/* 0x42: RF Reg[15:10] 88E */
 
-	thermal_value_temp = thermal_value + phydm_get_thermal_offset(p_dm);
-
-	ODM_RT_TRACE(p_dm, ODM_COMP_TX_PWR_TRACK, ODM_DBG_LOUD,
-		("thermal_value_temp(%d) = thermal_value(%d) + power_trim_thermal(%d)\n", thermal_value_temp, thermal_value, phydm_get_thermal_offset(p_dm)));
-
-	if (thermal_value_temp > 63)
-		thermal_value = 63;
-	else if (thermal_value_temp < 0)
-		thermal_value = 0;
-	else
-		thermal_value = thermal_value_temp;
-
 	if (!p_rf_calibrate_info->txpowertrack_control)
 		return;
 

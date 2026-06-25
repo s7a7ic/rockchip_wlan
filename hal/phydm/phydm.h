@@ -766,7 +766,6 @@ struct	phydm_iot_center {
 	struct _CCX_INFO											dm_ccx_info;
 	struct _hal_rf_												rf_table; 		/*for HALRF function*/
 	struct odm_rf_calibration_structure		rf_calibrate_info;
-	struct odm_power_trim_data						power_trim_data;
 
 #ifdef CONFIG_PSD_TOOL
 	struct _PHYDM_PSD_					dm_psd_table;

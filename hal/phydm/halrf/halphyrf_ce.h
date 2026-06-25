@@ -16,7 +16,6 @@
 #ifndef __HAL_PHY_RF_H__
 #define __HAL_PHY_RF_H__
 
-#include "halrf/halrf_kfree.h"
 #include "halrf/halrf_powertracking_ce.h"
 
 enum spur_cal_method {

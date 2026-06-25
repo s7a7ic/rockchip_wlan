@@ -21,8 +21,7 @@ _PHYDM_FILES := hal/phydm/phydm_debug.o	\
 								hal/phydm/halrf/halrf.o\
 								hal/phydm/halrf/halphyrf_ce.o\
 								hal/phydm/halrf/halrf_powertracking_ce.o\
-								hal/phydm/halrf/halrf_powertracking.o\
-								hal/phydm/halrf/halrf_kfree.o
+								hal/phydm/halrf/halrf_powertracking.o
 
 ifeq ($(CONFIG_RTL8723B), y)
 RTL871X = rtl8723b
