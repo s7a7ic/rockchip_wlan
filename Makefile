@@ -96,7 +96,7 @@ CONFIG_PLATFORM_ARM_PC = y
 
 CONFIG_DRVEXT_MODULE = n
 
-export TopDIR ?= $(src)
+export TopDIR ?= $(CURDIR)
 
 ########### COMMON  #################################
 ifeq ($(CONFIG_SDIO_HCI), y)
