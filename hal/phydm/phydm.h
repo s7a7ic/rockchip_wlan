@@ -16,7 +16,6 @@
 #include "phydm_adaptivity.h"
 #include "phydm_ccx.h"
 #include "phydm_psd.h"
-#include "phydm_primary_cca.h"
 #include "phydm_cck_pd.h"
 #include "phydm_rssi_monitor.h"
 #include "phydm_math_lib.h"

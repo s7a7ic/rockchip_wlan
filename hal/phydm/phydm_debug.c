@@ -1026,11 +1026,6 @@ phydm_basic_dbg_message
 	if (p_dm->is_linked) {
 		PHYDM_DBG(p_dm, ODM_COMP_COMMON, ("ID=((%d)), BW=((%d)), fc=((CH-%d))\n", p_dm->curr_station_id, 20<<(*(p_dm->p_band_width)), *(p_dm->p_channel)));
 
-		if ((*(p_dm->p_channel) <= 14) && (*(p_dm->p_band_width) == CHANNEL_WIDTH_40)) {
-			PHYDM_DBG(p_dm, ODM_COMP_COMMON, ("Primary CCA at ((%s SB))\n",
-				(((*(p_dm->p_sec_ch_offset)) == SECOND_CH_AT_LSB)?"U":"L")));
-		}
-
 		if ((p_dm->support_ic_type & ODM_IC_PHY_STATUE_NEW_TYPE) || p_dm->rx_rate > ODM_RATE11M) {
 			
 			PHYDM_DBG(p_dm, ODM_COMP_COMMON, ("[AGC Idx] {0x%x, 0x%x, 0x%x, 0x%x}\n",
