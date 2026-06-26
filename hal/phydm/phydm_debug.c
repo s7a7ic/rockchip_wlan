@@ -2041,7 +2041,6 @@ enum PHYDM_CMD_ID {
 	PHYDM_TUNE_PARAMETER,
 	PHYDM_ADAPTIVITY_DEBUG,
 	PHYDM_DIS_DYM_ANT_WEIGHTING,
-	PHYDM_FORECE_PT_STATE,
 	PHYDM_DIS_RXHP_CTR,
 	PHYDM_STA_INFO,
 	PHYDM_PAUSE_FUNC
@@ -2090,7 +2089,6 @@ struct _PHYDM_COMMAND phy_dm_ary[] = {
 	{"tune_para", PHYDM_TUNE_PARAMETER},
 	{"adapt_debug", PHYDM_ADAPTIVITY_DEBUG},
 	{"dis_dym_ant_wgt", PHYDM_DIS_DYM_ANT_WEIGHTING},
-	{"force_pt_state", PHYDM_FORECE_PT_STATE},
 	{"dis_drxhp", PHYDM_DIS_RXHP_CTR},
 	{"sta_info", PHYDM_STA_INFO},
 	{"pause", PHYDM_PAUSE_FUNC}
@@ -2878,19 +2876,6 @@ phydm_cmd_parser(
 			PHYDM_SNPRINTF((output + used, out_len - used, "\r\n Enable dynmic antenna weighting !\n"));
 		}
 		break;
-
-	case PHYDM_FORECE_PT_STATE:
-		{
-
-		#ifdef PHYDM_POWER_TRAINING_SUPPORT	
-			phydm_pow_train_debug(p_dm, &input[0], &used, output, &out_len, input_num);
-		#else
-			PHYDM_SNPRINTF((output + used, out_len - used, "Pow training: Not Support\n"));
-		#endif
-		
-		break;
-		}
-
 	case PHYDM_DIS_RXHP_CTR:
 		{
 			if (input[1])

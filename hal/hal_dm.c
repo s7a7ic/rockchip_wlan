@@ -959,8 +959,7 @@ void dump_sta_info(void *sel, struct sta_info *psta)
 	_RTW_PRINT_SEL(sel, "rssi : %d (%%), rssi_level : %d\n", psta->cmn.rssi_stat.rssi, ra_info->rssi_level);
 	_RTW_PRINT_SEL(sel, "is_support_sgi : %s, is_vht_enable : %s\n",
 			(ra_info->is_support_sgi) ? "Y" : "N", (ra_info->is_vht_enable) ? "Y" : "N");
-	_RTW_PRINT_SEL(sel, "disable_ra : %s, disable_pt : %s\n",
-				(ra_info->disable_ra) ? "Y" : "N", (ra_info->disable_pt) ? "Y" : "N");
+	_RTW_PRINT_SEL(sel, "disable_ra : %s\n", (ra_info->disable_ra) ? "Y" : "N");
 	_RTW_PRINT_SEL(sel, "is_noisy : %s\n", (ra_info->is_noisy) ? "Y" : "N");
 	_RTW_PRINT_SEL(sel, "txrx_state : %d\n", ra_info->txrx_state);/*0: uplink, 1:downlink, 2:bi-direction*/
 
@@ -1077,8 +1076,6 @@ void rtw_phydm_watchdog(_adapter *adapter)
 #endif /* CONFIG_BT_COEXIST */
 	odm_cmn_info_update(&pHalData->odmpriv, ODM_CMNINFO_BT_ENABLED,
 							(bBtDisabled == _TRUE) ? _FALSE : _TRUE);
-	odm_cmn_info_update(&pHalData->odmpriv, ODM_CMNINFO_POWER_TRAINING,
-							(pHalData->bDisableTXPowerTraining) ? _TRUE : _FALSE);
 #ifdef CONFIG_LPS_PG
 	_lps_pg_state_update(adapter);
 #endif

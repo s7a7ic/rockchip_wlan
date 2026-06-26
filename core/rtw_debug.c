@@ -1617,43 +1617,6 @@ int proc_get_trx_info(struct seq_file *m, void *v)
 	return 0;
 }
 
-int proc_get_dis_pwt(struct seq_file *m, void *v)
-{
-	struct net_device *dev = m->private;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	u8 dis_pwt = 0;
-	rtw_hal_get_def_var(padapter, HAL_DEF_DBG_DIS_PWT, &(dis_pwt));
-	RTW_PRINT_SEL(m, " Tx Power training mode:%s\n", (dis_pwt == _TRUE) ? "Disable" : "Enable");
-	return 0;
-}
-ssize_t proc_set_dis_pwt(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data)
-{
-	struct net_device *dev = data;
-	_adapter *padapter = (_adapter *)rtw_netdev_priv(dev);
-	char tmp[4] = {0};
-	u8 dis_pwt = 0;
-
-	if (count < 1)
-		return -EFAULT;
-
-	if (count > sizeof(tmp)) {
-		rtw_warn_on(1);
-		return -EFAULT;
-	}
-
-	if (buffer && !copy_from_user(tmp, buffer, count)) {
-
-		int num = sscanf(tmp, "%hhx", &dis_pwt);
-		RTW_INFO("Set Tx Power training mode:%s\n", (dis_pwt == _TRUE) ? "Disable" : "Enable");
-
-		if (num >= 1)
-			rtw_hal_set_def_var(padapter, HAL_DEF_DBG_DIS_PWT, &(dis_pwt));
-	}
-
-	return count;
-
-}
-
 int proc_get_rate_ctl(struct seq_file *m, void *v)
 {
 	struct net_device *dev = m->private;

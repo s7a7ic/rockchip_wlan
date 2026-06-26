@@ -1837,10 +1837,6 @@ phydm_watchdog(
 #ifdef PHYDM_LNA_SAT_CHK_SUPPORT
 	phydm_lna_sat_chk_watchdog(p_dm);
 #endif
-	
-#ifdef PHYDM_POWER_TRAINING_SUPPORT
-	phydm_update_power_training_state(p_dm);
-#endif
 
 	phydm_common_info_self_reset(p_dm);
 
@@ -2275,10 +2271,6 @@ odm_cmn_info_update(
 
 	case	ODM_CMNINFO_AP_TOTAL_NUM:
 		p_dm->ap_total_num = (u8)value;
-		break;
-
-	case	ODM_CMNINFO_POWER_TRAINING:
-		p_dm->is_disable_power_training = (boolean)value;
 		break;
 
 #ifdef CONFIG_PHYDM_DFS_MASTER

@@ -725,10 +725,7 @@ phydm_show_sta_info(
 		PHYDM_SNPRINTF((output + used, out_len - used, "VHT_en:%d, Wireless_set=0x%x, sm_ps=%d\n", 
 			p_ra->is_vht_enable, p_sta->support_wireless_set, p_sta->sm_ps));
 
-		PHYDM_SNPRINTF((output + used, out_len - used, "Dis{RA, PT}={%d, %d}, TxRx:%d, Noisy:%d\n", 
-			p_ra->disable_ra, p_ra->disable_pt, p_ra->txrx_state, p_ra->is_noisy));
-		
-		PHYDM_SNPRINTF((output + used, out_len - used, "TX{Rate, BW}={%d, %d}, RTY:%d\n", 
+		PHYDM_SNPRINTF((output + used, out_len - used, "TX{Rate, BW}={%d, %d}, RTY:%d\n",
 			p_ra->curr_tx_rate, p_ra->curr_tx_bw, p_ra->curr_retry_ratio));
 	
 		PHYDM_SNPRINTF((output + used, out_len - used, "RA_MAsk:0x%llx\n", p_ra->ramask));
@@ -1013,7 +1010,6 @@ phydm_ra_h2c(
 	void	*p_dm_void,
 	u8	macid,
 	u8	dis_ra,
-	u8	dis_pt,
 	u8	no_update_bw,
 	u8	init_ra_lv,
 	u64	ra_mask
@@ -1037,9 +1033,8 @@ phydm_ra_h2c(
 	h2c_val[0] = p_sta->mac_id;
 	h2c_val[1] = (p_ra->rate_id & 0x1f) | ((init_ra_lv & 0x3) << 5) | (p_ra->is_support_sgi << 7);
 	h2c_val[2] = (u8)((p_ra->ra_bw_mode) | (((p_sta->ldpc_en) ? 1 : 0) << 2) | 
-					((no_update_bw & 0x1) << 3) | (p_ra->is_vht_enable << 4) | 
-					((dis_pt & 0x1) << 6) | ((dis_ra & 0x1) << 7));
-	
+					((no_update_bw & 0x1) << 3) | (p_ra->is_vht_enable << 4) | ((dis_ra & 0x1) << 7));
+
 	h2c_val[3] = (u8)(ra_mask & 0xff);
 	h2c_val[4] = (u8)((ra_mask & 0xff00) >> 8);
 	h2c_val[5] = (u8)((ra_mask & 0xff0000) >> 16);
@@ -1102,7 +1097,6 @@ phydm_ra_registed(
 	
 	/*p_ra->is_vht_enable = (p_sta->support_wireless_set | WIRELESS_VHT) ? 1 : 0;*/
 	/*p_ra->disable_ra = 0;*/
-	/*p_ra->disable_pt = 0;*/
 	ra_mask = phydm_get_bb_mod_ra_mask(p_dm, macid);
 
 
@@ -1124,7 +1118,7 @@ phydm_ra_registed(
 	#endif
 	{
 		/*FW RA*/
-		phydm_ra_h2c(p_dm, macid, p_ra->disable_ra, p_ra->disable_pt, 0, init_ra_lv, ra_mask);
+		phydm_ra_h2c(p_dm, macid, p_ra->disable_ra, 0, init_ra_lv, ra_mask);
 	}
 
 	
@@ -1154,13 +1148,12 @@ phydm_ra_offline(
 
 	odm_memory_set(p_dm, &(p_ra->rate_id), 0, sizeof(struct ra_sta_info));
 	p_ra->disable_ra = 1;
-	p_ra->disable_pt = 1;
 
 	if (p_ra_t->record_ra_info)
 		p_ra_t->record_ra_info(p_dm, macid, p_sta, 0);
 
 	if (p_dm->support_ic_type != ODM_RTL8188E)
-		phydm_ra_h2c(p_dm, macid, p_ra->disable_ra, p_ra->disable_pt, 0, 0, 0);
+		phydm_ra_h2c(p_dm, macid, p_ra->disable_ra, 0, 0, 0);
 }
 
 void
@@ -1245,7 +1238,7 @@ phydm_ra_mask_watchdog(
 			#endif
 			{
 				/*FW RA*/
-				phydm_ra_h2c(p_dm, macid, p_ra->disable_ra, p_ra->disable_pt, 1, 0, ra_mask);
+				phydm_ra_h2c(p_dm, macid, p_ra->disable_ra, 1, 0, ra_mask);
 			}
 		}
 	}

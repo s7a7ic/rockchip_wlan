@@ -29,10 +29,6 @@
 #endif
 
 #if (RTL8822B_SUPPORT == 1)
-	/*#define PHYDM_POWER_TRAINING_SUPPORT*/
-#endif
-
-#if (RTL8822B_SUPPORT == 1)
 	#define PHYDM_TXA_CALIBRATION
 #endif
 

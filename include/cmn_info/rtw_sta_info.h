@@ -166,7 +166,6 @@ struct ra_sta_info {
 	u8	is_support_sgi:1;	/*driver*/
 	u8	is_vht_enable:2;		/*driver*/
 	u8	disable_ra:1;		/*driver*/
-	u8	disable_pt:1;		/*driver*/  /*remove is_disable_power_training*/
 	u8	txrx_state:2;		/*0: Tx, 1:Rx, 2:bi-direction*/
 	u8	is_noisy:1;
 	

@@ -10055,9 +10055,6 @@ SetHalDefVar(_adapter *adapter, HAL_DEF_VARIABLE variable, void *value)
 	case HAL_DEF_ANT_DETECT:
 		hal_data->AntDetection = *((u8 *)value);
 		break;
-	case HAL_DEF_DBG_DIS_PWT:
-		hal_data->bDisableTXPowerTraining = *((u8 *)value);
-		break;
 	default:
 		RTW_PRINT("%s: [WARNING] HAL_DEF_VARIABLE(%d) not defined!\n", __FUNCTION__, variable);
 		bResult = _FAIL;
@@ -10147,9 +10144,6 @@ GetHalDefVar(_adapter *adapter, HAL_DEF_VARIABLE variable, void *value)
 		break;
 	case HAL_DEF_TX_PAGE_SIZE:
 		*((u32 *)value) = _get_page_size(adapter);
-		break;
-	case HAL_DEF_DBG_DIS_PWT:
-		*(u8 *)value = hal_data->bDisableTXPowerTraining;
 		break;
 	case HAL_DEF_EXPLICIT_BEAMFORMER:
 	case HAL_DEF_EXPLICIT_BEAMFORMEE:

@@ -418,9 +418,6 @@ int proc_get_bmc_tx_rate(struct seq_file *m, void *v);
 ssize_t proc_set_bmc_tx_rate(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 #endif /*CONFIG_AP_MODE*/
 
-int proc_get_dis_pwt(struct seq_file *m, void *v);
-ssize_t proc_set_dis_pwt(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
-
 int proc_get_ps_dbg_info(struct seq_file *m, void *v);
 ssize_t proc_set_ps_dbg_info(struct file *file, const char __user *buffer, size_t count, loff_t *pos, void *data);
 

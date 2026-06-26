@@ -46,7 +46,6 @@
 #include "phydm_math_lib.h"
 #include "phydm_noisemonitor.h"
 #include "phydm_api.h"
-#include "phydm_pow_train.h"
 #if (DM_ODM_SUPPORT_TYPE & (ODM_WIN|ODM_CE))
 	#include "phydm_beamforming.h"
 #endif
@@ -297,7 +296,6 @@ enum odm_cmninfo_e {
 	ODM_CMNINFO_BT_OPERATION,
 	ODM_CMNINFO_BT_LIMITED_DIG,
 	ODM_CMNINFO_AP_TOTAL_NUM,
-	ODM_CMNINFO_POWER_TRAINING,
 	ODM_CMNINFO_DFS_REGION_DOMAIN,
 	/*------------CALL BY VALUE-------------*/
 
@@ -807,7 +805,6 @@ struct	phydm_iot_center {
 #if (DM_ODM_SUPPORT_TYPE & ODM_AP)
 	boolean		config_bbrf;
 #endif
-	boolean		is_disable_power_training;
 	u8			dynamic_tx_high_power_lvl;
 	u8			last_dtp_lvl;
 	u32			tx_agc_ofdm_18_6;
@@ -949,9 +946,6 @@ struct	phydm_iot_center {
 
 	struct	phydm_pause_lv				pause_lv_table;	
 	struct	phydm_api_stuc 				api_table;
-#ifdef PHYDM_POWER_TRAINING_SUPPORT
-	struct	phydm_pow_train_stuc			pow_train_table;
-#endif
 /*==========================================================*/
 
 #if (DM_ODM_SUPPORT_TYPE & ODM_WIN)

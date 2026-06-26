@@ -396,7 +396,6 @@ typedef struct hal_com_data {
 	u16	ForcedDataRate;	/* Force Data Rate. 0: Auto, 0x02: 1M ~ 0x6C: 54M. */
 	u8	bDumpRxPkt;
 	u8	bDumpTxPkt;
-	u8	bDisableTXPowerTraining;
 	u8	dis_turboedca;
 
 

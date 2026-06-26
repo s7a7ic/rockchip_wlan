@@ -188,7 +188,6 @@ enum rt_spinlock_type {
 	#define RTL8821C_SUPPORT				0
 
 	#define RATE_ADAPTIVE_SUPPORT			0
-	#define POWER_TRAINING_ACTIVE			0
 
 	#define sta_info	rtl_sta_info
 	#define	boolean		bool
