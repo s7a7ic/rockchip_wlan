@@ -303,7 +303,11 @@ __inline static void rtw_list_delete(_list *plist)
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0))
 static void legacy_timer_emu_func(struct timer_list *t)
 {
-  struct legacy_timer_emu *lt = from_timer(lt, t, t);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 16, 0))
+  struct legacy_timer_emu *lt = timer_container_of(lt, t, t);
+#else
+	struct legacy_timer_emu *lt = from_timer(lt, t, t);
+#endif
   lt->function(lt->data);
 }
 #endif //(LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0))
@@ -331,7 +335,9 @@ __inline static void _set_timer(_timer *ptimer, u32 delay_time)
 
 __inline static void _cancel_timer(_timer *ptimer, u8 *bcancelled)
 {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0))
+	*bcancelled = timer_delete_sync(&ptimer->t) == 1 ? 1 : 0;
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0))
 	*bcancelled = del_timer_sync(&ptimer->t) == 1 ? 1 : 0;
 #else
 	*bcancelled = del_timer_sync(ptimer) == 1 ? 1 : 0;
