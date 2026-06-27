@@ -160,7 +160,7 @@ struct rx_raw_rssi {
 };
 
 
-#include "cmn_info/rtw_sta_info.h"
+#include "rtw_sta_info.h"
 
 struct rx_pkt_attrib	{
 	u16	pkt_len;
