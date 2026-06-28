@@ -3036,14 +3036,6 @@ static struct xmit_buf *__rtw_alloc_cmd_xmitbuf(struct xmit_priv *pxmitpriv,
 		pxmitbuf->agg_num = 0;
 		pxmitbuf->pg_num = 0;
 #endif
-#ifdef CONFIG_PCI_HCI
-		pxmitbuf->len = 0;
-#ifdef CONFIG_TRX_BD_ARCH
-		/*pxmitbuf->buf_desc = NULL;*/
-#else
-		pxmitbuf->desc = NULL;
-#endif
-#endif
 
 		if (pxmitbuf->sctx) {
 			RTW_INFO("%s pxmitbuf->sctx is not NULL\n", __func__);
@@ -3121,21 +3113,12 @@ struct xmit_buf *rtw_alloc_xmitbuf_ext(struct xmit_priv *pxmitpriv)
 		RTW_INFO("DBG_XMIT_BUF_EXT ALLOC no=%d,  free_xmit_extbuf_cnt=%d\n", pxmitbuf->no, pxmitpriv->free_xmit_extbuf_cnt);
 #endif
 
-
 		pxmitbuf->priv_data = NULL;
 
 #if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
 		pxmitbuf->len = 0;
 		pxmitbuf->pdata = pxmitbuf->ptail = pxmitbuf->phead;
 		pxmitbuf->agg_num = 1;
-#endif
-#ifdef CONFIG_PCI_HCI
-		pxmitbuf->len = 0;
-#ifdef CONFIG_TRX_BD_ARCH
-		/*pxmitbuf->buf_desc = NULL;*/
-#else
-		pxmitbuf->desc = NULL;
-#endif
 #endif
 
 		if (pxmitbuf->sctx) {
@@ -3146,7 +3129,6 @@ struct xmit_buf *rtw_alloc_xmitbuf_ext(struct xmit_priv *pxmitpriv)
 	}
 
 	_exit_critical(&pfree_queue->lock, &irqL);
-
 
 	return pxmitbuf;
 }
@@ -3215,14 +3197,6 @@ struct xmit_buf *rtw_alloc_xmitbuf(struct xmit_priv *pxmitpriv)
 		pxmitbuf->pdata = pxmitbuf->ptail = pxmitbuf->phead;
 		pxmitbuf->agg_num = 0;
 		pxmitbuf->pg_num = 0;
-#endif
-#ifdef CONFIG_PCI_HCI
-		pxmitbuf->len = 0;
-#ifdef CONFIG_TRX_BD_ARCH
-		/*pxmitbuf->buf_desc = NULL;*/
-#else
-		pxmitbuf->desc = NULL;
-#endif
 #endif
 
 		if (pxmitbuf->sctx) {
@@ -3663,7 +3637,7 @@ struct xmit_frame *rtw_dequeue_xframe(struct xmit_priv *pxmitpriv, struct hw_xmi
 		}
 #endif
 
-#if defined(CONFIG_USB_HCI) || defined(CONFIG_SDIO_HCI) || defined(CONFIG_PCI_HCI)
+#if defined(CONFIG_USB_HCI) || defined(CONFIG_SDIO_HCI)
 		for (j = 0; j < 4; j++)
 			inx[j] = pxmitpriv->wmm_para_seq[j];
 #endif

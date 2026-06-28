@@ -189,7 +189,6 @@
 *	0x0300h ~ 0x03FFh	PCIe
 *
 * ----------------------------------------------------- */
-#ifndef CONFIG_TRX_BD_ARCH	/* prevent CONFIG_TRX_BD_ARCH to use old registers */
 
 #define REG_PCIE_CTRL_REG				0x0300
 #define REG_INT_MIG					0x0304	/* Interrupt Migration */
@@ -217,8 +216,6 @@
 #define REG_PCIE_HISRE					0x03A4
 #define REG_PCIE_HIMR					0x03A8
 #define REG_PCIE_HIMRE					0x03AC
-
-#endif /* !CONFIG_TRX_BD_ARCH */
 
 #define REG_USB_HIMR					0xFE38
 #define REG_USB_HIMRE					0xFE3C
@@ -1816,11 +1813,7 @@ Current IOREG MAP
 #define LAST_ENTRY_OF_TX_PKT_BUFFER_8723D		255
 
 #define POLLING_LLT_THRESHOLD				20
-#if defined(CONFIG_RTL8723B) && defined(CONFIG_PCI_HCI)
-	#define POLLING_READY_TIMEOUT_COUNT		6000
-#else
-	#define POLLING_READY_TIMEOUT_COUNT		1000
-#endif
+#define POLLING_READY_TIMEOUT_COUNT		1000
 
 
 /* GPIO BIT */
