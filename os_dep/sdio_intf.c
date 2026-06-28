@@ -922,10 +922,6 @@ static void rtw_dev_remove(struct sdio_func *func)
 		}
 	}
 
-#if defined(CONFIG_HAS_EARLYSUSPEND) || defined(CONFIG_ANDROID_POWER)
-	rtw_unregister_early_suspend(pwrctl);
-#endif
-
 	if (GET_HAL_DATA(padapter)->bFWReady == _TRUE) {
 		rtw_ps_deny(padapter, PS_DENY_DRV_REMOVE);
 		rtw_pm_set_ips(padapter, IPS_NONE);
@@ -1056,9 +1052,6 @@ static int rtw_sdio_resume(struct device *dev)
 			ret = rtw_resume_process(padapter);
 			rtw_resume_unlock_suspend();
 		} else {
-#ifdef CONFIG_RESUME_IN_WORKQUEUE
-			rtw_resume_in_workqueue(pwrpriv);
-#else
 			if (rtw_is_earlysuspend_registered(pwrpriv)) {
 				/* jeff: bypass resume here, do in late_resume */
 				rtw_set_do_late_resume(pwrpriv, _TRUE);
@@ -1067,7 +1060,6 @@ static int rtw_sdio_resume(struct device *dev)
 				ret = rtw_resume_process(padapter);
 				rtw_resume_unlock_suspend();
 			}
-#endif
 		}
 	}
 	pmlmeext->last_scan_time = rtw_get_current_time();

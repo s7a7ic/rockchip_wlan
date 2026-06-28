@@ -4530,10 +4530,6 @@ int rtw_resume_process_ap_wow(_adapter *padapter)
 		rtw_signal_process(padapter->pid[1], SIGUSR2);
 	}
 
-#ifdef CONFIG_RESUME_IN_WORKQUEUE
-	/* rtw_unlock_suspend(); */
-#endif /* CONFIG_RESUME_IN_WORKQUEUE */
-
 	if (pwrpriv->wowlan_wake_reason == AP_OFFLOAD_WAKEUP)
 		rtw_lock_ext_suspend_timeout(8000);
 
@@ -4649,9 +4645,6 @@ int rtw_resume_process_normal(_adapter *padapter)
 
 	rtw_mi_resume_process_normal(padapter);
 
-#ifdef CONFIG_RESUME_IN_WORKQUEUE
-	/* rtw_unlock_suspend(); */
-#endif /* CONFIG_RESUME_IN_WORKQUEUE */
 	RTW_INFO("<== "FUNC_ADPT_FMT" exit....\n", FUNC_ADPT_ARG(padapter));
 
 exit:
