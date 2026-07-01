@@ -4252,10 +4252,6 @@ unsigned int rtw_restructure_ht_ie(_adapter *padapter, u8 *in_ie, u8 *out_ie, ui
 	struct ht_priv		*phtpriv = &pmlmepriv->htpriv;
 	struct mlme_ext_priv	*pmlmeext = &padapter->mlmeextpriv;
 	struct hal_spec_t *hal_spec = GET_HAL_SPEC(padapter);
-#ifdef CONFIG_80211AC_VHT
-	struct mlme_ext_info	*pmlmeinfo = &(pmlmeext->mlmext_info);
-	struct vht_priv	*pvhtpriv = &pmlmepriv->vhtpriv;
-#endif /* CONFIG_80211AC_VHT */
 
 	phtpriv->ht_option = _FALSE;
 
@@ -4438,12 +4434,6 @@ unsigned int rtw_restructure_ht_ie(_adapter *padapter, u8 *in_ie, u8 *out_ie, ui
 		SET_HT_CAP_TXBF_EXPLICIT_COMP_FEEDBACK_CAP(&ht_capie, 2);
 
 		rtw_hal_get_def_var(padapter, HAL_DEF_BEAMFORMEE_CAP, (u8 *)&rf_num);
-#ifdef CONFIG_80211AC_VHT
-		/* IOT action suggested by Yu Chen 2017/3/3 */
-		if ((pmlmeinfo->assoc_AP_vendor == HT_IOT_PEER_BROADCOM) &&
-			!GET_VHT_CAPABILITY_ELE_MU_BFER(&pvhtpriv->beamform_cap))
-			rf_num = (rf_num >= 2 ? 2 : rf_num);
-#endif
 		SET_HT_CAP_TXBF_COMP_STEERING_NUM_ANTENNAS(&ht_capie, rf_num);
 	}
 #endif/*CONFIG_BEAMFORMING*/
@@ -4736,9 +4726,7 @@ void rtw_append_exented_cap(_adapter *padapter, u8 *out_ie, uint *pout_len)
 {
 	struct mlme_priv	*pmlmepriv = &padapter->mlmepriv;
 	struct ht_priv		*phtpriv = &pmlmepriv->htpriv;
-#ifdef CONFIG_80211AC_VHT
-	struct vht_priv	*pvhtpriv = &pmlmepriv->vhtpriv;
-#endif /* CONFIG_80211AC_VHT */
+
 	u8	cap_content[8] = { 0 };
 	u8	*pframe;
 	u8   null_content[8] = {0};
@@ -4746,10 +4734,6 @@ void rtw_append_exented_cap(_adapter *padapter, u8 *out_ie, uint *pout_len)
 	if (phtpriv->bss_coexist)
 		SET_EXT_CAPABILITY_ELE_BSS_COEXIST(cap_content, 1);
 
-#ifdef CONFIG_80211AC_VHT
-	if (pvhtpriv->vht_option)
-		SET_EXT_CAPABILITY_ELE_OP_MODE_NOTIF(cap_content, 1);
-#endif /* CONFIG_80211AC_VHT */
 	/*
 		From 802.11 specification,if a STA does not support any of capabilities defined
 		in the Extended Capabilities element, then the STA is not required to
