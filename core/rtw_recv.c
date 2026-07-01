@@ -2492,7 +2492,7 @@ exit:
 #endif
 
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 #ifdef PLATFORM_LINUX
 static void recvframe_expand_pkt(
 	PADAPTER padapter,
@@ -2581,7 +2581,7 @@ union recv_frame *recvframe_defrag(_adapter *adapter, _queue *defrag_q)
 		return NULL;
 	}
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 #ifndef CONFIG_SDIO_RX_COPY
 	recvframe_expand_pkt(adapter, prframe);
 #endif

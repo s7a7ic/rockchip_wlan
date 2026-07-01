@@ -284,7 +284,7 @@ void rtl8723b_fill_fake_txdesc(PADAPTER padapter, u8 *pDesc, u32 BufferLen, u8 I
 #endif
 void fill_txdesc_bmc_tx_rate(struct pkt_attrib *pattrib, u8 *ptxdesc);
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	s32 rtl8723bs_init_xmit_priv(PADAPTER padapter);
 	void rtl8723bs_free_xmit_priv(PADAPTER padapter);
 	s32 rtl8723bs_hal_xmit(PADAPTER padapter, struct xmit_frame *pxmitframe);

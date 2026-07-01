@@ -455,9 +455,6 @@ typedef struct rtw_if_operations {
 	#include <drv_types_sdio.h>
 	#define INTF_DATA	SDIO_DATA
 	#define INTF_OPS	PRTW_IF_OPS
-#elif defined(CONFIG_GSPI_HCI)
-	#include <drv_types_gspi.h>
-	#define INTF_DATA GSPI_DATA
 #endif
 
 #ifdef CONFIG_CONCURRENT_MODE
@@ -1026,9 +1023,6 @@ static struct device *dvobj_to_dev(struct dvobj_priv *dvobj)
 #ifdef CONFIG_SDIO_HCI
 	return &dvobj->intf_data.func->dev;
 #endif
-#ifdef CONFIG_GSPI_HCI
-	return &dvobj->intf_data.func->dev;
-#endif
 }
 #endif
 
@@ -1443,12 +1437,6 @@ int rtw_suspend_free_assoc_resource(_adapter *padapter);
 #ifdef CONFIG_SDIO_HCI
 	#include <sdio_ops.h>
 	#include <sdio_hal.h>
-#endif
-
-#ifdef CONFIG_GSPI_HCI
-	#include <gspi_osintf.h>
-	#include <gspi_ops.h>
-	#include <gspi_hal.h>
 #endif
 
 #endif /* __DRV_TYPES_H__ */

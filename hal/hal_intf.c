@@ -54,14 +54,12 @@ u8 rtw_hal_read_chip_info(_adapter *padapter)
 	systime start = rtw_get_current_time();
 
 	/*  before access eFuse, make sure card enable has been called */
-	if ((hci_type == RTW_SDIO || hci_type == RTW_GSPI)
-	    && !rtw_is_hw_init_completed(padapter))
+	if (hci_type == RTW_SDIO && !rtw_is_hw_init_completed(padapter))
 		rtw_hal_power_on(padapter);
 
 	rtn = padapter->hal_func.read_adapter_info(padapter);
 
-	if ((hci_type == RTW_SDIO || hci_type == RTW_GSPI)
-	    && !rtw_is_hw_init_completed(padapter))
+	if (hci_type == RTW_SDIO && !rtw_is_hw_init_completed(padapter))
 		rtw_hal_power_off(padapter);
 
 	RTW_INFO("%s in %d ms\n", __func__, rtw_get_passing_time_ms(start));
@@ -301,17 +299,17 @@ void	rtw_hal_get_odm_var(_adapter *padapter, HAL_ODM_VARIABLE eVariable, PVOID p
 /* FOR SDIO & PCIE */
 void rtw_hal_enable_interrupt(_adapter *padapter)
 {
-#if defined(CONFIG_SDIO_HCI) || defined (CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	padapter->hal_func.enable_interrupt(padapter);
-#endif /* #if defined (CONFIG_SDIO_HCI) || defined (CONFIG_GSPI_HCI) */
+#endif /* #if defined (CONFIG_SDIO_HCI) */
 }
 
 /* FOR SDIO & PCIE */
 void rtw_hal_disable_interrupt(_adapter *padapter)
 {
-#if defined(CONFIG_SDIO_HCI) || defined (CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	padapter->hal_func.disable_interrupt(padapter);
-#endif /* #if defined (CONFIG_SDIO_HCI) || defined (CONFIG_GSPI_HCI) */
+#endif /* #if defined (CONFIG_SDIO_HCI) */
 }
 
 
@@ -334,7 +332,7 @@ s32 rtw_hal_fw_dl(_adapter *padapter, u8 wowlan)
 #if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)
 void rtw_hal_clear_interrupt(_adapter *padapter)
 {
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	padapter->hal_func.clear_interrupt(padapter);
 #endif
 }
@@ -462,7 +460,7 @@ void rtw_hal_update_ra_mask(struct sta_info *psta)
 /*	Start specifical interface thread		*/
 void	rtw_hal_start_thread(_adapter *padapter)
 {
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 #ifndef CONFIG_SDIO_TX_TASKLET
 	padapter->hal_func.run_thread(padapter);
 #endif
@@ -471,7 +469,7 @@ void	rtw_hal_start_thread(_adapter *padapter)
 /*	Start specifical interface thread		*/
 void	rtw_hal_stop_thread(_adapter *padapter)
 {
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 #ifndef CONFIG_SDIO_TX_TASKLET
 
 	padapter->hal_func.cancel_thread(padapter);
@@ -1055,7 +1053,7 @@ u8 rtw_hal_ops_check(_adapter *padapter)
 		rtw_hal_error_msg("hal_xmitframe_enqueue");
 		ret = _FAIL;
 	}
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 #ifndef CONFIG_SDIO_TX_TASKLET
 	if (NULL == padapter->hal_func.run_thread) {
 		rtw_hal_error_msg("run_thread");
@@ -1084,7 +1082,7 @@ u8 rtw_hal_ops_check(_adapter *padapter)
 	}
 #endif
 
-#if defined(CONFIG_SDIO_HCI) || defined (CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	if (NULL == padapter->hal_func.enable_interrupt) {
 		rtw_hal_error_msg("enable_interrupt");
 		ret = _FAIL;
@@ -1093,7 +1091,7 @@ u8 rtw_hal_ops_check(_adapter *padapter)
 		rtw_hal_error_msg("disable_interrupt");
 		ret = _FAIL;
 	}
-#endif /* defined (CONFIG_SDIO_HCI) || defined (CONFIG_GSPI_HCI) */
+#endif /* defined (CONFIG_SDIO_HCI) */
 
 
 	/*** DM section ***/
@@ -1169,7 +1167,7 @@ u8 rtw_hal_ops_check(_adapter *padapter)
 	}
 
 #if defined(CONFIG_WOWLAN) || defined(CONFIG_AP_WOWLAN)
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	if (NULL == padapter->hal_func.clear_interrupt) {
 		rtw_hal_error_msg("clear_interrupt");
 		ret = _FAIL;

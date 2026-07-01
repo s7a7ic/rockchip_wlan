@@ -16,7 +16,7 @@
 #define _RTW_XMIT_H_
 
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	#ifdef CONFIG_TX_AGGREGATION
 		#define MAX_XMITBUF_SZ	(20480)	/* 20k */
 		/* #define SDIO_TX_AGG_MAX	5 */
@@ -27,9 +27,6 @@
 
 	#if defined CONFIG_SDIO_HCI
 		#define NR_XMITBUFF	(16)
-	#endif
-	#if defined(CONFIG_GSPI_HCI)
-		#define NR_XMITBUFF	(128)
 	#endif
 #endif
 
@@ -154,7 +151,7 @@
 #endif
 
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	#define TXDESC_OFFSET TXDESC_SIZE
 #endif
 
@@ -439,7 +436,7 @@ struct xmit_buf {
 
 	struct submit_ctx *sctx;
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	u8 *phead;
 	u8 *pdata;
 	u8 *ptail;
@@ -471,7 +468,7 @@ struct xmit_frame {
 
 	struct xmit_buf *pxmitbuf;
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	u8	pg_num;
 	u8	agg_num;
 #endif
@@ -594,7 +591,7 @@ struct	xmit_priv	{
 
 	u8	wmm_para_seq[4];/* sequence for wmm ac parameter strength from large to small. it's value is 0->vo, 1->vi, 2->be, 3->bk. */
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 #ifdef CONFIG_SDIO_TX_TASKLET
 #ifdef PLATFORM_LINUX
 	struct tasklet_struct xmit_tasklet;

@@ -3663,12 +3663,12 @@ static u8 rtw_hal_pause_rx_dma(_adapter *adapter)
 			ret = _SUCCESS;
 			break;
 		}
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 		else {
 			res = RecvOnePkt(adapter);
 			RTW_PRINT("RecvOnePkt Result: %d\n", res);
 		}
-#endif /* CONFIG_SDIO_HCI || CONFIG_GSPI_HCI */
+#endif /* CONFIG_SDIO_HCI */
 
 	} while (trycnt--);
 
@@ -3691,7 +3691,7 @@ static u8 rtw_hal_pause_rx_dma(_adapter *adapter)
 	return ret;
 }
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 static u8 rtw_hal_enable_cpwm2(_adapter *adapter)
 {
 	u8 ret = 0;
@@ -3723,7 +3723,7 @@ static u8 rtw_hal_enable_cpwm2(_adapter *adapter)
 	return ret;
 #endif /* CONFIG_CPIO_WAKEUP */
 }
-#endif /* CONFIG_SDIO_HCI, CONFIG_GSPI_HCI */
+#endif /* CONFIG_SDIO_HCI */
 #endif /* CONFIG_WOWLAN || CONFIG_AP_WOWLAN */
 
 #ifdef CONFIG_WOWLAN
@@ -4629,7 +4629,7 @@ static void rtw_hal_ap_wow_enable(_adapter *padapter)
 	if (res == _FAIL)
 		RTW_PRINT("[WARNING] pause RX DMA fail\n");
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	/* Enable CPWM2 only. */
 	res = rtw_hal_enable_cpwm2(padapter);
 	if (res == _FAIL)
@@ -8290,7 +8290,7 @@ static void rtw_hal_wow_enable(_adapter *adapter)
 		}
 	}
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	/* Enable CPWM2 only. */
 	res = rtw_hal_enable_cpwm2(adapter);
 	if (res == _FAIL)

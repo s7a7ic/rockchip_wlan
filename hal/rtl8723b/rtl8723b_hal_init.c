@@ -2835,7 +2835,7 @@ u8 rtl8723b_MRateIdxToARFRId(PADAPTER padapter, u8 rate_idx)
 	return ret;
 }
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 void rtl8723b_cal_txdesc_chksum(struct tx_desc *ptxdesc)
 {
 	u16	*usPtr = (u16 *)ptxdesc;
@@ -2930,7 +2930,7 @@ void rtl8723b_fill_fake_txdesc(
 		}
 	}
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	/* USB interface drop packet if the checksum of descriptor isn't correct. */
 	/* Using this checksum can let hardware recovery from packet bulk out error (e.g. Cancel URC, Bulk out error.). */
 	rtl8723b_cal_txdesc_chksum((struct tx_desc *)pDesc);
@@ -3101,7 +3101,7 @@ s32 rtl8723b_InitLLTTable(PADAPTER padapter)
 	return ret;
 }
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 void _DisableGPIO(PADAPTER	padapter)
 {
 #if 0
@@ -3417,7 +3417,7 @@ s32 CardDisableWithoutHWSM(PADAPTER padapter)
 
 	return rtStatus;
 }
-#endif /* CONFIG_SDIO_HCI || CONFIG_GSPI_HCI */
+#endif /* CONFIG_SDIO_HCI */
 
 void
 Hal_InitPGData(
@@ -4116,7 +4116,7 @@ static void rtl8723b_fill_default_txdesc(
 				FUNC_ADPT_ARG(padapter), pattrib->ether_type, MRateToHwRate(pmlmeext->tx_rate));
 		}
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 		SET_TX_DESC_USB_TXAGG_NUM_8723B(pbuf, pxmitframe->agg_num);
 #endif
 
@@ -4227,7 +4227,7 @@ void rtl8723b_update_txdesc(struct xmit_frame *pxmitframe, u8 *pbuf)
 	odm_set_tx_ant_by_tx_info(&GET_HAL_DATA(padapter)->odmpriv, pbuf, pxmitframe->attrib.mac_id);
 #endif /* CONFIG_ANTENNA_DIVERSITY */
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	rtl8723b_cal_txdesc_chksum((struct tx_desc *)pbuf);
 #endif
 }
@@ -5590,7 +5590,7 @@ void Hal_DetectWoWMode(PADAPTER pAdapter)
 
 void rtl8723b_start_thread(_adapter *padapter)
 {
-#if (defined CONFIG_SDIO_HCI) || (defined CONFIG_GSPI_HCI)
+#if (defined CONFIG_SDIO_HCI)
 #ifndef CONFIG_SDIO_TX_TASKLET
 	struct xmit_priv *xmitpriv = &padapter->xmitpriv;
 
@@ -5605,7 +5605,7 @@ void rtl8723b_start_thread(_adapter *padapter)
 
 void rtl8723b_stop_thread(_adapter *padapter)
 {
-#if (defined CONFIG_SDIO_HCI) || (defined CONFIG_GSPI_HCI)
+#if (defined CONFIG_SDIO_HCI)
 #ifndef CONFIG_SDIO_TX_TASKLET
 	struct xmit_priv *xmitpriv = &padapter->xmitpriv;
 

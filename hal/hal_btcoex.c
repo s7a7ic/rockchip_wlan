@@ -2411,7 +2411,7 @@ u8 EXhalbtcoutsrc_InitlizeVariables(void *padapter)
 
 	halbtcoutsrc_coex_offload_init();
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 	pBtCoexist->chip_interface = BTC_INTF_SDIO;
 #else
 	pBtCoexist->chip_interface = BTC_INTF_UNKNOWN;

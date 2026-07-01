@@ -208,7 +208,7 @@ u8 rtw_mi_check_pending_xmitbuf(_adapter *padapter);
 u8 rtw_mi_buddy_check_pending_xmitbuf(_adapter *padapter);
 #endif
 
-#if defined(CONFIG_SDIO_HCI) || defined(CONFIG_GSPI_HCI)
+#if defined(CONFIG_SDIO_HCI)
 #ifdef CONFIG_RTL8822B
 	#include <rtl8822b_hal.h>
 #else
